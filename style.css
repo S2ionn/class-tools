@@ -1,0 +1,54 @@
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --text: #1f2328;
+  --muted: #6b7078;
+  --line: #e2e0d8;
+  --accent: #2f6fdb;
+  --accent-soft: #e6eefc;
+  --ok: #1f8a4c;
+  --bad: #c9372c;
+  --radius: 12px;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181b;
+    --surface: #212328;
+    --text: #e8e9eb;
+    --muted: #9a9ea6;
+    --line: #34373d;
+    --accent: #6c9cf0;
+    --accent-soft: #263552;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.55; }
+a { color: var(--accent); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+header.top { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+header.top a.home { text-decoration: none; color: var(--muted); font-size: 14px; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 24px 0 8px; }
+.muted { color: var(--muted); font-size: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+a.tool { display: block; text-decoration: none; color: inherit; transition: transform .1s, border-color .1s; }
+a.tool:hover { transform: translateY(-2px); border-color: var(--accent); }
+a.tool .emoji { font-size: 36px; }
+label { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 4px; }
+input[type=text], input[type=number], textarea, select {
+  width: 100%; font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+}
+textarea { min-height: 220px; font-family: ui-monospace, Consolas, monospace; font-size: 14px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1 1 160px; }
+button, .btn {
+  font: inherit; font-weight: 600; cursor: pointer; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text); border-radius: 8px; padding: 9px 16px;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.danger { color: var(--bad); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.hidden { display: none !important; }

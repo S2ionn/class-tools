@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>단어 테스트지</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .sheet { background: #fff; color: #111; padding: 32px 36px; border-radius: var(--radius); margin-top: 24px; border: 1px solid var(--line); }
+  .sheet h3 { text-align: center; font-size: 22px; margin: 0 0 4px; }
+  .sheet .meta { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 16px; }
+  .sheet ol { columns: 2; column-gap: 32px; margin: 0; padding-left: 28px; }
+  .sheet li { break-inside: avoid; padding: 6px 0; border-bottom: 1px dotted #bbb; font-size: 15px; }
+  .sheet li .blank { display: inline-block; min-width: 45%; }
+  .sheet li .ans { color: #c9372c; font-weight: 600; }
+  @media print {
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .wrap { max-width: none; padding: 0; }
+    .sheet { border: none; padding: 0; margin: 0; border-radius: 0; }
+    .sheet + .sheet { break-before: page; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top no-print"><a class="home" href="index.html">← 수업 도구 모음</a></header>
+  <div class="no-print">
+    <h1>단어 테스트지 만들기</h1>
+    <p class="muted">한 줄에 하나씩 <b>영어 단어 · 뜻</b> 순서로 붙여넣어 주세요. 탭, 쉼표, 하이픈(-), 콜론(:) 중 하나로 나누면 돼요. 엑셀에서 두 칸을 복사해 붙여넣어도 돼요.</p>
+
+    <div class="card">
+      <label for="words">단어 목록</label>
+      <textarea id="words" placeholder="abandon	버리다&#10;absorb - 흡수하다&#10;accurate, 정확한"></textarea>
+      <p class="muted" id="count">0개</p>
+
+      <div class="row">
+        <div><label for="title">시험지 제목</label><input type="text" id="title" value="영어 단어 테스트"></div>
+        <div><label for="sub">범위 (예: Day 25-30)</label><input type="text" id="sub" value=""></div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="mode">문제 유형</label>
+          <select id="mode">
+            <option value="meaning">뜻 쓰기 (영어 → 한글)</option>
+            <option value="english">영어 쓰기 (한글 → 영어)</option>
+            <option value="mixed">혼합 (반반)</option>
+          </select>
+        </div>
+        <div><label for="num">문제 수 (비우면 전부)</label><input type="number" id="num" min="1" placeholder="전부"></div>
+        <div>
+          <label for="order">순서</label>
+          <select id="order"><option value="shuffle">섞기</option><option value="keep">입력 순서대로</option></select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="make">시험지 만들기</button>
+        <button id="print" disabled>인쇄 / PDF 저장</button>
+      </div>
+      <p class="muted">PDF로 저장하려면 인쇄 창에서 대상(프린터)을 <b>PDF로 저장</b>으로 고르세요. 시험지 다음 장에 답지가 붙어 나와요.</p>
+    </div>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const STORE = 'wordtest:v1';
+
+function parse(text) {
+  return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => {
+    const m = l.match(/^(.+?)\s*(?:\t|,|\s-\s|:|\s{2,})\s*(.+)$/) || l.match(/^([A-Za-z][A-Za-z' .-]*?)\s+(.*[^\x00-\x7F].*)$/);
+    return m ? { en: m[1].trim(), ko: m[2].trim() } : null;
+  }).filter(Boolean);
+}
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function esc(s) { return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function sheet(items, answers) {
+  const t = esc($('title').value || '영어 단어 테스트');
+  const sub = esc($('sub').value);
+  const lis = items.map(it => {
+    const q = it.ask === 'meaning' ? it.en : it.ko;
+    const a = it.ask === 'meaning' ? it.ko : it.en;
+    return `<li><b>${esc(q)}</b> &nbsp;<span class="blank">${answers ? `<span class="ans">${esc(a)}</span>` : ''}</span></li>`;
+  }).join('');
+  return `<section class="sheet">
+    <h3>${t}${answers ? ' — 답지' : ''}</h3>
+    <div class="meta"><span>${sub}</span><span>이름: ____________ &nbsp; 점수: ______ / ${items.length}</span></div>
+    <ol>${lis}</ol></section>`;
+}
+
+function make() {
+  let list = parse($('words').value);
+  if (!list.length) { alert('단어를 먼저 붙여넣어 주세요.'); return; }
+  if ($('order').value === 'shuffle') list = shuffle(list);
+  const n = parseInt($('num').value, 10);
+  if (n > 0) list = list.slice(0, n);
+  const mode = $('mode').value;
+  const askFlags = mode === 'mixed' ? shuffle(list.map((_, i) => i % 2 === 0)) : null;
+  const items = list.map((w, i) => ({ ...w, ask: mode === 'mixed' ? (askFlags[i] ? 'meaning' : 'english') : mode }));
+  $('out').innerHTML = sheet(items, false) + sheet(items, true);
+  $('print').disabled = false;
+  $('out').scrollIntoView({ behavior: 'smooth' });
+}
+
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify({ words: $('words').value, title: $('title').value, sub: $('sub').value })); } catch (e) {}
+  $('count').textContent = parse($('words').value).length + '개 인식됨';
+}
+
+try {
+  const s = JSON.parse(localStorage.getItem(STORE) || 'null');
+  if (s) { $('words').value = s.words || ''; $('title').value = s.title || $('title').value; $('sub').value = s.sub || ''; }
+} catch (e) {}
+save();
+['words', 'title', 'sub'].forEach(id => $(id).addEventListener('input', save));
+$('make').addEventListener('click', make);
+$('print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
