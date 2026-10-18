@@ -6,18 +6,32 @@
 <title>단어 테스트지</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  .sheet { background: #fff; color: #111; padding: 32px 36px; border-radius: var(--radius); margin-top: 24px; border: 1px solid var(--line); }
-  .sheet h3 { text-align: center; font-size: 22px; margin: 0 0 4px; }
-  .sheet .meta { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 16px; }
-  .sheet ol { columns: 2; column-gap: 32px; margin: 0; padding-left: 28px; }
-  .sheet li { break-inside: avoid; padding: 6px 0; border-bottom: 1px dotted #bbb; font-size: 15px; }
+  /* 시험지 안의 크기는 모두 em 단위 → .sheet 글자 크기 하나로 전체가 같이 커지고 작아짐 */
+  .sheet { background: #fff; color: #111; padding: 32px 36px; border-radius: var(--radius); margin-top: 24px; border: 1px solid var(--line); font-size: 15px; }
+  .sheet h3 { text-align: center; font-size: 1.47em; margin: 0 0 .27em; }
+  .sheet .meta { display: flex; justify-content: space-between; gap: 1em; flex-wrap: wrap; font-size: .93em; border-bottom: 2px solid #111; padding-bottom: .57em; margin-bottom: 1.14em; }
+  .sheet ol { columns: 2; column-gap: 2.1em; margin: 0; padding-left: 1.9em; }
+  .sheet li { break-inside: avoid; padding: .4em 0; border-bottom: 1px dotted #bbb; }
   .sheet li .blank { display: inline-block; min-width: 45%; }
-  .sheet li .ans { color: #c9372c; font-weight: 600; }
+  .sheet .ans { color: #c9372c; font-weight: 600; }
+  .sheet .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .1em .8em; font-size: .93em; margin-top: .15em; }
+  .sheet .key { font-size: .93em; margin: 0 0 .8em; word-break: keep-all; }
+  .measure { position: absolute; left: -10000px; top: 0; width: 186mm; visibility: hidden; }
+  .measure .sheet { border: none; padding: 0; margin: 0; border-radius: 0; }
+  label.check { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 16px; }
+  label.check input { width: 18px; height: 18px; margin: 0; }
+  @media screen and (max-width: 480px) {
+    .sheet { padding: 20px 16px; }
+    .sheet ol { columns: 1; }
+  }
+  /* '한 장에 맞추기' 계산은 A4(210×297mm)에서 여백 12mm를 뺀 186×273mm 기준 */
+  @page { size: A4; margin: 12mm; }
   @media print {
     body { background: #fff; }
     .no-print { display: none !important; }
     .wrap { max-width: none; padding: 0; }
     .sheet { border: none; padding: 0; margin: 0; border-radius: 0; }
+    .fit .sheet { font-size: var(--pfs, 15px); }
     .sheet + .sheet { break-before: page; }
   }
 </style>
@@ -45,6 +59,7 @@
             <option value="meaning">뜻 쓰기 (영어 → 한글)</option>
             <option value="english">영어 쓰기 (한글 → 영어)</option>
             <option value="mixed">혼합 (반반)</option>
+            <option value="choice">객관식 (4지선다, 영어 → 뜻)</option>
           </select>
         </div>
         <div><label for="num">문제 수 (비우면 전부)</label><input type="number" id="num" min="1" placeholder="전부"></div>
@@ -53,6 +68,8 @@
           <select id="order"><option value="shuffle">섞기</option><option value="keep">입력 순서대로</option></select>
         </div>
       </div>
+      <label class="check"><input type="checkbox" id="fit"> 한 장에 맞추기 (A4 한 장에 들어가게 인쇄 글자 크기 자동 조절)</label>
+      <p class="muted" id="fitMsg"></p>
       <div class="actions">
         <button class="primary" id="make">시험지 만들기</button>
         <button id="print" disabled>인쇄 / PDF 저장</button>
@@ -67,6 +84,7 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const STORE = 'wordtest:v1';
+const NUM = ['①', '②', '③', '④'];
 
 function parse(text) {
   return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => {
@@ -87,6 +105,10 @@ function sheet(items, answers) {
   const t = esc($('title').value || '영어 단어 테스트');
   const sub = esc($('sub').value);
   const lis = items.map(it => {
+    if (it.ask === 'choice') {
+      const opts = it.opts.map((o, k) => `<span${answers && k === it.answer ? ' class="ans"' : ''}>${NUM[k]} ${esc(o)}</span>`).join('');
+      return `<li><b>${esc(it.en)}</b>${answers ? ` &nbsp;<span class="ans">정답 ${NUM[it.answer]}</span>` : ''}<div class="opts">${opts}</div></li>`;
+    }
     const q = it.ask === 'meaning' ? it.en : it.ko;
     const a = it.ask === 'meaning' ? it.ko : it.en;
     return `<li><b>${esc(q)}</b> &nbsp;<span class="blank">${answers ? `<span class="ans">${esc(a)}</span>` : ''}</span></li>`;
@@ -94,36 +116,88 @@ function sheet(items, answers) {
   return `<section class="sheet">
     <h3>${t}${answers ? ' — 답지' : ''}</h3>
     <div class="meta"><span>${sub}</span><span>이름: ____________ &nbsp; 점수: ______ / ${items.length}</span></div>
+    ${answers && items.some(it => it.ask === 'choice') ? `<p class="key"><b>빠른 정답</b> &nbsp;${items.map((it, i) => it.ask === 'choice' ? `${i + 1}.${NUM[it.answer]}` : '').filter(Boolean).join(' &nbsp;')}</p>` : ''}
     <ol>${lis}</ol></section>`;
 }
 
+// 객관식 보기: 정답 뜻 + 같은 목록의 다른 단어 뜻 3개 (같은 단어의 다른 뜻·중복 뜻은 제외)
+function choiceItem(w, all) {
+  const same = new Set(all.filter(x => x.en.toLowerCase() === w.en.toLowerCase()).map(x => x.ko));
+  const pool = [...new Set(all.map(x => x.ko))].filter(ko => !same.has(ko));
+  if (pool.length < 3) return null;
+  const opts = shuffle([w.ko, ...shuffle(pool).slice(0, 3)]);
+  return { ...w, ask: 'choice', opts, answer: opts.indexOf(w.ko) };
+}
+
 function make() {
-  let list = parse($('words').value);
+  const all = parse($('words').value);
+  let list = all;
   if (!list.length) { alert('단어를 먼저 붙여넣어 주세요.'); return; }
+  const mode = $('mode').value;
+  if (mode === 'choice' && all.length < 4) { alert(`객관식은 보기 4개를 다른 단어 뜻에서 뽑기 때문에 단어가 4개 이상 필요해요. (지금 ${all.length}개)`); return; }
   if ($('order').value === 'shuffle') list = shuffle(list);
   const n = parseInt($('num').value, 10);
   if (n > 0) list = list.slice(0, n);
-  const mode = $('mode').value;
-  const askFlags = mode === 'mixed' ? shuffle(list.map((_, i) => i % 2 === 0)) : null;
-  const items = list.map((w, i) => ({ ...w, ask: mode === 'mixed' ? (askFlags[i] ? 'meaning' : 'english') : mode }));
+  let items;
+  if (mode === 'choice') {
+    items = list.map(w => choiceItem(w, all));
+    const bad = list.find((w, i) => !items[i]);
+    if (bad) { alert(`'${bad.en}'의 보기를 만들 서로 다른 뜻이 부족해요. 뜻이 다른 단어를 더 넣어 주세요.`); return; }
+  } else {
+    const askFlags = mode === 'mixed' ? shuffle(list.map((_, i) => i % 2 === 0)) : null;
+    items = list.map((w, i) => ({ ...w, ask: mode === 'mixed' ? (askFlags[i] ? 'meaning' : 'english') : mode }));
+  }
   $('out').innerHTML = sheet(items, false) + sheet(items, true);
   $('print').disabled = false;
+  fit();
   $('out').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ---------- 한 장에 맞추기 ----------
+// 화면 밖에 인쇄 폭(186mm)으로 복사본을 놓고, 높이가 273mm 안에 들어가는 가장 큰 글자 크기를 찾는다
+const MM = 96 / 25.4, PAGE_H = 273 * MM * 0.96, FS_MAX = 15, FS_MIN = 7;
+function fit() {
+  const on = $('fit').checked;
+  const sheets = [...document.querySelectorAll('#out .sheet')];
+  $('out').classList.toggle('fit', on);
+  if (!on || !sheets.length) { $('fitMsg').textContent = ''; return; }
+  const box = document.createElement('div');
+  box.className = 'measure';
+  document.body.appendChild(box);
+  const sizes = sheets.map(s => {
+    const c = s.cloneNode(true);
+    box.replaceChildren(c);
+    const fits = (fs) => { c.style.fontSize = fs + 'px'; return c.offsetHeight <= PAGE_H; };
+    if (fits(FS_MAX)) return FS_MAX;
+    if (!fits(FS_MIN)) return -FS_MIN;
+    let lo = FS_MIN, hi = FS_MAX;
+    for (let k = 0; k < 10; k++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+    return Math.floor(lo * 10) / 10;
+  });
+  box.remove();
+  sheets.forEach((s, i) => s.style.setProperty('--pfs', Math.abs(sizes[i]) + 'px'));
+  const fs = Math.abs(sizes[0]);
+  $('fitMsg').textContent = sizes.some(x => x < 0)
+    ? `단어가 너무 많아 가장 작은 글자(${FS_MIN}px)로도 한 장에 다 들어가지 않아요. 문제 수를 줄여 주세요.`
+    : fs >= FS_MAX ? '이미 한 장에 들어가요. 글자 크기 그대로 인쇄해요.'
+    : `한 장에 맞게 인쇄 글자 크기를 ${fs}px로 줄였어요. (화면 미리보기는 그대로예요)`;
+}
+
 function save() {
-  try { localStorage.setItem(STORE, JSON.stringify({ words: $('words').value, title: $('title').value, sub: $('sub').value })); } catch (e) {}
+  try { localStorage.setItem(STORE, JSON.stringify({ words: $('words').value, title: $('title').value, sub: $('sub').value, fit: $('fit').checked })); } catch (e) {}
   $('count').textContent = parse($('words').value).length + '개 인식됨';
 }
 
 try {
   const s = JSON.parse(localStorage.getItem(STORE) || 'null');
-  if (s) { $('words').value = s.words || ''; $('title').value = s.title || $('title').value; $('sub').value = s.sub || ''; }
+  if (s) { $('words').value = s.words || ''; $('title').value = s.title || $('title').value; $('sub').value = s.sub || ''; $('fit').checked = !!s.fit; }
 } catch (e) {}
 save();
 ['words', 'title', 'sub'].forEach(id => $(id).addEventListener('input', save));
 $('make').addEventListener('click', make);
-$('print').addEventListener('click', () => window.print());
+$('fit').addEventListener('change', () => { save(); fit(); });
+$('print').addEventListener('click', () => { fit(); window.print(); });
+window.addEventListener('beforeprint', fit);
 </script>
 </body>
 </html>
