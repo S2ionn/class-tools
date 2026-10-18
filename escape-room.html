@@ -69,7 +69,7 @@ const SAMPLE = [
 let rooms = [];
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
-function norm(s) { return s.toLowerCase().replace(/[.!?]+$/,'').replace(/\s+/g, ' ').trim(); }
+function norm(s) { return s.toLowerCase().replace(/\s+/g, ' ').trim().replace(/\s*[.!?]+$/, ''); }
 
 function data() {
   return { title: $('gTitle').value, time: +$('gTime').value || 0, intro: $('gIntro').value, rooms };
