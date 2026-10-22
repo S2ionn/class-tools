@@ -867,6 +867,7 @@ function drawInk(){
 }
 function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720]; }
 ink.addEventListener("pointerdown", e=>{
+  if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   ink.setPointerCapture(e.pointerId);
   stroke = {t:tool, c:color, pts:[pos(e)]}; drawInk();
 });
