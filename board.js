@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-5";
+const VERSION = "2026-10-23-6";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -174,7 +174,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
   <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd></li>
-  <li><b>레이저</b> <kbd>L</kbd> 흔적 없이 가리키기 (상대 화면에도 보여요)</li>
+  <li><b>레이저</b> <kbd>L</kbd> 움직이면 빨간 점이 따라와요. 흔적은 바로 사라져요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
   <h4>꾹 누르기</h4>
@@ -468,16 +468,40 @@ function heartPts(l, t, w, h){
   for(let i=1;i<HEART.length;i++){ const [c1, c2, e] = HEART[i].map(m); out = out.concat(bez(cur0, c1, c2, e)); cur0 = e; }
   return out;
 }
-/* 별: 한 붓 그리기 별(꼭짓점 0→2→4→1→3→0)에 끝이 조금 더 나가게. 색연필이면 꼭짓점을 살짝 흔듦 */
+/* 별: 펜이면 반듯한 별. 색연필이면 한 붓 그리기 별(0→2→4→1→3→0)을 부드러운 곡선으로 —
+   꼭짓점을 지나쳤다 돌아와 열린 고리가 생기고, 마지막은 시작점을 지나서 끝남, 꼭짓점·획이 살짝 흔들림 */
+function catmull(pts, seg = 10){
+  const out = [[...pts[0], .5]];
+  for(let i=0;i<pts.length-1;i++){
+    const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || p2;
+    for(let s=1;s<=seg;s++){ const u = s/seg, u2 = u*u, u3 = u2*u;
+      out.push([.5*((2*p1[0]) + (-p0[0]+p2[0])*u + (2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*u2 + (-p0[0]+3*p1[0]-3*p2[0]+p3[0])*u3),
+                .5*((2*p1[1]) + (-p0[1]+p2[1])*u + (2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*u2 + (-p0[1]+3*p1[1]-3*p2[1]+p3[1])*u3), .5]); }
+  }
+  return out;
+}
 function starPts(l, t, w, h, hand){
   const cx = l + w/2, rx = w/1.902, ry = h/1.809, cy = t + ry, s = Math.max(w, h);
+  if(s < 6) return [];
   const v = [0,1,2,3,4].map(k=>{ const a = (-90 + 72*k) * Math.PI/180; return [cx + rx*Math.cos(a), cy + ry*Math.sin(a)]; });
-  const J = [[.02,-.03],[-.03,.02],[.03,.03],[-.02,-.02],[.02,.01]];
+  const J = [[.015,-.02],[-.02,.015],[.02,.02],[-.015,-.015],[.015,.01]];
   if(hand) v.forEach((q,k)=>{ q[0] += J[k][0]*s; q[1] += J[k][1]*s; });
-  const order = [0,2,4,1,3,0].map(k=>v[k]), last = order[4], end = order[5];
-  order[5] = [end[0] + (end[0]-last[0])*.14, end[1] + (end[1]-last[1])*.14];
-  let out = [[...order[0], .5]]; for(let i=1;i<order.length;i++) out = out.concat(sampleLine(order[i-1], order[i]).slice(1));
-  return out;
+  const order = [0,2,4,1,3,0].map(k=>v[k]);
+  if(!hand){ let out = [[...order[0], .5]]; for(let i=1;i<6;i++) out = out.concat(sampleLine(order[i-1], order[i]).slice(1)); return out; }   /* 펜: 깔끔한 별 */
+  const o = s*.085, bend = s*.018;
+  const dir = (a, b)=>{ const dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx, dy) || 1; return [dx/L, dy/L]; };
+  const d0 = dir(order[0], order[1]);
+  const pts = [[order[0][0] - d0[0]*o*.4, order[0][1] - d0[1]*o*.4]];
+  for(let i=1;i<=5;i++){
+    const A = order[i-1], T = order[i], dIn = dir(A, T);
+    const m = [(A[0]+T[0])/2 - dIn[1]*bend*(i%2 ? 1 : -1), (A[1]+T[1])/2 + dIn[0]*bend*(i%2 ? 1 : -1)];
+    pts.push(m);
+    if(i===5){ pts.push([T[0] + dIn[0]*o*1.5, T[1] + dIn[1]*o*1.5]); break; }   /* 마지막은 시작점을 지나서 끝 */
+    const dOut = dir(T, order[i+1]);
+    pts.push([T[0] + dIn[0]*o, T[1] + dIn[1]*o]);           /* 꼭짓점을 살짝 지나침 */
+    pts.push([T[0] - dOut[0]*o*.9 - dIn[0]*o*.15, T[1] - dOut[1]*o*.9 - dIn[1]*o*.15]);  /* 돌아와 다음 획 시작 → 열린 고리 */
+  }
+  return catmull(pts);
 }
 /* 손으로 그린 원: 살짝 기울고, 한 바퀴보다 조금 더 돌아 끝이 바깥으로 빠짐 */
 function handCircle(cx, cy, rx, ry){
@@ -592,7 +616,7 @@ ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
   const q = pos(e);
-  if(tool==="laser"){ laserDown = true; laserAt(q, true); return; }
+  if(tool==="laser"){ laserDown = true; laserAt(q); return; }
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
@@ -604,7 +628,7 @@ ink.addEventListener("pointerdown", e=>{
   drawInk();
 });
 ink.addEventListener("pointermove", e=>{
-  if(tool==="laser"){ laserAt(pos(e), laserDown); return; }
+  if(tool==="laser"){ laserAt(pos(e)); return; }
   if(!stroke) return;
   const q = pos(e);
   if(stroke.shape==="line"){
@@ -655,37 +679,46 @@ function clearInk(){ const k = skey(); INK[k] = []; REDO[k] = []; send({type:"cl
 
 /* ---------- 레이저·상대 커서 ---------- */
 const LASER = {};                                 /* 누구 → [{x,y,t}] */
-let laserDown = false, fxOn = false;
-function laserAt(q, trail){
+let laserDown = false, fxOn = false, lastLaser = 0;
+/* 레이저: 레이저 도구일 때 움직이기만 해도(누르지 않아도) 빨간 점이 따라오고 짧은 꼬리가 생겼다 사라짐 */
+function laserAt(q){
   const a = LASER.me ||= [];
-  if(!q){ LASER.me = []; send({type:"laser", who:ME, x:null}); return; }
-  if(!trail) a.length = 0;
+  if(!q){ LASER.me = []; send({type:"laser", who:ME, x:null}); kickFx(); return; }
   a.push({x:q[0], y:q[1], t:performance.now()});
-  if(conns.length && Date.now()-lastLaser > 30){ lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1], trail}); }
+  if(a.length > 80) a.splice(0, a.length-80);
+  if(conns.length && Date.now()-lastLaser > 16){ lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1]}); }
   kickFx();
 }
-let lastLaser = 0;
 function hideLaser(){ if(LASER.me && LASER.me.length){ LASER.me = []; send({type:"laser", who:ME, x:null}); kickFx(); } }
 function kickFx(){ if(!fxOn){ fxOn = true; requestAnimationFrame(drawFx); } }
 function drawFx(){
-  const now = performance.now(), LIFE = 650;
+  const now = performance.now(), LIFE = 420;
   fctx.setTransform(1,0,0,1,0,0); fctx.clearRect(0,0,fx.width,fx.height); fctx.setTransform(2,0,0,2,0,0);
   let alive = false;
   for(const who in LASER){
     const a = LASER[who]; while(a.length > 1 && now - a[0].t > LIFE) a.shift();
     if(!a.length) continue;
     alive = true;
-    fctx.lineCap = "round"; fctx.lineJoin = "round";
-    for(let i=1;i<a.length;i++){
-      const f = 1 - (now - a[i].t)/LIFE; if(f <= 0) continue;
-      fctx.strokeStyle = `rgba(255,40,40,${.55*f})`; fctx.lineWidth = 2 + 6*f;
-      fctx.beginPath(); fctx.moveTo(a[i-1].x, a[i-1].y); fctx.lineTo(a[i].x, a[i].y); fctx.stroke();
-    }
     const h = a[a.length-1];
-    const g = fctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 16);
-    g.addColorStop(0, "rgba(255,60,60,.95)"); g.addColorStop(.35, "rgba(255,30,30,.55)"); g.addColorStop(1, "rgba(255,0,0,0)");
-    fctx.fillStyle = g; fctx.beginPath(); fctx.arc(h.x, h.y, 16, 0, 7); fctx.fill();
-    fctx.fillStyle = "#fff"; fctx.beginPath(); fctx.arc(h.x, h.y, 2.6, 0, 7); fctx.fill();
+    if(a.length > 1){                              /* 꼬리: 한 줄로 매끈하게, 끝으로 갈수록 투명하게 */
+      const tl = a[0];
+      fctx.save(); fctx.lineCap = "round"; fctx.lineJoin = "round";
+      fctx.beginPath(); fctx.moveTo(tl.x, tl.y);
+      for(let i=1;i<a.length-1;i++){ const mx = (a[i].x+a[i+1].x)/2, my = (a[i].y+a[i+1].y)/2; fctx.quadraticCurveTo(a[i].x, a[i].y, mx, my); }
+      fctx.lineTo(h.x, h.y);
+      const gr = fctx.createLinearGradient(tl.x, tl.y, h.x, h.y);
+      gr.addColorStop(0, "rgba(255,40,40,0)"); gr.addColorStop(1, "rgba(255,40,40,.5)");
+      fctx.strokeStyle = gr; fctx.lineWidth = 9; fctx.shadowColor = "rgba(255,0,0,.6)"; fctx.shadowBlur = 12; fctx.stroke();
+      const gc = fctx.createLinearGradient(tl.x, tl.y, h.x, h.y);
+      gc.addColorStop(0, "rgba(255,90,90,0)"); gc.addColorStop(1, "rgba(255,70,70,.95)");
+      fctx.strokeStyle = gc; fctx.lineWidth = 3.2; fctx.shadowBlur = 0; fctx.stroke();
+      fctx.restore();
+    }
+    fctx.save();                                   /* 머리: 빛나는 빨간 점 */
+    fctx.shadowColor = "rgba(255,0,0,.9)"; fctx.shadowBlur = 18;
+    fctx.fillStyle = "#ff2b2b"; fctx.beginPath(); fctx.arc(h.x, h.y, 5.5, 0, 7); fctx.fill();
+    fctx.shadowBlur = 0; fctx.fillStyle = "rgba(255,235,235,.95)"; fctx.beginPath(); fctx.arc(h.x, h.y, 2.2, 0, 7); fctx.fill();
+    fctx.restore();
   }
   if(alive) requestAnimationFrame(drawFx); else fxOn = false;
 }
@@ -808,7 +841,7 @@ function apply(msg, from){
   else if(t==="cur"){ showRcur(msg); }
   else if(t==="laser"){
     const a = LASER[msg.who] ||= [];
-    if(msg.x==null) a.length = 0; else { if(!msg.trail) a.length = 0; a.push({x:msg.x, y:msg.y, t:performance.now()}); }
+    if(msg.x==null) a.length = 0; else { a.push({x:msg.x, y:msg.y, t:performance.now()}); if(a.length > 80) a.splice(0, a.length-80); }
     kickFx();
   }
   if(isHost && t!=="sync") send(msg, from);
