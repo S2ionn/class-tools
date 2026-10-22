@@ -120,6 +120,9 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 #pen button.c{width:30px;height:30px;padding:0;border-radius:50%;border:3px solid transparent}
 #pen button.on{outline:3px solid #fff;outline-offset:1px}
 #pen .sep{width:1px;height:24px;background:#4a5263;margin:0 2px}
+#pen #colors,#pen #sizes{display:flex;gap:6px;align-items:center}
+#pen button.s{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center}
+#pen button.s i{display:block;border-radius:50%;background:#fff}
 #ui button.on{background:#e8633a;color:#fff}
 
 @media print{
@@ -138,13 +141,12 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 <div id="stage"></div>
 <canvas id="ink" width="2560" height="1440"></canvas>
 <div id="pen">
-  <button class="c on" style="background:#e5322d" data-c="#e5322d" title="빨강"></button>
-  <button class="c" style="background:#2563eb" data-c="#2563eb" title="파랑"></button>
-  <button class="c" style="background:#16a34a" data-c="#16a34a" title="초록"></button>
-  <button class="c" style="background:#111827;border-color:#6b7280" data-c="#111827" title="검정"></button>
+  <span id="colors"></span>
+  <span class="sep"></span>
+  <span id="sizes"></span>
   <span class="sep"></span>
   <button data-t="pen" class="on" title="펜">펜</button>
-  <button data-t="hl" title="형광펜">형광펜</button>
+  <button data-t="hl" title="형광펜 (곧은 선)">형광펜</button>
   <button data-t="er" title="지우개 (E)">지우개</button>
   <span class="sep"></span>
   <button onclick="undoInk()" title="되돌리기 (Ctrl+Z)">되돌리기</button>
@@ -835,23 +837,44 @@ function fit(){
 /* ---------- 판서 : 슬라이드마다 따로 저장 ---------- */
 const ink = document.getElementById("ink"), ctx = ink.getContext("2d");
 const INK = {};                                   /* 슬라이드 번호 → 획 목록 */
-let tool = "pen", color = "#e5322d", stroke = null;
-const W = {pen:4, hl:24, er:40};
+/* 펜과 형광펜은 색 목록이 따로, 굵기는 도구마다 따로 기억 */
+const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
+const SIZES = {pen:[2,4,7,11], hl:[14,24,36], er:[20,40,80]};
+const sel = {pen:{c:0,s:1}, hl:{c:0,s:1}, er:{s:1}};
+let tool = "pen", stroke = null;
+const palOf = t => t==="hl" ? "hl" : "pen";
 function togglePen(){
   document.body.classList.toggle("drawing");
   document.getElementById("penBtn").classList.toggle("on", document.body.classList.contains("drawing"));
 }
-function setTool(t){
-  tool = t;
-  document.body.classList.toggle("er", t==="er");
-  document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===t));
+function buildBar(){
+  const k = palOf(tool);
+  document.getElementById("colors").innerHTML = PAL[k].map((c,i)=>
+    `<button class="c${tool!=="er"&&sel[k].c===i?" on":""}" data-c="${i}" style="background:${c}${c==="#111827"?";border-color:#6b7280":""}"></button>`).join("");
+  const ws = SIZES[tool], hc = PAL.hl[sel.hl.c];
+  document.getElementById("sizes").innerHTML = ws.map((w,i)=>{
+    const d = Math.round(5 + i*17/(ws.length-1));      /* 버튼 안 점 크기 5~22px */
+    const look = tool==="hl" ? `width:22px;height:${Math.max(4,d-4)}px;border-radius:2px;background:${hc}`
+               : tool==="er" ? `width:${d}px;height:${d}px;background:none;border:2px solid #fff`
+               : `width:${d}px;height:${d}px;background:${PAL.pen[sel.pen.c]}${sel.pen.c===3?";box-shadow:0 0 0 1px #fff":""}`;
+    return `<button class="s${sel[tool].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
+  }).join("");
+  document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===tool));
+  document.body.classList.toggle("er", tool==="er");
 }
+function setTool(t){ tool = t; buildBar(); }
+document.getElementById("pen").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.t) setTool(b.dataset.t);
+  else if(b.dataset.c){ if(tool==="er") tool = "pen"; sel[palOf(tool)].c = +b.dataset.c; buildBar(); }
+  else if(b.dataset.s){ sel[tool].s = +b.dataset.s; buildBar(); }
+});
 function paint(st){
   const p = st.pts;
   ctx.save();
   ctx.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
-  ctx.globalAlpha = st.t==="hl" ? .35 : 1;
-  ctx.strokeStyle = st.c; ctx.lineWidth = W[st.t];
+  ctx.globalAlpha = st.t==="hl" ? .45 : 1;
+  ctx.strokeStyle = st.c; ctx.lineWidth = st.w;
   ctx.lineCap = st.t==="hl" ? "butt" : "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
   if(p.length===1) ctx.lineTo(p[0][0]+.1, p[0][1]);
@@ -869,23 +892,28 @@ function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.lef
 ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   ink.setPointerCapture(e.pointerId);
-  stroke = {t:tool, c:color, pts:[pos(e)]}; drawInk();
+  const c = tool==="er" ? "#000" : PAL[palOf(tool)][sel[palOf(tool)].c];
+  stroke = {t:tool, c, w:SIZES[tool][sel[tool].s], pts:[pos(e)]}; drawInk();
 });
 ink.addEventListener("pointermove", e=>{
   if(!stroke) return;
-  (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(ev=>stroke.pts.push(pos(ev)));
+  if(stroke.t==="hl"){                             /* 형광펜은 시작점에서 곧은 선, 거의 수평이면 딱 수평으로 */
+    const [x0,y0] = stroke.pts[0]; let [x,y] = pos(e);
+    if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
+    stroke.pts = [[x0,y0],[x,y]];
+  } else (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(ev=>stroke.pts.push(pos(ev)));
   drawInk();
 });
-const endStroke = ()=>{ if(!stroke) return; (INK[cur] ||= []).push(stroke); stroke = null; drawInk(); };
+const endStroke = ()=>{
+  if(!stroke) return;
+  if(stroke.t!=="hl" || stroke.pts.length>1) (INK[cur] ||= []).push(stroke);   /* 형광펜은 클릭만 하면 버림 */
+  stroke = null; drawInk();
+};
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
 function undoInk(){ (INK[cur]||[]).pop(); drawInk(); }
 function clearInk(){ INK[cur] = []; drawInk(); }
-document.querySelectorAll("#pen .c").forEach(b=>b.addEventListener("click",()=>{
-  color = b.dataset.c; if(tool==="er") setTool("pen");
-  document.querySelectorAll("#pen .c").forEach(x=>x.classList.toggle("on", x===b));
-}));
-document.querySelectorAll("#pen [data-t]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.t)));
+buildBar();
 function tg(c){ document.body.classList.toggle(c); }
 function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
 addEventListener("resize", fit);
