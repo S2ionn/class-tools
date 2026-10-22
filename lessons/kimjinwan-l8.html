@@ -167,6 +167,9 @@ table.cmp{font-size:19px}table.cmp th{font-size:16px}
 #pen button.c{width:20px;height:20px;padding:0;margin:0 3px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);transition:transform .15s}
 #pen button.c:hover{transform:scale(1.12)}
 #pen button.c.on{box-shadow:0 0 0 2px #1d2433,0 0 0 3.5px #fff}
+#pen .pick{position:relative;display:block;width:20px;height:20px;margin:0 3px;border-radius:50%;cursor:pointer;background:conic-gradient(#ff4d4d,#ffd84d,#5ee35e,#4dd8ff,#5b6bff,#e44dff,#ff4d4d);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .15s}
+#pen .pick:hover{transform:scale(1.12)}
+#pen .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
 #pen button.s{width:28px;padding:0;justify-content:center}
 #pen button.s.on{background:rgba(255,255,255,.16)}
 #pen button.s i{display:block;border-radius:50%}
@@ -974,17 +977,31 @@ const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[20,40,80]};
 const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:1}};
 let tool = "pen", stroke = null;
 const palOf = t => t==="hl" || t==="pc" ? t : "pen";
-/* 색연필 : 같은 색이면 늘 같은 거친 입자 무늬(두 기기에서 똑같이 보이도록 고정된 난수) */
-const GRAIN = {};
+/* 색연필 : 종이 결 무늬(여러 겹의 잡음)를 색으로 칠해 씀. 같은 색이면 두 기기에서 늘 같은 무늬 */
+const GRAIN = {}, CUSTOM = {};
+const colorOf = k => sel[k].c < PAL[k].length ? PAL[k][sel[k].c] : (CUSTOM[k] || PAL[k][0]);
+const PAPER = (()=>{                              /* 0~1 종이 결 값 (128×128, 이어 붙여도 이음새 없음) */
+  const N = 128, out = new Float32Array(N*N);
+  let s = 20261023; const rnd = ()=> (s = (s*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const grid = g => { const a = Array.from({length:g*g}, rnd);
+    return (x, y)=>{ const fx = x/N*g, fy = y/N*g, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx-x0, ty = fy-y0;
+      const v = (i, j)=>a[((j+g)%g)*g + (i+g)%g];
+      return (v(x0,y0)*(1-tx) + v(x0+1,y0)*tx)*(1-ty) + (v(x0,y0+1)*(1-tx) + v(x0+1,y0+1)*tx)*ty; }; };
+  const n8 = grid(8), n32 = grid(32), n64 = grid(64);
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+    const streak = .5 + .5*Math.sin((x*.9 + y*.35) + n8(x,y)*6);   /* 비스듬한 종이 섬유 결 */
+    out[y*N+x] = .34*rnd() + .26*n64(x,y) + .2*n32(x,y) + .1*n8(x,y) + .1*streak;
+  }
+  return out;
+})();
 function grain(c){
   if(GRAIN[c]) return GRAIN[c];
-  const N = 96, cv = document.createElement("canvas"); cv.width = cv.height = N;
+  const N = 128, cv = document.createElement("canvas"); cv.width = cv.height = N;
   const g = cv.getContext("2d"), img = g.createImageData(N, N);
   const [r, gg, b] = [1,3,5].map(i=>parseInt(c.slice(i, i+2), 16));
-  let s = 12345; const rnd = ()=> (s = (s*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
   for(let i=0;i<N*N;i++){
-    const v = rnd(), a = v < .38 ? 0 : v < .6 ? 110 + rnd()*60 : 190 + rnd()*65;   /* 빈틈 + 옅은 입자 + 진한 입자 */
-    img.data.set([r, gg, b, a], i*4);
+    const a = Math.max(0, Math.min(1, (PAPER[i] - .36) * 3.2));   /* 결이 높은 곳에만 색이 묻음 */
+    img.data.set([r, gg, b, a*255], i*4);
   }
   g.putImageData(img, 0, 0);
   const p = ctx.createPattern(cv, "repeat");
@@ -995,22 +1012,34 @@ function togglePen(){
   document.body.classList.toggle("drawing");
   document.getElementById("penBtn").classList.toggle("on", document.body.classList.contains("drawing"));
 }
+let shownK = "";
 function buildBar(){
-  const k = palOf(tool);
-  document.getElementById("colors").innerHTML = PAL[k].map((c,i)=>
-    `<button class="c${tool!=="er"&&sel[k].c===i?" on":""}" data-c="${i}" style="background:${c}"></button>`).join("");
-  const ws = SIZES[tool], hc = PAL.hl[sel.hl.c];
+  const k = palOf(tool), box = document.getElementById("colors");
+  if(k!==shownK){                                 /* 도구의 색 목록이 바뀔 때만 다시 그림 (색 고르는 창이 닫히지 않게) */
+    shownK = k;
+    box.innerHTML = PAL[k].map((c,i)=>`<button class="c" data-c="${i}" style="background:${c}"></button>`).join("")
+      + `<button class="c" data-c="${PAL[k].length}" title="직접 고른 색"></button>`
+      + `<label class="pick" title="색 직접 고르기"><input type="color" value="${colorOf(k)}"></label>`;
+  }
+  const cs = box.querySelectorAll(".c"), cu = cs[cs.length-1];
+  cu.style.display = CUSTOM[k] ? "" : "none"; if(CUSTOM[k]) cu.style.background = CUSTOM[k];
+  cs.forEach((b,i)=>b.classList.toggle("on", tool!=="er" && sel[k].c===i));
+  const ws = SIZES[tool], hc = colorOf("hl"), cc = colorOf(k);
   document.getElementById("sizes").innerHTML = ws.map((w,i)=>{
     const d = Math.round(4 + i*12/(ws.length-1));      /* 버튼 안 점 크기 4~16px */
-    const k = palOf(tool), cc = PAL[k][sel[k].c];
     const look = tool==="hl" ? `width:18px;height:${Math.max(4,d-3)}px;border-radius:2px;background:${hc}`
                : tool==="er" ? `width:${d}px;height:${d}px;background:none;border:2px solid #fff`
-               : `width:${d}px;height:${d}px;background:${cc}${cc==="#111827"?";box-shadow:0 0 0 1px #fff":""}`;
+               : `width:${d}px;height:${d}px;background:${cc};box-shadow:0 0 0 1px rgba(255,255,255,.35)`;
     return `<button class="s${sel[tool].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
   }).join("");
   document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===tool));
   document.body.classList.toggle("er", tool==="er");
 }
+document.getElementById("pen").addEventListener("input", e=>{
+  if(e.target.type!=="color") return;
+  if(tool==="er") tool = "pen";
+  const k = palOf(tool); CUSTOM[k] = e.target.value; sel[k].c = PAL[k].length; buildBar();
+});
 function setTool(t){ tool = t; buildBar(); }
 document.getElementById("pen").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
@@ -1018,32 +1047,67 @@ document.getElementById("pen").addEventListener("click", e=>{
   else if(b.dataset.c){ if(tool==="er") tool = "pen"; sel[palOf(tool)].c = +b.dataset.c; buildBar(); }
   else if(b.dataset.s){ sel[tool].s = +b.dataset.s; buildBar(); }
 });
-function paint(st){
-  const p = st.pts;
-  ctx.save();
-  ctx.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
-  ctx.globalAlpha = st.t==="hl" ? .45 : st.t==="pc" ? .9 : 1;
-  ctx.strokeStyle = st.t==="pc" ? grain(st.c) : st.c; ctx.lineWidth = st.w;
-  ctx.lineCap = st.t==="hl" ? "butt" : "round"; ctx.lineJoin = "round";
-  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
-  if(p.length===1) ctx.lineTo(p[0][0]+.1, p[0][1]);
-  for(let i=1;i<p.length-1;i++){ const mx=(p[i][0]+p[i+1][0])/2, my=(p[i][1]+p[i+1][1])/2; ctx.quadraticCurveTo(p[i][0],p[i][1],mx,my); }
-  if(p.length>1) ctx.lineTo(p[p.length-1][0], p[p.length-1][1]);
-  ctx.stroke(); ctx.restore();
+/* 색연필 한 획 = 가는 여러 가닥. 가닥마다 살짝 흔들리고, 펜 압력(마우스는 보통)에 따라 진하기가 달라짐 */
+function paintPencil(st, g){
+  const p = st.pts, w = st.w;
+  let seed = 7; for(const ch of String(st.id||"")) seed = (seed*31 + ch.charCodeAt(0)) % 9973;
+  const h = (k, i)=>{ const v = Math.sin(k*12.9898 + i*78.233 + seed*.618) * 43758.5453; return v - Math.floor(v); };
+  const nrm = p.map((q,i)=>{ const a = p[Math.max(0,i-1)], b = p[Math.min(p.length-1,i+1)];
+    const dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx,dy) || 1; return [-dy/L, dx/L]; });
+  const K = Math.max(3, Math.round(w*.8));
+  g.save();
+  g.strokeStyle = g.fillStyle = grain(st.c); g.lineCap = "round"; g.lineJoin = "round";
+  g.lineWidth = Math.max(1.1, w/K*1.7);
+  for(let k=0;k<K;k++){
+    const off = (k/(K-1) - .5) * w * .85, shade = .75 + .35*h(k, -1);
+    const at = i=>{ const j = (h(k, i) - .5) * w * .16;
+      return [p[i][0] + nrm[i][0]*(off+j), p[i][1] + nrm[i][1]*(off+j)]; };
+    if(p.length===1){ const [x,y] = at(0); g.globalAlpha = .7*shade; g.beginPath(); g.arc(x, y, g.lineWidth/2, 0, 7); g.fill(); continue; }
+    for(let s=0; s<p.length-1; s+=6){             /* 6점씩 끊어서 압력에 맞는 진하기로 */
+      const e = Math.min(p.length-1, s+6);
+      let pr = 0; for(let i=s;i<=e;i++) pr += (p[i][2] ?? .5); pr /= (e-s+1);
+      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade);
+      g.beginPath(); const a = at(s); g.moveTo(a[0], a[1]);
+      for(let i=s+1;i<=e;i++){ const b = at(i); g.lineTo(b[0], b[1]); }
+      g.stroke();
+    }
+  }
+  g.restore();
 }
+function paint(st, g = ctx){
+  if(st.t==="pc") return paintPencil(st, g);
+  const p = st.pts;
+  g.save();
+  g.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
+  g.globalAlpha = st.t==="hl" ? .45 : 1;
+  g.strokeStyle = st.c; g.lineWidth = st.w;
+  g.lineCap = st.t==="hl" ? "butt" : "round"; g.lineJoin = "round";
+  g.beginPath(); g.moveTo(p[0][0], p[0][1]);
+  if(p.length===1) g.lineTo(p[0][0]+.1, p[0][1]);
+  for(let i=1;i<p.length-1;i++){ const mx=(p[i][0]+p[i+1][0])/2, my=(p[i][1]+p[i+1][1])/2; g.quadraticCurveTo(p[i][0],p[i][1],mx,my); }
+  if(p.length>1) g.lineTo(p[p.length-1][0], p[p.length-1][1]);
+  g.stroke(); g.restore();
+}
+/* 다 그은 획은 따로 한 장에 모아 두고, 긋는 중에는 그 장 + 지금 획만 다시 그림 (색연필이 많아도 느려지지 않게) */
+const done = document.createElement("canvas"); done.width = ink.width; done.height = ink.height;
+const dctx = done.getContext("2d"); let doneSig = "";
 function drawInk(){
-  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height);
+  const k = skey(), arr = INK[k] || [], sig = k + ":" + arr.length + ":" + (arr.length ? arr[arr.length-1].id : "");
+  if(sig !== doneSig){
+    doneSig = sig;
+    dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,done.width,done.height);
+    dctx.setTransform(2,0,0,2,0,0); arr.forEach(st=>paint(st, dctx));
+  }
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height); ctx.drawImage(done, 0, 0);
   ctx.setTransform(2,0,0,2,0,0);
-  const k = skey();
-  (INK[k]||[]).forEach(paint);
   Object.values(LIVE).forEach(st=>{ if(st.k===k) paint(st); });
   if(stroke) paint(stroke);
 }
-function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720]; }
+function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720, e.pointerType==="pen" && e.pressure ? e.pressure : .5]; }
 ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
-  const c = tool==="er" ? "#000" : PAL[palOf(tool)][sel[palOf(tool)].c];
+  const c = tool==="er" ? "#000" : colorOf(palOf(tool));
   stroke = {t:tool, c, w:SIZES[tool][sel[tool].s], pts:[pos(e)], k:skey(), id:ME+Date.now().toString(36), o:ME}; drawInk();
 });
 ink.addEventListener("pointermove", e=>{
