@@ -104,26 +104,12 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 .q.open .hint{display:none}
 
 /* controls */
-#ui{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;z-index:9;opacity:.35;transition:opacity .2s}
-#ui:hover{opacity:1}
-#ui button{font:600 13px Body,"Malgun Gothic",sans-serif;background:#fff;border:0;border-radius:8px;padding:7px 11px;cursor:pointer;color:#1d2433}
 #bar{position:fixed;left:0;top:0;height:3px;background:#e8633a;z-index:9;transition:width .2s}
 
 /* ===== 판서 ===== */
 #ink{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;pointer-events:none;z-index:5;touch-action:none}
 .drawing #ink{pointer-events:auto;cursor:crosshair}
 .drawing.er #ink{cursor:cell}
-#pen{position:fixed;left:14px;bottom:12px;display:none;gap:6px;align-items:center;z-index:10;background:#1d2433;border-radius:12px;padding:6px 8px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.drawing #pen{display:flex}
-.drawing #ui{opacity:1}
-#pen button{font:600 13px Body,"Malgun Gothic",sans-serif;border:0;border-radius:8px;padding:7px 10px;cursor:pointer;background:#2e3546;color:#fff}
-#pen button.c{width:30px;height:30px;padding:0;border-radius:50%;border:3px solid transparent}
-#pen button.on{outline:3px solid #fff;outline-offset:1px}
-#pen .sep{width:1px;height:24px;background:#4a5263;margin:0 2px}
-#pen #colors,#pen #sizes{display:flex;gap:6px;align-items:center}
-#pen button.s{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center}
-#pen button.s i{display:block;border-radius:50%;background:#fff}
-#ui button.on{background:#e8633a;color:#fff}
 
 /* ===== 같이 쓰기 ===== */
 #co{position:fixed;right:14px;bottom:56px;width:300px;display:none;flex-direction:column;gap:10px;z-index:11;background:#1d2433;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:500 14px Body,"Malgun Gothic",sans-serif}
@@ -136,7 +122,36 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 #co .st{font-size:13px;color:#c7ccd6;line-height:1.45}
 #co .st b{color:#7ee08a}
 #co .x{position:absolute;right:10px;top:6px;background:none;flex:none;padding:4px 6px;font-size:16px;color:#9aa1b0}
+
+/* ===== 버튼 디자인 ===== */
+.bar{position:fixed;bottom:12px;display:flex;align-items:center;gap:2px;z-index:9;background:rgba(29,36,51,.94);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:5px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+#ui{right:14px;opacity:.55;transition:opacity .2s}
+#ui:hover,.drawing #ui,#ui:has(.live){opacity:1}
+#pen{left:14px;display:none;z-index:10}
+.drawing #pen{display:flex}
+.bar button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 11px;border:0;border-radius:10px;background:transparent;color:#d5d9e2;font:600 14px Body,"Malgun Gothic",sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.bar button:hover{background:rgba(255,255,255,.1);color:#fff}
+.bar button.ic{width:36px;padding:0;justify-content:center}
+.bar button.on{background:#fff;color:#1d2433}
+.bar svg{width:18px;height:18px;flex:none}
+.bar .sep{width:1px;height:22px;background:rgba(255,255,255,.14);margin:0 4px}
 #coBtn.live{background:#16a34a;color:#fff}
+/* 해석·문법을 숨기면 눈 감은 아이콘 + 흐린 글씨 */
+#ui .off{display:none}
+.hideKo #koBtn .on-i,.hideNt #ntBtn .on-i{display:none}
+.hideKo #koBtn .off,.hideNt #ntBtn .off{display:block}
+.hideKo #koBtn,.hideNt #ntBtn{color:#7d8699}
+/* 판서 도구 막대 */
+#pen #colors,#pen #sizes{display:flex;gap:2px;align-items:center;padding:0 3px}
+#pen button.c{width:24px;height:24px;padding:0;margin:0 3px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);transition:transform .15s}
+#pen button.c:hover{transform:scale(1.12)}
+#pen button.c.on{box-shadow:0 0 0 2px #1d2433,0 0 0 4px #fff}
+#pen button.s{width:34px;padding:0;justify-content:center}
+#pen button.s.on{background:rgba(255,255,255,.16)}
+#pen button.s i{display:block;border-radius:50%}
+@media (max-width:1180px){#pen{bottom:64px}}
+#co{bottom:62px}
+#co button{border-radius:10px;padding:9px 10px}
 
 @media print{
   @page{size:1280px 720px;margin:0}
@@ -153,17 +168,17 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 <div id="bar"></div>
 <div id="stage"></div>
 <canvas id="ink" width="2560" height="1440"></canvas>
-<div id="pen">
+<div id="pen" class="bar">
   <span id="colors"></span>
   <span class="sep"></span>
   <span id="sizes"></span>
   <span class="sep"></span>
-  <button data-t="pen" class="on" title="펜">펜</button>
-  <button data-t="hl" title="형광펜 (곧은 선)">형광펜</button>
-  <button data-t="er" title="지우개 (E)">지우개</button>
+  <button data-t="pen" class="on" title="펜"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>펜</span></button>
+  <button data-t="hl" title="형광펜 (곧은 선)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>형광펜</span></button>
+  <button data-t="er" title="지우개 (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/></svg><span>지우개</span></button>
   <span class="sep"></span>
-  <button onclick="undoInk()" title="되돌리기 (Ctrl+Z)">되돌리기</button>
-  <button onclick="clearInk()" title="이 장 모두 지우기 (Delete)">모두 지우기</button>
+  <button class="ic" onclick="undoInk()" title="되돌리기 (Ctrl+Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+  <button class="ic" onclick="clearInk()" title="이 장 모두 지우기 (Delete)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
 </div>
 <div id="co">
   <button class="x" onclick="coPanel(false)" title="닫기">✕</button>
@@ -181,14 +196,16 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
     <div class="row" style="margin-top:8px"><button onclick="coLeave()">연결 끊기</button></div>
   </div>
 </div>
-<div id="ui">
-  <button onclick="go(cur-1)">◀</button>
-  <button onclick="go(cur+1)">▶</button>
-  <button id="penBtn" onclick="togglePen()" title="P">✏️ 판서</button>
-  <button id="coBtn" onclick="coPanel()">👥 같이 쓰기</button>
-  <button onclick="tg('hideKo')" title="K">해석 숨기기</button>
-  <button onclick="tg('hideNt')" title="N">문법 숨기기</button>
-  <button onclick="fs()" title="F">전체화면</button>
+<div id="ui" class="bar">
+  <button class="ic" onclick="go(cur-1)" title="이전 (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button class="ic" onclick="go(cur+1)" title="다음 (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+  <span class="sep"></span>
+  <button id="penBtn" onclick="togglePen()" title="판서 (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>판서</span></button>
+  <button id="coBtn" onclick="coPanel()" title="같이 쓰기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>같이 쓰기</span></button>
+  <span class="sep"></span>
+  <button id="koBtn" onclick="tg('hideKo')" title="해석 보이기/숨기기 (K)"><svg class="on-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg><span>해석</span></button>
+  <button id="ntBtn" onclick="tg('hideNt')" title="문법 보이기/숨기기 (N)"><svg class="on-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg><span>문법</span></button>
+  <button class="ic" onclick="fs()" title="전체화면 (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
 </div>
 
 <script>
@@ -881,7 +898,7 @@ function togglePen(){
 function buildBar(){
   const k = palOf(tool);
   document.getElementById("colors").innerHTML = PAL[k].map((c,i)=>
-    `<button class="c${tool!=="er"&&sel[k].c===i?" on":""}" data-c="${i}" style="background:${c}${c==="#111827"?";border-color:#6b7280":""}"></button>`).join("");
+    `<button class="c${tool!=="er"&&sel[k].c===i?" on":""}" data-c="${i}" style="background:${c}"></button>`).join("");
   const ws = SIZES[tool], hc = PAL.hl[sel.hl.c];
   document.getElementById("sizes").innerHTML = ws.map((w,i)=>{
     const d = Math.round(5 + i*17/(ws.length-1));      /* 버튼 안 점 크기 5~22px */
