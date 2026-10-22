@@ -124,17 +124,17 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 #co .x{position:absolute;right:10px;top:6px;background:none;flex:none;padding:4px 6px;font-size:16px;color:#9aa1b0}
 
 /* ===== 버튼 디자인 ===== */
-.bar{position:fixed;bottom:12px;display:flex;align-items:center;gap:2px;z-index:9;background:rgba(29,36,51,.94);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:5px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.bar{position:fixed;bottom:10px;display:flex;align-items:center;gap:1px;z-index:9;background:rgba(29,36,51,.94);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
 #ui{right:14px;opacity:.55;transition:opacity .2s}
 #ui:hover,.drawing #ui,#ui:has(.live){opacity:1}
-#pen{left:14px;display:none;z-index:10}
+#pen{left:12px;display:none;z-index:10}
 .drawing #pen{display:flex}
-.bar button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 11px;border:0;border-radius:10px;background:transparent;color:#d5d9e2;font:600 14px Body,"Malgun Gothic",sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.bar button{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:0;border-radius:9px;background:transparent;color:#d5d9e2;font:600 13.5px Body,"Malgun Gothic",sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
 .bar button:hover{background:rgba(255,255,255,.1);color:#fff}
-.bar button.ic{width:36px;padding:0;justify-content:center}
+.bar button.ic{width:32px;padding:0;justify-content:center}
 .bar button.on{background:#fff;color:#1d2433}
-.bar svg{width:18px;height:18px;flex:none}
-.bar .sep{width:1px;height:22px;background:rgba(255,255,255,.14);margin:0 4px}
+.bar svg{width:17px;height:17px;flex:none}
+.bar .sep{width:1px;height:20px;background:rgba(255,255,255,.14);margin:0 3px}
 #coBtn.live{background:#16a34a;color:#fff}
 /* 해석·문법을 숨기면 눈 감은 아이콘 + 흐린 글씨 */
 #ui .off{display:none}
@@ -142,14 +142,14 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 .hideKo #koBtn .off,.hideNt #ntBtn .off{display:block}
 .hideKo #koBtn,.hideNt #ntBtn{color:#7d8699}
 /* 판서 도구 막대 */
-#pen #colors,#pen #sizes{display:flex;gap:2px;align-items:center;padding:0 3px}
-#pen button.c{width:24px;height:24px;padding:0;margin:0 3px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);transition:transform .15s}
+#pen #colors,#pen #sizes{display:flex;gap:1px;align-items:center;padding:0 2px}
+#pen button.c{width:20px;height:20px;padding:0;margin:0 3px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);transition:transform .15s}
 #pen button.c:hover{transform:scale(1.12)}
-#pen button.c.on{box-shadow:0 0 0 2px #1d2433,0 0 0 4px #fff}
-#pen button.s{width:34px;padding:0;justify-content:center}
+#pen button.c.on{box-shadow:0 0 0 2px #1d2433,0 0 0 3.5px #fff}
+#pen button.s{width:28px;padding:0;justify-content:center}
 #pen button.s.on{background:rgba(255,255,255,.16)}
 #pen button.s i{display:block;border-radius:50%}
-@media (max-width:1180px){#pen{bottom:64px}}
+@media (max-width:860px){#pen{bottom:58px}}
 #co{bottom:62px}
 #co button{border-radius:10px;padding:9px 10px}
 
@@ -173,9 +173,9 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
   <span class="sep"></span>
   <span id="sizes"></span>
   <span class="sep"></span>
-  <button data-t="pen" class="on" title="펜"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>펜</span></button>
-  <button data-t="hl" title="형광펜 (곧은 선)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>형광펜</span></button>
-  <button data-t="er" title="지우개 (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/></svg><span>지우개</span></button>
+  <button data-t="pen" class="ic on" title="펜"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+  <button class="ic" data-t="hl" title="형광펜 (곧은 선)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
+  <button class="ic" data-t="er" title="지우개 (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/></svg></button>
   <span class="sep"></span>
   <button class="ic" onclick="undoInk()" title="되돌리기 (Ctrl+Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
   <button class="ic" onclick="clearInk()" title="이 장 모두 지우기 (Delete)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
@@ -901,8 +901,8 @@ function buildBar(){
     `<button class="c${tool!=="er"&&sel[k].c===i?" on":""}" data-c="${i}" style="background:${c}"></button>`).join("");
   const ws = SIZES[tool], hc = PAL.hl[sel.hl.c];
   document.getElementById("sizes").innerHTML = ws.map((w,i)=>{
-    const d = Math.round(5 + i*17/(ws.length-1));      /* 버튼 안 점 크기 5~22px */
-    const look = tool==="hl" ? `width:22px;height:${Math.max(4,d-4)}px;border-radius:2px;background:${hc}`
+    const d = Math.round(4 + i*12/(ws.length-1));      /* 버튼 안 점 크기 4~16px */
+    const look = tool==="hl" ? `width:18px;height:${Math.max(4,d-3)}px;border-radius:2px;background:${hc}`
                : tool==="er" ? `width:${d}px;height:${d}px;background:none;border:2px solid #fff`
                : `width:${d}px;height:${d}px;background:${PAL.pen[sel.pen.c]}${sel.pen.c===3?";box-shadow:0 0 0 1px #fff":""}`;
     return `<button class="s${sel[tool].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
@@ -1108,7 +1108,20 @@ try{ document.getElementById("coIn").value = localStorage.getItem("coRoom") || "
 const roomQ = new URLSearchParams(location.search).get("room");
 if(roomQ){ autoOpen = true; coPanel(true); coStart(roomQ); }
 function tg(c){ document.body.classList.toggle(c); }
-function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+function fs(){
+  const d = document, el = d.documentElement;
+  if(d.fullscreenElement || d.webkitFullscreenElement){ (d.exitFullscreen || d.webkitExitFullscreen).call(d); return; }
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+  const fallback = ()=>{                          /* 다른 사이트 화면 안에 들어 있으면 전체화면이 막혀 있음 → 새 창으로 */
+    if(window.top !== window) window.open(location.href, "_blank");
+    else alert("이 브라우저에서는 전체화면 버튼이 막혀 있어요. PC라면 키보드의 F11을 눌러 보세요.");
+  };
+  if(!req || d.fullscreenEnabled === false || d.webkitFullscreenEnabled === false) return fallback();
+  let done = false;
+  const p = (()=>{ try{ return req.call(el); }catch(e){ return Promise.reject(e); } })();
+  if(p && p.then) p.then(()=>done = true, ()=>{ done = true; fallback(); });
+  setTimeout(()=>{ if(!done && !(d.fullscreenElement || d.webkitFullscreenElement)) fallback(); }, 1500);   /* 응답이 없을 때도 */
+}
 addEventListener("resize", fit);
 addEventListener("keydown", e=>{
   const k = e.key;
