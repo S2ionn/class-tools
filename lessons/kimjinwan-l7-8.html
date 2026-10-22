@@ -117,8 +117,8 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 #co .row{display:flex;gap:6px}
 #co button{font:600 13px Body,"Malgun Gothic",sans-serif;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;background:#2e3546;color:#fff;flex:1}
 #co button.main{background:#e8633a}
-#co input{flex:1;min-width:0;font:700 18px Body,"Malgun Gothic",sans-serif;letter-spacing:.2em;text-transform:uppercase;text-align:center;border:0;border-radius:8px;padding:6px;background:#fff;color:#1d2433}
-#co .code{font:800 34px Title,Body,sans-serif;letter-spacing:.15em;text-align:center;background:#2e3546;border-radius:10px;padding:6px 0}
+#co input{flex:1;min-width:0;font:700 17px Body,"Malgun Gothic",sans-serif;letter-spacing:.03em;border:0;border-radius:10px;padding:7px 12px;background:#fff;color:#1d2433}
+#co .code{font:800 28px Title,Body,sans-serif;letter-spacing:.04em;text-align:center;background:#2e3546;border-radius:10px;padding:6px 0}
 #co .st{font-size:13px;color:#c7ccd6;line-height:1.45}
 #co .st b{color:#7ee08a}
 #co .x{position:absolute;right:10px;top:6px;background:none;flex:none;padding:4px 6px;font-size:16px;color:#9aa1b0}
@@ -182,18 +182,18 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 </div>
 <div id="co">
   <button class="x" onclick="coPanel(false)" title="닫기">✕</button>
-  <b style="font-size:16px">👥 같이 쓰기</b>
+  <b style="font-size:16px">같이 쓰기</b>
+  <div class="st">같은 링크를 연 두 사람의 판서와 슬라이드 넘김이 실시간으로 맞춰져요.</div>
   <div id="coIdle">
-    <div class="st" style="margin-bottom:8px">같은 페이지를 연 사람끼리 판서와 슬라이드 넘김이 실시간으로 맞춰져요.</div>
-    <button class="main" style="width:100%" onclick="coHost()">방 만들기</button>
-    <div class="st" style="margin:10px 0 6px">받은 코드로 참여하기</div>
-    <div class="row"><input id="coIn" maxlength="4" placeholder="코드" onkeydown="event.stopPropagation(); if(event.key==='Enter') coJoin(this.value)"><button onclick="coJoin(coIn.value)" style="flex:none">참여</button></div>
+    <div class="st" style="margin-bottom:6px">방 이름 (영어·숫자)</div>
+    <div class="row"><input id="coIn" maxlength="16" placeholder="예: dahyun" autocomplete="off" onkeydown="event.stopPropagation(); if(event.key==='Enter') coStart(this.value)"><button class="main" onclick="coStart(coIn.value)" style="flex:none;padding:9px 16px">시작</button></div>
   </div>
   <div id="coOn" style="display:none">
-    <div id="coCodeBox"><div class="st" style="margin-bottom:6px">이 코드를 상대에게 알려 주세요</div><div class="code" id="coCode"></div>
-      <div class="row" style="margin-top:8px"><button onclick="coCopy()" id="coCopyBtn">참여 링크 복사</button></div></div>
+    <div class="code" id="coCode"></div>
     <div class="st" id="coSt" style="margin-top:8px"></div>
-    <div class="row" style="margin-top:8px"><button onclick="coLeave()">연결 끊기</button></div>
+    <div class="row" style="margin-top:8px"><button class="main" onclick="coCopy()" id="coCopyBtn">수업방에 올릴 링크 복사</button></div>
+    <div class="st" style="margin-top:8px">이 링크를 수업방에 한 번 올려 두면, 선생님과 학생이 언제 들어오든 자동으로 연결돼요.</div>
+    <div class="row" style="margin-top:8px"><button onclick="coLeave()">나가기</button></div>
   </div>
 </div>
 <div id="ui" class="bar">
@@ -876,7 +876,7 @@ function go(i){
   document.getElementById("bar").style.width = ((cur+1)/slides.length*100)+"%";
   try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
   drawInk();
-  if(!remoteGo) coSend({type:"go", k:skey()});
+  if(!remoteGo){ if(coLoaded) touched = true; coSend({type:"go", k:skey()}); }
 }
 function fit(){
   const s = Math.min(innerWidth/1280, innerHeight/720);
@@ -957,7 +957,7 @@ ink.addEventListener("pointermove", e=>{
 });
 const endStroke = ()=>{
   if(!stroke) return;
-  if(stroke.t!=="hl" || stroke.pts.length>1){ (INK[stroke.k] ||= []).push(stroke); coSend({type:"add", who:ME, st:stroke}); }   /* 형광펜은 클릭만 하면 버림 */
+  if(stroke.t!=="hl" || stroke.pts.length>1){ touched = true; (INK[stroke.k] ||= []).push(stroke); coSend({type:"add", who:ME, st:stroke}); }   /* 형광펜은 클릭만 하면 버림 */
   stroke = null; drawInk();
 };
 ink.addEventListener("pointerup", endStroke);
@@ -970,11 +970,13 @@ function undoInk(){                              /* 내가 그은 마지막 획�
 function clearInk(){ const k = skey(); INK[k] = []; coSend({type:"clear", k}); drawInk(); }
 buildBar();
 
-/* ---------- 같이 쓰기 : PeerJS로 두 기기를 직접 연결 ---------- */
+/* ---------- 같이 쓰기 : 같은 링크(방 이름)를 연 두 기기를 PeerJS로 직접 연결 ----------
+   먼저 들어온 쪽이 방을 맡고, 나중에 들어온 쪽이 거기에 붙음. 한쪽이 나가면 남은 쪽이 방을 이어받음 */
 const ME = Math.random().toString(36).slice(2,8);
 const LIVE = {};                                  /* 상대가 지금 긋고 있는 획 */
-let peer = null, conns = [], isHost = false, roomCode = "", remoteGo = false, lastLive = 0;
-const CO_PREFIX = "s2ionn-class-", CODE_CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+let peer = null, conns = [], isHost = false, room = "", active = false, retryT = 0, autoOpen = false, remoteGo = false, lastLive = 0;
+let touched = /^#([2-9]|\d\d)/.test(location.hash), coLoaded = false;   /* 이 화면에서 슬라이드를 넘기거나 그린 적이 있는지 */
+setTimeout(()=>coLoaded = true, 1500);
 /* 슬라이드 번호 대신 내용으로 이름을 붙여, 기기마다 장 나눔이 달라도 같은 장을 찾게 함 */
 const baseKey = x => x.ns ? `${x.m.ls}#${x.ns.join(",")}` : x.raw ? "raw" : `${x.m.ls}|${x.sec}`;
 function skey(i = cur){
@@ -997,89 +999,114 @@ function coSend(msg, except){
   conns.forEach(c=>{ if(c!==except && c.open) try{ c.send(msg); }catch(e){} });
 }
 function coApply(msg, from){
-  if(msg.type==="state"){ Object.keys(INK).forEach(k=>delete INK[k]); Object.assign(INK, msg.ink); goKey(msg.k); }
+  if(msg.type==="sync"){                          /* 획 id 기준으로 합치기 */
+    for(const [k, arr] of Object.entries(msg.ink||{})){
+      const mine = INK[k] ||= [], ids = new Set(mine.map(s=>s.id));
+      arr.forEach(s=>{ if(!ids.has(s.id)) mine.push(s); });
+    }
+    if(msg.touched && (!touched || msg.host)) goKey(msg.k);   /* 막 들어온 쪽이 상대 화면을 첫 장으로 돌리지 않게 */
+  }
   else if(msg.type==="live"){ LIVE[msg.who] = msg.st; }
   else if(msg.type==="add"){ delete LIVE[msg.who]; (INK[msg.st.k] ||= []).push(msg.st); }
   else if(msg.type==="del"){ const a = INK[msg.k]||[]; const j = a.findIndex(s=>s.id===msg.id); if(j>=0) a.splice(j,1); }
   else if(msg.type==="clear"){ INK[msg.k] = []; }
   else if(msg.type==="go"){ goKey(msg.k); }
-  if(isHost && msg.type!=="state") coSend(msg, from);   /* 방장이 다른 참여자에게 전달 */
+  if(isHost && msg.type!=="sync") coSend(msg, from);   /* 방을 맡은 쪽이 다른 참여자에게 전달 */
   drawInk();
 }
+/* 방 주소 = 페이지 제목 + 방 이름 → 7과·8과는 같은 방 이름이라도 서로 다른 방 */
+function pid(){ let h = 5381; for(const ch of document.title) h = (h*33 ^ ch.codePointAt(0))>>>0; return `s2ionn-${h.toString(36)}-${room}`; }
+const setSt = h => document.getElementById("coSt").innerHTML = h;
 function coStatus(){
   const n = conns.filter(c=>c.open).length;
-  document.getElementById("coSt").innerHTML = n ? `<b>● 연결됨</b> · ${isHost ? "참여자 "+n+"명" : "방 "+roomCode}` : (isHost ? "상대가 들어오기를 기다리는 중…" : "연결하는 중…");
+  if(active) setSt(n ? "<b>● 연결됨</b> · 함께 쓰는 중" : isHost ? "상대가 들어오기를 기다리는 중…" : "연결하는 중…");
   document.getElementById("coBtn").classList.toggle("live", n>0);
+  if(n && autoOpen){ autoOpen = false; setTimeout(()=>coPanel(false), 1500); }
 }
 function coPanel(open = !document.getElementById("co").classList.contains("open")){
   document.getElementById("co").classList.toggle("open", open);
 }
-function coUI(on){
-  document.getElementById("coIdle").style.display = on ? "none" : "";
-  document.getElementById("coOn").style.display = on ? "" : "none";
-  document.getElementById("coCodeBox").style.display = isHost ? "" : "none";
-  document.getElementById("coCode").textContent = roomCode;
+function coUI(){
+  document.getElementById("coIdle").style.display = active ? "none" : "";
+  document.getElementById("coOn").style.display = active ? "" : "none";
+  document.getElementById("coCode").textContent = room;
   coStatus();
 }
 function loadPeer(){
   return window.Peer ? Promise.resolve() : new Promise((ok, no)=>{
     const s = document.createElement("script");
     s.src = "https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js";
-    s.onload = ok; s.onerror = ()=>no(new Error("load")); document.head.appendChild(s);
+    s.onload = ok; s.onerror = ()=>{ s.remove(); no(new Error("load")); }; document.head.appendChild(s);
   });
+}
+function dropPeer(){
+  const old = conns; conns = [];                  /* 먼저 비워서 close 이벤트가 재접속을 일으키지 않게 */
+  old.forEach(c=>{ try{ c.close(); }catch(e){} });
+  if(peer){ const p = peer; peer = null; try{ p.destroy(); }catch(e){} }
 }
 function coWire(c){
   c.on("open", ()=>{
     if(!conns.includes(c)) conns.push(c);
-    if(isHost) c.send({type:"state", ink:INK, k:skey()});
+    c.send({type:"sync", ink:INK, k:skey(), touched, host:isHost});
     coStatus();
   });
   c.on("data", m=>coApply(m, c));
   c.on("close", ()=>{
+    if(!conns.includes(c)) return;
     conns = conns.filter(x=>x!==c); Object.keys(LIVE).forEach(k=>delete LIVE[k]); drawInk(); coStatus();
-    if(!isHost && peer) document.getElementById("coSt").innerHTML = "연결이 끊겼어요. 다시 참여해 주세요.";
+    if(!isHost && active){ clearTimeout(retryT); retryT = setTimeout(coEnter, 1000); }   /* 방을 맡던 쪽이 나가면 이어받기 */
   });
   c.on("error", ()=>{});
 }
-async function coHost(tries = 0){
-  try{ await loadPeer(); }catch(e){ alert("인터넷 연결을 확인해 주세요."); return; }
-  coLeave(true);
-  roomCode = Array.from({length:4}, ()=>CODE_CH[Math.floor(Math.random()*CODE_CH.length)]).join("");
-  isHost = true;
-  peer = new Peer(CO_PREFIX + roomCode);
-  peer.on("open", ()=>coUI(true));
-  peer.on("connection", coWire);
-  peer.on("error", err=>{
-    if(err.type==="unavailable-id" && tries<5) return coHost(tries+1);
-    document.getElementById("coSt").textContent = "연결 오류: " + err.type;
+async function coEnter(){
+  clearTimeout(retryT); if(!active) return;
+  try{ await loadPeer(); }catch(e){ setSt("인터넷 연결을 확인해 주세요. 다시 시도하는 중…"); retryT = setTimeout(coEnter, 5000); return; }
+  if(!active) return;
+  dropPeer(); isHost = false; coStatus();
+  const p = peer = new Peer(pid());               /* 방을 맡아 보기 */
+  p.on("open", ()=>{ if(p===peer){ isHost = true; coStatus(); } });
+  p.on("connection", c=>{ if(p===peer) coWire(c); });
+  p.on("disconnected", ()=>{ if(p===peer && active) try{ p.reconnect(); }catch(e){} });
+  p.on("error", err=>{
+    if(p!==peer) return;
+    if(err.type==="unavailable-id") coJoin();     /* 이미 상대가 맡고 있으면 붙기 */
+    else{ setSt("연결 오류 · 다시 시도하는 중…"); retryT = setTimeout(coEnter, 3000); }
   });
 }
-async function coJoin(code){
-  code = String(code||"").trim().toUpperCase();
-  if(code.length!==4){ alert("4자리 코드를 입력해 주세요."); return; }
-  try{ await loadPeer(); }catch(e){ alert("인터넷 연결을 확인해 주세요."); return; }
-  coLeave(true);
-  roomCode = code; isHost = false;
-  peer = new Peer();
-  peer.on("open", ()=>{ coUI(true); coWire(peer.connect(CO_PREFIX + code, {reliable:true})); });
-  peer.on("error", err=>{
-    document.getElementById("coSt").textContent = err.type==="peer-unavailable" ? "그 코드의 방이 없어요. 코드를 확인해 주세요." : "연결 오류: " + err.type;
+function coJoin(){
+  dropPeer(); isHost = false;
+  const p = peer = new Peer();
+  p.on("open", ()=>{
+    if(p!==peer) return;
+    const c = p.connect(pid(), {reliable:true});
+    coWire(c);
+    setTimeout(()=>{ if(p===peer && !c.open) coEnter(); }, 8000);   /* 응답이 없으면 처음부터 다시 */
   });
+  p.on("error", ()=>{ if(p===peer){ clearTimeout(retryT); retryT = setTimeout(coEnter, 2000); } });
 }
-function coLeave(silent){
-  conns.forEach(c=>{ try{ c.close(); }catch(e){} }); conns = [];
-  if(peer){ try{ peer.destroy(); }catch(e){} peer = null; }
-  if(silent!==true){ isHost = false; roomCode = ""; coUI(false); }
-  document.getElementById("coBtn").classList.remove("live");
+function coStart(name){
+  name = String(name||"").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if(name.length<2){ alert("방 이름은 영어나 숫자로 2글자 이상 적어 주세요."); return; }
+  room = name; active = true;
+  try{ localStorage.setItem("coRoom", name); }catch(e){}
+  try{ const u = new URL(location.href); u.searchParams.set("room", name); history.replaceState(null, "", u); }catch(e){}
+  coUI(); coEnter();
+}
+function coLeave(){
+  active = false; clearTimeout(retryT); dropPeer(); isHost = false;
+  try{ const u = new URL(location.href); u.searchParams.delete("room"); history.replaceState(null, "", u); }catch(e){}
+  coUI();
 }
 function coCopy(){
-  const url = location.origin + location.pathname + "?room=" + roomCode;
-  const done = ()=>{ const b = document.getElementById("coCopyBtn"); b.textContent = "복사했어요!"; setTimeout(()=>b.textContent = "참여 링크 복사", 1500); };
-  navigator.clipboard ? navigator.clipboard.writeText(url).then(done, ()=>prompt("이 링크를 복사하세요", url)) : prompt("이 링크를 복사하세요", url);
+  const url = location.origin + location.pathname + "?room=" + room;
+  const done = ()=>{ const b = document.getElementById("coCopyBtn"); b.textContent = "복사했어요!"; setTimeout(()=>b.textContent = "수업방에 올릴 링크 복사", 1500); };
+  const ask = ()=>prompt("이 링크를 복사해서 수업방에 올리세요", url);
+  try{ navigator.clipboard.writeText(url).then(done, ask); }catch(e){ ask(); }
 }
 addEventListener("beforeunload", ()=>{ if(peer) peer.destroy(); });
+try{ document.getElementById("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
 const roomQ = new URLSearchParams(location.search).get("room");
-if(roomQ){ coPanel(true); coJoin(roomQ); }
+if(roomQ){ autoOpen = true; coPanel(true); coStart(roomQ); }
 function tg(c){ document.body.classList.toggle(c); }
 function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
 addEventListener("resize", fit);
