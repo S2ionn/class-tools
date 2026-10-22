@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-3";
+const VERSION = "2026-10-23-4";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -66,7 +66,18 @@ const CSS = `
 .slide.blank{background-color:#fff;background-image:linear-gradient(#eef1f6 1px,transparent 1px),linear-gradient(90deg,#eef1f6 1px,transparent 1px);background-size:40px 40px}
 .slide.blank .bk{position:absolute;left:28px;top:20px;font:700 15px Body,"Malgun Gothic",sans-serif;color:#9aa1b0;display:flex;gap:10px;align-items:center}
 #ui.bar #unblankBtn.arm{background:#e5322d;color:#fff}
-@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui{display:none!important}}
+#helpBtn{position:fixed;right:8px;top:8px;width:18px;height:18px;padding:0;border:0;border-radius:50%;background:rgba(29,36,51,.6);color:#fff;font:700 11px/18px Body,"Malgun Gothic",sans-serif;text-align:center;cursor:pointer;z-index:9;opacity:.35;transition:opacity .2s}
+#helpBtn:hover{opacity:1}
+#help{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,14,22,.5);z-index:30}
+#help.open{display:flex}
+#help .box{position:relative;width:min(580px,92vw);max-height:86vh;overflow:auto;background:#fff;color:#1d2433;border-radius:16px;padding:22px 26px 18px;font:500 14px/1.6 Body,"Malgun Gothic",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+#help h3{font:400 20px Title,Body,"Malgun Gothic",sans-serif;margin-bottom:4px}
+#help h4{font-weight:800;font-size:14px;margin:12px 0 3px;color:#e8633a}
+#help ul{padding-left:18px}
+#help li{margin:2px 0}
+#help kbd{font:700 11.5px Consolas,monospace;background:#eef0f4;border:1px solid #d9dde5;border-bottom-width:2px;border-radius:4px;padding:0 5px}
+#help .x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:18px;color:#9aa1b0;cursor:pointer}
+@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui,#helpBtn,#help{display:none!important}}
 `;
 document.head.insertAdjacentHTML("beforeend", `<style>${CSS}</style>`);
 
@@ -80,7 +91,8 @@ const I = {
   er: ic('<path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/>'),
   laser: ic('<circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'),
   line: ic('<path d="M5 19L19 5"/>'), circle: ic('<circle cx="12" cy="12" r="8"/>'), tri: ic('<path d="M12 4l9 16H3Z"/>'),
-  heart: ic('<path d="M12 20s-7-4.4-9-9a4.5 4.5 0 0 1 9-3 4.5 4.5 0 0 1 9 3c-2 4.6-9 9-9 9Z"/>'),
+  heart: ic('<path d="M12 20.5C9 18.4 2.5 14 2.5 8.6 2.5 5.5 4.8 3.5 7.4 3.5c2 0 3.6 1.2 4.6 3 1-1.8 2.6-3 4.6-3 2.6 0 4.9 2 4.9 5.1 0 5.4-6.5 9.8-9.5 11.9Z"/>'),
+  star: ic('<path d="M12 2.5 17.8 20.5 2.6 9.4h18.8L6.2 20.5Z"/>'),
   undo: ic('<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
   redo: ic('<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>'),
   trash: ic('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
@@ -115,6 +127,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <button class="ic" data-shape="circle" title="원">${I.circle}</button>
   <button class="ic" data-shape="tri" title="세모">${I.tri}</button>
   <button class="ic" data-shape="heart" title="하트">${I.heart}</button>
+  <button class="ic" data-shape="star" title="별">${I.star}</button>
 </div>
 <div id="co">
   <button class="x" id="coX" title="닫기">✕</button>
@@ -137,7 +150,35 @@ document.body.insertAdjacentHTML("beforeend", `
     <div class="row" style="margin-top:8px"><button id="coLeave">나가기</button></div>
   </div>
 </div>
-<div id="bdToast"></div>`);
+<div id="bdToast"></div>
+<button id="helpBtn" title="판서 사용설명서 (?)">?</button>
+<div id="help"><div class="box">
+  <button class="x" id="helpX" title="닫기">✕</button>
+  <h3>판서 사용설명서</h3>
+  <h4>시작</h4>
+  <ul><li>아래 <b>판서</b> 버튼 또는 <kbd>P</kbd>로 켜고 끄기, <kbd>Esc</kbd>로 끄기</li>
+  <li>펜과 마우스로만 써져요. 손가락·손바닥이 닿아도 그려지지 않아요</li></ul>
+  <h4>도구 (왼쪽 아래 막대)</h4>
+  <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
+  <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd></li>
+  <li><b>레이저</b> <kbd>L</kbd> 흔적 없이 가리키기 (상대 화면에도 보여요)</li>
+  <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
+  <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
+  <h4>꾹 누르기</h4>
+  <ul><li>그리다가 멈추고 꾹 누르고 있으면 반듯하게: 선 → 직선, 대충 그린 동그라미·세모·네모 → 반듯한 모양</li>
+  <li>직선은 웬만하면 가로·세로로 맞춰져요. 다른 각도는 <b>꾹 누른 뒤 움직이기</b></li>
+  <li>글자 밑에 가로선을 그으면 글자 바로 밑에 붙어요 (밑줄)</li></ul>
+  <h4>고치기</h4>
+  <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
+  <li>되돌리기는 내가 그은 선만 지워요</li></ul>
+  <h4>슬라이드</h4>
+  <ul><li>넘기기 <kbd>←</kbd> <kbd>→</kbd> · 해석 숨기기 <kbd>K</kbd> · 문법 숨기기 <kbd>N</kbd> · 전체화면 <kbd>F</kbd></li>
+  <li><b>빈 칠판</b> 칠판 버튼 → 지금 장 다음에 빈 장 추가. 지울 때는 "칠판 지우기"를 두 번</li></ul>
+  <h4>같이 쓰기 (온라인 과외)</h4>
+  <ul><li>같이 쓰기 → 방 이름 → 시작 → <b>수업방에 올릴 링크 복사</b> → 수업방에 붙여 넣기. 둘 다 그 링크로 들어오면 자동 연결</li>
+  <li>판서·슬라이드·해석/문법 가리기·퀴즈 정답·레이저·상대 커서가 맞춰져요</li>
+  <li>연결되면 <b>슬라이드 넘기기 [둘 다] [나만]</b> — 선생님이 먼저 "나만"을 누르면 학생은 못 넘겨요</li></ul>
+</div></div>`);
 const ui = $("ui");
 ui.className = "bar";
 ui.innerHTML = `
@@ -213,7 +254,7 @@ function goKey(k){ const i = indexOfKey(k); if(i>=0 && i!==cur){ remoteGo = true
 
 /* ---------- 판서 상태 ---------- */
 const INK = {}, REDO = {};                         /* 슬라이드 이름 → 획 목록 / 내가 되돌린 획 */
-const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], pc:["#e0524d","#f08c2e","#3f74d6","#3c9a5f","#5b5f68"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
+const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], pc:["#d93a2b","#ee7f1f","#2f66cf","#2f8f52","#4d515a"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
 const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[20,40,80]};
 const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:1}};
 const CUSTOM = {};
@@ -310,7 +351,7 @@ function grain(c){
   const N = 128, cv = document.createElement("canvas"); cv.width = cv.height = N;
   const g = cv.getContext("2d"), img = g.createImageData(N, N);
   const [r, gg, b] = [1,3,5].map(i=>parseInt(c.slice(i, i+2), 16));
-  for(let i=0;i<N*N;i++){ const a = Math.max(0, Math.min(1, (PAPER[i] - .36) * 3.2)); img.data.set([r, gg, b, a*255], i*4); }
+  for(let i=0;i<N*N;i++){ const a = Math.max(0, Math.min(1, (PAPER[i] - .2) * 2.6)); img.data.set([r, gg, b, a*255], i*4); }
   g.putImageData(img, 0, 0);
   const p = ctx.createPattern(cv, "repeat");
   p.setTransform?.(new DOMMatrix([.5,0,0,.5,0,0]));
@@ -324,21 +365,21 @@ function paintPencil(st, g){
   const h = (k, i)=>{ const v = Math.sin(k*12.9898 + i*78.233 + seed*.618) * 43758.5453; return v - Math.floor(v); };
   const nrm = p.map((q,i)=>{ const a = p[Math.max(0,i-1)], b = p[Math.min(p.length-1,i+1)];
     const dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx,dy) || 1; return [-dy/L, dx/L]; });
-  const K = Math.max(3, Math.round(w*.8));
+  const K = Math.max(4, Math.round(w*1.1));
   const cum = [0]; for(let i=1;i<p.length;i++) cum.push(cum[i-1] + Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]));
   const total = cum[cum.length-1], T = Math.max(1, Math.min(w*2.5 + 8, total*.3));
   const tp = st.closed ? ()=>1 : i=>{ const u = Math.min(1, Math.min(cum[i], total-cum[i]) / T); return .55 + .45*u*u*(3-2*u); };
   g.save();
   g.strokeStyle = g.fillStyle = grain(st.c); g.lineCap = "round"; g.lineJoin = "round";
-  const lw = Math.max(1.1, w/K*1.7); g.lineWidth = lw;
+  const lw = Math.max(1.3, w/K*2.5); g.lineWidth = lw;
   for(let k=0;k<K;k++){
     const off = (k/(K-1) - .5) * w * .85, shade = .75 + .35*h(k, -1);
-    const at = i=>{ const j = (h(k, i) - .5) * w * .16, o = (off+j) * tp(i); return [p[i][0] + nrm[i][0]*o, p[i][1] + nrm[i][1]*o]; };
+    const at = i=>{ const j = (h(k, i) - .5) * w * .1, o = (off+j) * tp(i); return [p[i][0] + nrm[i][0]*o, p[i][1] + nrm[i][1]*o]; };
     if(p.length===1){ const [x,y] = at(0); g.globalAlpha = .7*shade; g.beginPath(); g.arc(x, y, lw/2, 0, 7); g.fill(); continue; }
     for(let s=0; s<p.length-1; s+=4){
       const e = Math.min(p.length-1, s+4);
       let pr = 0, ta = 0; for(let i=s;i<=e;i++){ pr += (p[i][2] ?? .5); ta += tp(i); } pr /= (e-s+1); ta /= (e-s+1);
-      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade * (.8 + .2*ta));
+      g.globalAlpha = Math.min(1, (.6 + .8*pr) * shade * (.8 + .2*ta));
       g.lineWidth = lw * (.85 + .15*ta);
       g.beginPath(); const a = at(s); g.moveTo(a[0], a[1]);
       for(let i=s+1;i<=e;i++){ const b = at(i); g.lineTo(b[0], b[1]); }
@@ -390,18 +431,45 @@ function sampleLine(a, b, step = 4){
 }
 function polyPts(vs){ let out = []; vs.forEach((v,i)=>{ const seg = sampleLine(v, vs[(i+1)%vs.length]); out = out.concat(i ? seg.slice(1) : seg); }); return out; }
 function ellipsePts(cx, cy, rx, ry){ const n = Math.max(32, Math.round((rx+ry)*.6)), out = []; for(let i=0;i<=n;i++){ const a = -Math.PI/2 + i/n*Math.PI*2; out.push([cx+rx*Math.cos(a), cy+ry*Math.sin(a), .5]); } return out; }
-function shapePts(kind, x0, y0, x1, y1){
+function bez(a, b, c, d, n = 24){ const out = []; for(let i=1;i<=n;i++){ const s = i/n, u = 1-s;
+  out.push([u*u*u*a[0] + 3*u*u*s*b[0] + 3*u*s*s*c[0] + s*s*s*d[0], u*u*u*a[1] + 3*u*u*s*b[1] + 3*u*s*s*c[1] + s*s*s*d[1], .5]); } return out; }
+/* 하트: 둥근 두 봉우리 + 얕게 들어간 가운데 + 아래 뾰족 (0~1 상자 기준 베지어) */
+const HEART = [[.5,.97], [[.36,.86],[.03,.63],[.03,.36]], [[.03,.14],[.17,.04],[.29,.04]], [[.41,.04],[.47,.11],[.5,.21]],
+               [[.53,.11],[.59,.04],[.71,.04]], [[.83,.04],[.97,.14],[.97,.36]], [[.97,.63],[.64,.86],[.5,.97]]];
+function heartPts(l, t, w, h){
+  const m = q=>[l + q[0]*w, t + q[1]*h]; let cur0 = m(HEART[0]), out = [[...cur0, .5]];
+  for(let i=1;i<HEART.length;i++){ const [c1, c2, e] = HEART[i].map(m); out = out.concat(bez(cur0, c1, c2, e)); cur0 = e; }
+  return out;
+}
+/* 별: 한 붓 그리기 별(꼭짓점 0→2→4→1→3→0)에 끝이 조금 더 나가게. 색연필이면 꼭짓점을 살짝 흔듦 */
+function starPts(l, t, w, h, hand){
+  const cx = l + w/2, rx = w/1.902, ry = h/1.809, cy = t + ry, s = Math.max(w, h);
+  const v = [0,1,2,3,4].map(k=>{ const a = (-90 + 72*k) * Math.PI/180; return [cx + rx*Math.cos(a), cy + ry*Math.sin(a)]; });
+  const J = [[.02,-.03],[-.03,.02],[.03,.03],[-.02,-.02],[.02,.01]];
+  if(hand) v.forEach((q,k)=>{ q[0] += J[k][0]*s; q[1] += J[k][1]*s; });
+  const order = [0,2,4,1,3,0].map(k=>v[k]), last = order[4], end = order[5];
+  order[5] = [end[0] + (end[0]-last[0])*.14, end[1] + (end[1]-last[1])*.14];
+  let out = [[...order[0], .5]]; for(let i=1;i<order.length;i++) out = out.concat(sampleLine(order[i-1], order[i]).slice(1));
+  return out;
+}
+/* 손으로 그린 원: 살짝 기울고, 한 바퀴보다 조금 더 돌아 끝이 바깥으로 빠짐 */
+function handCircle(cx, cy, rx, ry){
+  const n = Math.max(40, Math.round((rx+ry)*.7)), out = [], rot = -.12, a0 = .62*Math.PI;
+  for(let i=0;i<=n;i++){
+    const s = i/n * 1.1, a = a0 - s*Math.PI*2, k = .955 + .09*s;
+    const x = rx*k*Math.cos(a), y = ry*k*Math.sin(a);
+    out.push([cx + x*Math.cos(rot) - y*Math.sin(rot), cy + x*Math.sin(rot) + y*Math.cos(rot), .5]);
+  }
+  return out;
+}
+const circleFor = (base, cx, cy, rx, ry) => base==="pc" ? handCircle(cx, cy, rx, ry) : ellipsePts(cx, cy, rx, ry);
+function shapePts(kind, x0, y0, x1, y1, base){
   const l = Math.min(x0,x1), r = Math.max(x0,x1), t = Math.min(y0,y1), b = Math.max(y0,y1), w = r-l, h = b-t;
-  if(kind==="circle") return ellipsePts((l+r)/2, (t+b)/2, w/2, h/2);
+  if(kind==="circle") return circleFor(base, (l+r)/2, (t+b)/2, w/2, h/2);
+  if(kind==="star") return starPts(l, t, w, h, base==="pc");
   if(kind==="tri") return polyPts([[(l+r)/2, t], [r, b], [l, b]]);
   if(kind==="rect") return polyPts([[l,t],[r,t],[r,b],[l,b]]);
-  if(kind==="heart"){
-    const n = 90, out = [];
-    for(let i=0;i<=n;i++){ const a = i/n*Math.PI*2;
-      const hx = 16*Math.sin(a)**3, hy = 13*Math.cos(a) - 5*Math.cos(2*a) - 2*Math.cos(3*a) - Math.cos(4*a);
-      out.push([l + (hx+16)/32*w, t + (12-hy)/29*h, .5]); }
-    return out;
-  }
+  if(kind==="heart") return heartPts(l, t, w, h);
   return [];
 }
 /* 꾹 누르면 정리: 열린 선 → 직선, 닫힌 모양 → 원(타원)·세모·네모 */
@@ -421,13 +489,13 @@ function recognize(st){
   if(gap > size*.3) return {kind:"line"};
   const cx = (l+r)/2, cy = (t+b)/2, rx = Math.max(1,(r-l)/2), ry = Math.max(1,(b-t)/2);
   const err = p.reduce((s,q)=>s + Math.abs(Math.hypot((q[0]-cx)/rx, (q[1]-cy)/ry) - 1), 0) / p.length;
-  if(err < .13) return {kind:"ellipse", pts:ellipsePts(cx, cy, rx, ry)};
+  if(err < .13) return {kind:"ellipse", pts:circleFor(st.t, cx, cy, rx, ry), open:st.t==="pc"};
   const ring = p.concat([p[0]]); let m = 0, md = 0;   /* 시작점에서 가장 먼 점에서 둘로 나눠 꼭짓점 찾기 */
   ring.forEach((q,i)=>{ const d = Math.hypot(q[0]-p[0][0], q[1]-p[0][1]); if(d > md){ md = d; m = i; } });
   let v = rdp(ring.slice(0, m+1), size*.12).slice(0, -1).concat(rdp(ring.slice(m), size*.12)); v = v.slice(0, -1);
   if(v.length > 1 && Math.hypot(v[0][0]-v[v.length-1][0], v[0][1]-v[v.length-1][1]) < size*.15) v = v.slice(0, -1);
   if(v.length===3 || v.length===4) return {kind:"poly", pts:polyPts(v)};
-  if(err < .22) return {kind:"ellipse", pts:ellipsePts(cx, cy, rx, ry)};
+  if(err < .22) return {kind:"ellipse", pts:circleFor(st.t, cx, cy, rx, ry), open:st.t==="pc"};
   return null;
 }
 
@@ -452,6 +520,33 @@ function hv(a, q, tol){
   if(toV < toH && toV <= tol) return [a[0], q[1], q[2]];
   return q;
 }
+/* 밑줄: 가로선이 글자 줄의 아랫부분~바로 밑에 걸치면 그 글자 바로 밑으로 붙임 */
+let TEXTR = [];
+function textRects(){
+  const sl = slides[cur]; if(!sl) return [];
+  const sr = stage.getBoundingClientRect(), sc = sr.width/1280, out = [];
+  const tw = document.createTreeWalker(sl, NodeFilter.SHOW_TEXT, {acceptNode:n=>n.nodeValue.trim() ? 1 : 2});
+  const rg = document.createRange();
+  for(let n; (n = tw.nextNode());){
+    const pe = n.parentElement; if(!pe || getComputedStyle(pe).visibility==="hidden") continue;
+    rg.selectNodeContents(n);
+    for(const rc of rg.getClientRects()) if(rc.width > 2) out.push({l:(rc.left-sr.left)/sc, r:(rc.right-sr.left)/sc, t:(rc.top-sr.top)/sc, b:(rc.bottom-sr.top)/sc});
+  }
+  return out;
+}
+function underline(a, e){
+  if(Math.abs(e[1]-a[1]) > .01 || Math.abs(e[0]-a[0]) < 12 || !stroke || stroke.free) return sampleLine(a, e);
+  const x0 = Math.min(a[0], e[0]), x1 = Math.max(a[0], e[0]), y = a[1];
+  let best = null, bd = 1e9;
+  for(const r of TEXTR){
+    const h = r.b - r.t, ov = Math.min(x1, r.r) - Math.max(x0, r.l);
+    if(ov < 8 || y < r.t + h*.45 || y > r.b + 16) continue;   /* 글자 줄 아래쪽 절반 ~ 바로 밑 16px */
+    const d = Math.abs(y - r.b); if(d < bd){ bd = d; best = r; }
+  }
+  if(!best) return sampleLine(a, e);
+  const yy = best.b - (best.b - best.t)*.1 + stroke.w/2;
+  return sampleLine([a[0], yy, .5], [e[0], yy, .5]);
+}
 function freeAngle(){                             /* 직선 도구: 꾹 누르고 있으면 자유 각도 */
   if(!stroke || stroke.shape!=="line" || stroke.free) return;
   stroke.free = true; toast("자유 각도로 그려요");
@@ -459,8 +554,8 @@ function freeAngle(){                             /* 직선 도구: 꾹 누르�
 function snapStroke(){
   if(!stroke || stroke.snap || stroke.shape) return;
   const res = recognize(stroke); if(!res) return;
-  if(res.kind==="line"){ stroke.snap = "line"; stroke.pts = sampleLine(stroke.pts[0], hv(stroke.pts[0], stroke.raw || stroke.pts[stroke.pts.length-1], 15)); }
-  else { stroke.snap = "shape"; stroke.closed = true; stroke.pts = res.pts; }
+  if(res.kind==="line"){ stroke.snap = "line"; stroke.pts = underline(stroke.pts[0], hv(stroke.pts[0], stroke.raw || stroke.pts[stroke.pts.length-1], 15)); }
+  else { stroke.snap = "shape"; stroke.closed = !res.open; stroke.pts = res.pts; }
   delete stroke.raw; drawInk(); sendLive(true);
 }
 function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720, e.pointerType==="pen" && e.pressure ? e.pressure : .5]; }
@@ -474,7 +569,8 @@ ink.addEventListener("pointerdown", e=>{
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
-  if(tool==="shape"){ stroke.shape = shapeKind; stroke.x0 = q[0]; stroke.y0 = q[1]; stroke.closed = shapeKind!=="line"; }
+  if(tool==="shape"){ stroke.shape = shapeKind; stroke.x0 = q[0]; stroke.y0 = q[1]; stroke.closed = shapeKind==="tri" || shapeKind==="heart" || (shapeKind==="circle" && base!=="pc"); }
+  if((base==="pen" || base==="pc") && tool!=="er") TEXTR = textRects();   /* 밑줄 맞추기용 글자 위치 */
   holdAt = q; clearTimeout(holdT);
   if(stroke.shape==="line") holdT = setTimeout(freeAngle, 450);
   else if(tool!=="shape" && (base==="pen" || base==="pc")) holdT = setTimeout(snapStroke, 700);
@@ -487,15 +583,15 @@ ink.addEventListener("pointermove", e=>{
   if(stroke.shape==="line"){
     if(!holdAt || Math.hypot(q[0]-holdAt[0], q[1]-holdAt[1]) > 4){ holdAt = q; clearTimeout(holdT); if(!stroke.free) holdT = setTimeout(freeAngle, 450); }
     const a = [stroke.x0, stroke.y0];
-    stroke.pts = sampleLine(a, stroke.free ? q : hv(a, q, 90));
+    stroke.pts = underline(a, stroke.free ? q : hv(a, q, 90));
   }
-  else if(stroke.shape) stroke.pts = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1]);
+  else if(stroke.shape) stroke.pts = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1], stroke.t);
   else if(stroke.t==="hl"){
     const [x0,y0] = stroke.pts[0]; let [x,y] = q;
     if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
     stroke.pts = [[x0,y0],[x,y]];
   }
-  else if(stroke.snap==="line") stroke.pts = sampleLine(stroke.pts[0], hv(stroke.pts[0], q, 15));
+  else if(stroke.snap==="line") stroke.pts = underline(stroke.pts[0], hv(stroke.pts[0], q, 15));
   else if(stroke.snap) return;
   else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>addPt(pos(x))); }
   drawInk(); sendLive();
@@ -806,11 +902,17 @@ $("coBtn").onclick = ()=>coPanel();
 $("koBtn").onclick = ()=>window.tg("hideKo");
 $("ntBtn").onclick = ()=>window.tg("hideNt");
 $("fsBtn").onclick = ()=>window.fs();
+const helpOpen = (on = !$("help").classList.contains("open")) => $("help").classList.toggle("open", on);
+$("helpBtn").onclick = ()=>helpOpen();
+$("helpX").onclick = ()=>helpOpen(false);
+$("help").addEventListener("click", e=>{ if(e.target.id==="help") helpOpen(false); });
 addEventListener("keydown", e=>{
   const k = e.key;
   if(e.target.matches && e.target.matches("input, textarea")) return;
   if((e.ctrlKey||e.metaKey) && (k==="z"||k==="Z")){ e.preventDefault(); e.shiftKey ? redoInk() : undoInk(); return; }
   if((e.ctrlKey||e.metaKey) && (k==="y"||k==="Y")){ e.preventDefault(); redoInk(); return; }
+  if($("help").classList.contains("open") && k==="Escape"){ helpOpen(false); return; }
+  if(k==="?"){ helpOpen(); return; }
   if(k==="p"||k==="P"){ togglePen(); return; }
   if(document.body.classList.contains("drawing")){
     if(k==="e"||k==="E"){ setTool(tool==="er" ? drawBase : "er"); return; }
