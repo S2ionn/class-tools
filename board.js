@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23";
+const VERSION = "2026-10-23-2";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -65,8 +65,8 @@ const CSS = `
 #bdToast.show{opacity:1}
 .slide.blank{background-color:#fff;background-image:linear-gradient(#eef1f6 1px,transparent 1px),linear-gradient(90deg,#eef1f6 1px,transparent 1px);background-size:40px 40px}
 .slide.blank .bk{position:absolute;left:28px;top:20px;font:700 15px Body,"Malgun Gothic",sans-serif;color:#9aa1b0;display:flex;gap:10px;align-items:center}
-.slide.blank .bk button{font:600 12px Body,"Malgun Gothic",sans-serif;border:1px solid #d9dde5;background:#fff;color:#6b7385;border-radius:7px;padding:3px 9px;cursor:pointer}
-@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui{display:none!important}.slide.blank .bk button{display:none}}
+#ui.bar #unblankBtn.arm{background:#e5322d;color:#fff}
+@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui{display:none!important}}
 `;
 document.head.insertAdjacentHTML("beforeend", `<style>${CSS}</style>`);
 
@@ -147,6 +147,7 @@ ui.innerHTML = `
   <button id="coBtn" title="같이 쓰기">${I.users}<span>같이 쓰기</span></button>
   <span class="sep"></span>
   <button class="ic" id="blankBtn" title="다음에 빈 칠판 추가">${I.board}</button>
+  <button id="unblankBtn" title="이 빈 칠판 지우기" style="display:none">${I.trash}<span>칠판 지우기</span></button>
   <button id="koBtn" title="해석 보이기/숨기기 (K)">${eyes()}<span>해석</span></button>
   <button id="ntBtn" title="문법 보이기/숨기기 (N)">${eyes()}<span>문법</span></button>
   <button class="ic" id="fsBtn" title="전체화면 (F)">${I.full}</button>`;
@@ -166,7 +167,7 @@ const pageGo = window.go, pageTg = window.tg;
 let remoteGo = false;
 window.go = function(i){
   if(!remoteGo && !canNav()){ toast("지금은 상대만 슬라이드를 넘길 수 있어요."); return; }
-  pageGo(i);
+  pageGo(i); blankUI();
   if(!remoteGo){ if(coLoaded) touched = true; send({type:"go", k:skey()}); }
   drawInk();
 };
@@ -579,7 +580,7 @@ function applyQuiz(k, i, open){
 
 /* ---------- 빈 칠판 ---------- */
 const BLANKS = [];                                 /* [{id, after}] 추가한 순서대로 */
-const blankHTML = id => `<section class="slide blank" data-blank="${id}"><div class="bk">빈 칠판 <button data-unblank="${id}">이 칠판 지우기</button></div><div class="ft">빈 칠판<span class="pg"></span></div></section>`;
+const blankHTML = id => `<section class="slide blank" data-blank="${id}"><div class="bk">빈 칠판</div><div class="ft">빈 칠판<span class="pg"></span></div></section>`;
 function renumber(){ slides.forEach((s,i)=>{ const p = s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; }); }
 function insertBlank(id, after, mine){
   if(data().some(x=>x.blank===id)) return;
@@ -605,11 +606,23 @@ $("blankBtn").onclick = ()=>{
   insertBlank(id, after, true); send({type:"blank", id, after}); send({type:"go", k:skey()});
   if(!document.body.classList.contains("drawing")) togglePen(true);
 };
-stage.addEventListener("click", e=>{
-  const b = e.target.closest("[data-unblank]"); if(!b) return;
-  if(!confirm("이 빈 칠판과 그 위의 판서를 지울까요?")) return;
-  removeBlank(b.dataset.unblank); send({type:"unblank", id:b.dataset.unblank});
-});
+/* 빈 칠판 지우기: 아래 막대에 있고(판서 중에도 누를 수 있게), 두 번 눌러야 지워짐(확인 창은 다른 사이트 화면 안에서 막힐 수 있어서 안 씀) */
+let armT = 0;
+function blankUI(){
+  const b = $("unblankBtn"), on = !!(data()[cur] && data()[cur].blank);
+  b.style.display = on ? "" : "none";
+  if(!on){ b.classList.remove("arm"); b.querySelector("span").textContent = "칠판 지우기"; }
+}
+$("unblankBtn").onclick = ()=>{
+  const b = $("unblankBtn"), x = data()[cur]; if(!x || !x.blank) return;
+  if(!canNav()){ toast("지금은 상대만 슬라이드를 바꿀 수 있어요."); return; }
+  if(!b.classList.contains("arm")){
+    b.classList.add("arm"); b.querySelector("span").textContent = "한 번 더 누르면 지워져요";
+    clearTimeout(armT); armT = setTimeout(blankUI, 3000); return;
+  }
+  clearTimeout(armT); const id = x.blank;
+  removeBlank(id); send({type:"unblank", id}); send({type:"go", k:skey()}); blankUI();
+};
 
 /* ---------- 같이 쓰기 (PeerJS) ---------- */
 const LIVE = {};
@@ -676,7 +689,7 @@ function lockUI(){
     b.disabled = !!other;
   });
   $("coLockSt").textContent = other ? "상대가 '나만'으로 정했어요. 상대만 넘길 수 있어요." : LOCK===CID ? "나만 슬라이드를 넘길 수 있어요." : "";
-  document.querySelectorAll("#ui .nav, #blankBtn").forEach(b=>b.classList.toggle("locked", !!other));
+  document.querySelectorAll("#ui .nav, #blankBtn, #unblankBtn").forEach(b=>b.classList.toggle("locked", !!other));
 }
 document.querySelectorAll("#coLock [data-lock]").forEach(b=>b.onclick = ()=>{
   if(LOCK && LOCK!==CID) return;
