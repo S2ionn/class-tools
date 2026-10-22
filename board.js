@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-4";
+const VERSION = "2026-10-23-5";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -77,7 +77,19 @@ const CSS = `
 #help li{margin:2px 0}
 #help kbd{font:700 11.5px Consolas,monospace;background:#eef0f4;border:1px solid #d9dde5;border-bottom-width:2px;border-radius:4px;padding:0 5px}
 #help .x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:18px;color:#9aa1b0;cursor:pointer}
-@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui,#helpBtn,#help{display:none!important}}
+#saveAsk{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,14,22,.5);z-index:31}
+#saveAsk.open{display:flex}
+#saveAsk .box{position:relative;width:min(440px,92vw);background:#fff;color:#1d2433;border-radius:16px;padding:22px 24px 18px;font:500 14px/1.6 Body,"Malgun Gothic",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+#saveAsk h3{font:400 20px Title,Body,"Malgun Gothic",sans-serif;margin-bottom:6px}
+#saveAsk .st2{color:#5b6475;font-size:13.5px}
+#saveAsk .row2{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+#saveAsk .row2 button{font:700 14px Body,"Malgun Gothic",sans-serif;border:0;border-radius:10px;padding:11px;cursor:pointer;background:#eef0f4;color:#1d2433}
+#saveAsk .row2 button.main{background:#e8633a;color:#fff}
+#saveAsk .x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:18px;color:#9aa1b0;cursor:pointer}
+img.bd-print{display:none}
+@media print{img.bd-print{display:block;position:absolute;left:0;top:0;width:1280px;height:720px;z-index:50;pointer-events:none}.slide.bd-noprint{display:none!important}#saveAsk{display:none!important}}
+
+@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui,#helpBtn,#help,#saveAsk{display:none!important}}
 `;
 document.head.insertAdjacentHTML("beforeend", `<style>${CSS}</style>`);
 
@@ -100,6 +112,7 @@ const I = {
   eye: ic('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'),
   eyeoff: ic('<path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/>'),
   full: ic('<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>'),
+  pdf: ic('<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>'),
   board: ic('<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M12 8v6M9 11h6"/>'),
 };
 const eyes = () => I.eye.replace("<svg ", '<svg class="on-i" ') + I.eyeoff.replace("<svg ", '<svg class="off" ');
@@ -168,6 +181,9 @@ document.body.insertAdjacentHTML("beforeend", `
   <ul><li>그리다가 멈추고 꾹 누르고 있으면 반듯하게: 선 → 직선, 대충 그린 동그라미·세모·네모 → 반듯한 모양</li>
   <li>직선은 웬만하면 가로·세로로 맞춰져요. 다른 각도는 <b>꾹 누른 뒤 움직이기</b></li>
   <li>글자 밑에 가로선을 그으면 글자 바로 밑에 붙어요 (밑줄)</li></ul>
+  <h4>저장</h4>
+  <ul><li>아래 막대의 저장(↓) 버튼 → <b>필기한 장만</b> 또는 <b>전체 슬라이드</b>를 PDF로. 인쇄 창에서 대상을 "PDF로 저장"으로</li>
+  <li>저장하지 않은 필기가 있을 때 창을 닫으면 "나가시겠어요?"가 떠요. <b>머무르기</b>를 누르면 PDF 저장 창이 나와요</li></ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
   <li>되돌리기는 내가 그은 선만 지워요</li></ul>
@@ -178,6 +194,16 @@ document.body.insertAdjacentHTML("beforeend", `
   <ul><li>같이 쓰기 → 방 이름 → 시작 → <b>수업방에 올릴 링크 복사</b> → 수업방에 붙여 넣기. 둘 다 그 링크로 들어오면 자동 연결</li>
   <li>판서·슬라이드·해석/문법 가리기·퀴즈 정답·레이저·상대 커서가 맞춰져요</li>
   <li>연결되면 <b>슬라이드 넘기기 [둘 다] [나만]</b> — 선생님이 먼저 "나만"을 누르면 학생은 못 넘겨요</li></ul>
+</div></div>
+<div id="saveAsk"><div class="box">
+  <button class="x" id="saveX" title="닫기">✕</button>
+  <h3 id="saveTitle">필기를 PDF로 저장할까요?</h3>
+  <p class="st2">인쇄 창이 열리면 <b>대상</b>을 <b>PDF로 저장</b>으로 고르고 저장을 누르세요.</p>
+  <div class="row2">
+    <button class="main" id="saveInk">필기한 장만 저장</button>
+    <button id="saveAll">전체 슬라이드 저장</button>
+    <button id="saveNo">저장 안 함</button>
+  </div>
 </div></div>`);
 const ui = $("ui");
 ui.className = "bar";
@@ -192,6 +218,7 @@ ui.innerHTML = `
   <button id="unblankBtn" title="이 빈 칠판 지우기" style="display:none">${I.trash}<span>칠판 지우기</span></button>
   <button id="koBtn" title="해석 보이기/숨기기 (K)">${eyes()}<span>해석</span></button>
   <button id="ntBtn" title="문법 보이기/숨기기 (N)">${eyes()}<span>문법</span></button>
+  <button class="ic" id="pdfBtn" title="필기 PDF로 저장">${I.pdf}</button>
   <button class="ic" id="fsBtn" title="전체화면 (F)">${I.full}</button>`;
 
 let toastT = 0;
@@ -891,7 +918,56 @@ $("coGo").onclick = ()=>coStart($("coIn").value);
 $("coIn").addEventListener("keydown", e=>{ e.stopPropagation(); if(e.key==="Enter") coStart(e.target.value); });
 $("coLeave").onclick = coLeave;
 $("coCopy").onclick = coCopy;
-addEventListener("beforeunload", ()=>{ if(peer) peer.destroy(); });
+addEventListener("pagehide", ()=>{ if(peer) peer.destroy(); });
+/* ---------- 필기 PDF 저장 : 판서를 장마다 그림으로 얹고 인쇄(→ PDF로 저장) ---------- */
+let savedSig = "", prepared = false;
+const inkCount = () => Object.values(INK).reduce((s,a)=>s + a.length, 0);
+const inkSig = () => Object.entries(INK).map(([k,a])=>k + a.length + (a.length ? a[a.length-1].id : "")).join("|");
+const unsaved = () => inkCount() > 0 && inkSig() !== savedSig;
+function preparePrint(onlyInk){
+  cleanupPrint();
+  const cv = document.createElement("canvas"); cv.width = 2560; cv.height = 1440; const g = cv.getContext("2d");
+  slides.forEach((sl,i)=>{
+    const arr = INK[skey(i)] || [];
+    if(!arr.length){ if(onlyInk) sl.classList.add("bd-noprint"); return; }
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,2560,1440); g.setTransform(2,0,0,2,0,0);
+    arr.forEach(st=>paint(st, g));
+    const im = new Image(); im.className = "bd-print"; im.src = cv.toDataURL("image/png"); sl.appendChild(im);
+  });
+  prepared = true;
+}
+function cleanupPrint(){
+  document.querySelectorAll("img.bd-print").forEach(x=>x.remove());
+  document.querySelectorAll(".slide.bd-noprint").forEach(x=>x.classList.remove("bd-noprint"));
+  prepared = false;
+}
+addEventListener("beforeprint", ()=>{ if(!prepared) preparePrint(false); });   /* Ctrl+P로 인쇄해도 필기가 같이 나옴 */
+addEventListener("afterprint", ()=>{ cleanupPrint(); savedSig = inkSig(); });
+function savePdf(onlyInk){
+  saveAsk(false);
+  if(onlyInk && !inkCount()){ toast("아직 필기한 장이 없어요."); return; }
+  preparePrint(onlyInk);
+  setTimeout(()=>{ try{ window.print(); }catch(e){ cleanupPrint(); toast("이 화면에서는 인쇄가 막혀 있어요. 새 창에서 열어 저장해 주세요."); } }, 60);
+}
+function saveAsk(on = true, closing = false){
+  $("saveAsk").classList.toggle("open", on);
+  $("saveTitle").textContent = closing ? "나가기 전에 필기를 PDF로 저장할까요?" : "필기를 PDF로 저장할까요?";
+  $("saveNo").textContent = closing ? "저장 안 함" : "닫기";
+}
+$("pdfBtn").onclick = ()=>saveAsk(true);
+$("saveInk").onclick = ()=>savePdf(true);
+$("saveAll").onclick = ()=>savePdf(false);
+$("saveNo").onclick = ()=>{ saveAsk(false); savedSig = inkSig(); };   /* 저장 안 함 → 이번 필기로는 다시 묻지 않음 */
+$("saveX").onclick = ()=>saveAsk(false);
+$("saveAsk").addEventListener("click", e=>{ if(e.target.id==="saveAsk") saveAsk(false); });
+/* 창을 닫거나 새로고침할 때: 저장 안 한 필기가 있으면 브라우저의 "나가시겠어요?"를 띄우고,
+   머무르기를 고르면 바로 PDF 저장 창을 보여 줌 (브라우저는 닫힐 때 직접 만든 창을 띄우지 못하게 막음) */
+addEventListener("beforeunload", e=>{
+  if(!unsaved()) return;
+  e.preventDefault(); e.returnValue = "";
+  setTimeout(()=>saveAsk(true, true), 200);
+});
+
 try{ $("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
 
 /* ---------- 버튼·단축키 ---------- */
@@ -912,6 +988,7 @@ addEventListener("keydown", e=>{
   if((e.ctrlKey||e.metaKey) && (k==="z"||k==="Z")){ e.preventDefault(); e.shiftKey ? redoInk() : undoInk(); return; }
   if((e.ctrlKey||e.metaKey) && (k==="y"||k==="Y")){ e.preventDefault(); redoInk(); return; }
   if($("help").classList.contains("open") && k==="Escape"){ helpOpen(false); return; }
+  if($("saveAsk").classList.contains("open") && k==="Escape"){ saveAsk(false); return; }
   if(k==="?"){ helpOpen(); return; }
   if(k==="p"||k==="P"){ togglePen(); return; }
   if(document.body.classList.contains("drawing")){
