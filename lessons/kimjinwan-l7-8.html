@@ -1034,12 +1034,25 @@ ink.addEventListener("pointermove", e=>{
     const [x0,y0] = stroke.pts[0]; let [x,y] = pos(e);
     if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
     stroke.pts = [[x0,y0],[x,y]];
-  } else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>stroke.pts.push(pos(x))); }
+  } else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>addPt(pos(x))); }
   drawInk();
   if(conns.length && Date.now()-lastLive > 40){ lastLive = Date.now(); coSend({type:"live", who:ME, st:stroke}); }
 });
+/* 선 보정 : 손떨림을 줄이도록 새 점을 이전 점 쪽으로 살짝 끌어당겨 찍음 */
+const SMOOTH = .42;                               /* 1이면 보정 없음, 작을수록 더 매끈 */
+function addPt(q){
+  const L = stroke.pts[stroke.pts.length-1], lp = L[2] ?? .5, qp = q[2] ?? .5;
+  const s = [L[0] + (q[0]-L[0])*SMOOTH, L[1] + (q[1]-L[1])*SMOOTH, lp + (qp-lp)*SMOOTH];
+  stroke.raw = q;
+  if(Math.hypot(s[0]-L[0], s[1]-L[1]) >= .8) stroke.pts.push(s);   /* 너무 촘촘한 점은 건너뜀 */
+}
 const endStroke = ()=>{
   if(!stroke) return;
+  if(stroke.raw){                                 /* 보정 때문에 덜 따라온 끝부분을 실제 끝점까지 이어 줌 */
+    const L = stroke.pts[stroke.pts.length-1], q = stroke.raw;
+    for(let i=1;i<=3;i++) stroke.pts.push([L[0]+(q[0]-L[0])*i/3, L[1]+(q[1]-L[1])*i/3, L[2] ?? .5]);
+    delete stroke.raw;
+  }
   if(stroke.t!=="hl" || stroke.pts.length>1){ touched = true; (INK[stroke.k] ||= []).push(stroke); coSend({type:"add", who:ME, st:stroke}); }   /* 형광펜은 클릭만 하면 버림 */
   stroke = null; drawInk();
 };
