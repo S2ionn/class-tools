@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-8";
+const VERSION = "2026-10-23-9";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -14,8 +14,7 @@ const CSS = `
 #ink{touch-action:none}
 .drawing #ink{pointer-events:auto;cursor:crosshair}
 .drawing.er #ink{cursor:cell}
-.drawing.laser #ink{cursor:crosshair}
-.drawing.lasering #ink{cursor:none}
+.drawing.laser #ink{cursor:none}
 #fx{pointer-events:none}
 .rcur{position:absolute;left:0;top:0;display:none;pointer-events:none;transform:translate(-3px,-2px)}
 .rcur svg{width:22px;height:22px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
@@ -102,6 +101,7 @@ const I = {
   pc: ic('<path d="M21.2 6.8a2.8 2.8 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8l-1.3 4.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5Z"/><path d="M15 5l4 4"/>'),
   hl: ic('<path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>'),
   er: ic('<path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/>'),
+  se: ic('<path d="M3 15c2.5-4 5 1 7.5-3S16 13 21 8"/><path d="M14 14l6 6M20 14l-6 6"/>'),
   laser: ic('<circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'),
   line: ic('<path d="M5 19L19 5"/>'), circle: ic('<circle cx="12" cy="12" r="8"/>'), tri: ic('<path d="M12 4l9 16H3Z"/>'),
   heart: ic('<path d="M12 20.5C9 18.4 2.5 14 2.5 8.6 2.5 5.5 4.8 3.5 7.4 3.5c2 0 3.6 1.2 4.6 3 1-1.8 2.6-3 4.6-3 2.6 0 4.9 2 4.9 5.1 0 5.4-6.5 9.8-9.5 11.9Z"/>'),
@@ -129,6 +129,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <button class="ic" data-t="pc" title="색연필">${I.pc}</button>
   <button class="ic" data-t="hl" title="형광펜 (곧은 선)">${I.hl}</button>
   <button class="ic" data-t="er" title="지우개 (E)">${I.er}</button>
+  <button class="ic" data-t="se" title="획 지우개 — 닿은 선을 통째로 지워요 (S)">${I.se}</button>
   <button class="ic" data-t="laser" title="레이저 포인터 (L)">${I.laser}</button>
   <button class="ic" data-t="shape" id="shapeBtn" title="도형">${I.circle}</button>
   <span class="sep"></span>
@@ -174,8 +175,8 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>펜과 마우스로만 써져요. 손가락·손바닥이 닿아도 그려지지 않아요</li></ul>
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
-  <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd></li>
-  <li><b>레이저</b> <kbd>L</kbd> 누르고 있는 동안 빨간 점이 따라와요. 떼면 꼬리가 사라져요 (상대 화면에도 보여요)</li>
+  <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> 문지른 곳만 · <b>획 지우개</b> <kbd>S</kbd> 닿은 선을 통째로</li>
+  <li><b>레이저</b> <kbd>L</kbd> 평소엔 빨간 점이 커서 대신 따라다니고, 누르고 움직이면 꼬리가 생겨요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
   <h4>꾹 누르기</h4>
@@ -290,7 +291,7 @@ let tool = "pen", drawBase = "pen", shapeKind = "circle", stroke = null;
 const ME = Math.random().toString(36).slice(2,8);
 const CID = (()=>{ try{ let c = localStorage.getItem("boardCid"); if(!c){ c = Math.random().toString(36).slice(2,10); localStorage.setItem("boardCid", c); } return c; }catch(e){ return "t" + ME; } })();
 const palOf = t => t==="hl" || t==="pc" ? t : "pen";
-const sizeOf = t => t==="shape" || t==="laser" ? drawBase : t;   /* 도형은 마지막에 쓴 펜/색연필 모양을 따름 */
+const sizeOf = t => t==="shape" || t==="laser" || t==="se" ? drawBase : t;   /* 도형은 마지막에 쓴 펜/색연필 모양을 따름 */
 const colorOf = k => sel[k].c < PAL[k].length ? PAL[k][sel[k].c] : (CUSTOM[k] || PAL[k][0]);
 
 function togglePen(on = !document.body.classList.contains("drawing")){
@@ -309,7 +310,7 @@ function buildBar(){
   }
   const cs = box.querySelectorAll(".c"), cu = cs[cs.length-1];
   cu.style.display = CUSTOM[k] ? "" : "none"; if(CUSTOM[k]) cu.style.background = CUSTOM[k];
-  cs.forEach((b,i)=>b.classList.toggle("on", tool!=="er" && tool!=="laser" && sel[k].c===i));
+  cs.forEach((b,i)=>b.classList.toggle("on", !["er","laser","se"].includes(tool) && sel[k].c===i));
   const ws = SIZES[st], cc = colorOf(k);
   $("sizes").innerHTML = ws.map((w,i)=>{
     const d = Math.round(4 + i*12/(ws.length-1));
@@ -318,10 +319,10 @@ function buildBar(){
                : `width:${d}px;height:${d}px;background:${cc};box-shadow:0 0 0 1px rgba(255,255,255,.35)`;
     return `<button class="s${sel[st].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
   }).join("");
-  $("sizes").style.visibility = tool==="laser" ? "hidden" : "";
+  $("sizes").style.visibility = tool==="laser" || tool==="se" ? "hidden" : "";
   document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===tool));
   $("shapeBtn").innerHTML = I[shapeKind];
-  document.body.classList.toggle("er", tool==="er");
+  document.body.classList.toggle("er", tool==="er" || tool==="se");
   document.body.classList.toggle("laser", tool==="laser");
   $("undoBtn").style.opacity = myLast(skey()) >= 0 ? "" : ".4";
   $("redoBtn").style.opacity = (REDO[skey()]||[]).length ? "" : ".4";
@@ -342,12 +343,12 @@ $("pen").addEventListener("click", e=>{
   }
   $("shapeMenu").classList.remove("open");
   if(b.dataset.t) setTool(b.dataset.t);
-  else if(b.dataset.c){ if(tool==="er" || tool==="laser") setTool(drawBase); sel[palOf(sizeOf(tool))].c = +b.dataset.c; buildBar(); }
+  else if(b.dataset.c){ if(["er","laser","se"].includes(tool)) setTool(drawBase); sel[palOf(sizeOf(tool))].c = +b.dataset.c; buildBar(); }
   else if(b.dataset.s){ sel[sizeOf(tool)].s = +b.dataset.s; buildBar(); }
 });
 $("pen").addEventListener("input", e=>{
   if(e.target.type!=="color") return;
-  if(tool==="er" || tool==="laser") setTool(drawBase);
+  if(["er","laser","se"].includes(tool)) setTool(drawBase);
   const k = palOf(sizeOf(tool)); CUSTOM[k] = e.target.value; sel[k].c = PAL[k].length; buildBar();
 });
 $("shapeMenu").addEventListener("click", e=>{
@@ -591,7 +592,8 @@ ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
   const q = pos(e);
-  if(tool==="laser"){ laserDown = true; document.body.classList.add("lasering"); laserAt(q, "down"); return; }
+  if(tool==="laser"){ laserDown = true; laserAt(q, "down"); return; }
+  if(tool==="se"){ seDown = true; seLast = null; eraseAt(q); return; }
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
@@ -603,7 +605,8 @@ ink.addEventListener("pointerdown", e=>{
   drawInk();
 });
 ink.addEventListener("pointermove", e=>{
-  if(tool==="laser"){ if(laserDown){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>laserAt(pos(x), "move")); } return; }
+  if(tool==="laser"){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>laserAt(pos(x), laserDown ? "move" : "hover")); return; }
+  if(tool==="se"){ if(seDown){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>eraseAt(pos(x))); } return; }
   if(!stroke) return;
   const q = pos(e);
   if(stroke.shape==="line"){
@@ -623,7 +626,8 @@ ink.addEventListener("pointermove", e=>{
   drawInk(); sendLive();
 });
 const endStroke = ()=>{
-  if(laserDown){ laserDown = false; document.body.classList.remove("lasering"); laserAt(null, "up"); }
+  if(laserDown){ laserDown = false; laserAt(null, "up"); }
+  seDown = false;
   clearTimeout(holdT); holdAt = null;
   if(!stroke) return;
   if(stroke.raw){                                 /* 보정 때문에 덜 따라온 끝부분을 실제 끝점까지 이어 줌 */
@@ -637,6 +641,31 @@ const endStroke = ()=>{
 };
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
+ink.addEventListener("pointerleave", ()=>{ if(tool==="laser" && !laserDown) laserAt(null, "out"); });
+/* 획 지우개: 지나간 자리에 닿은 선을 통째로 지움(내 선·상대 선 모두). 문지르는 지우개 자국은 건드리지 않음 */
+let seDown = false, seLast = null;
+function segDist(px, py, a, b){
+  const dx = b[0]-a[0], dy = b[1]-a[1], L = dx*dx + dy*dy;
+  const u = L ? Math.max(0, Math.min(1, ((px-a[0])*dx + (py-a[1])*dy) / L)) : 0;
+  return Math.hypot(px - (a[0]+dx*u), py - (a[1]+dy*u));
+}
+function eraseAt(q){                             /* 빠르게 문질러도 건너뛰지 않게 지난 위치와의 사이를 4px 간격으로 채워 검사 */
+  const from = seLast || q; seLast = q;
+  const n = Math.max(1, Math.ceil(Math.hypot(q[0]-from[0], q[1]-from[1]) / 4));
+  for(let i=1;i<=n;i++) eraseOne([from[0] + (q[0]-from[0])*i/n, from[1] + (q[1]-from[1])*i/n]);
+}
+function eraseOne(q){
+  const k = skey(), arr = INK[k]; if(!arr || !arr.length) return;
+  let hit = false;
+  for(let j=arr.length-1;j>=0;j--){
+    const st = arr[j]; if(st.t==="er") continue;
+    const R = 7 + st.w/2, p = st.pts;
+    let on = p.length===1 ? Math.hypot(q[0]-p[0][0], q[1]-p[0][1]) <= R : false;
+    for(let i=1;i<p.length && !on;i++) if(segDist(q[0], q[1], p[i-1], p[i]) <= R) on = true;
+    if(on){ arr.splice(j,1); send({type:"del", k, id:st.id}); hit = true; }
+  }
+  if(hit){ touched = true; drawInk(); }
+}
 
 
 function myLast(k){ const a = INK[k]||[]; for(let j=a.length-1;j>=0;j--) if(!a[j].o || a[j].o===ME) return j; return -1; }
@@ -663,16 +692,21 @@ function laserPush(L, x, y, now){
   if(last && Math.hypot(x-last.x, y-last.y) < .6){ last.t = now; return; }
   a.push({x, y, t:now}); if(a.length > 120) a.splice(0, a.length-120);
 }
-function laserAt(q, phase){                        /* phase: "down" | "move" | "up" */
-  const L = LASER.me ||= {pts:[], down:false}, now = performance.now();
-  if(phase==="down"){ L.pts = []; L.down = true; }
+/* 레이저: 평소엔 빨간 점만 따라다니고(커서 대신), 누르고 있는 동안은 점 뒤로 꼬리가 생김 */
+function laserAt(q, phase){                        /* phase: "hover" | "down" | "move" | "up" | "out" */
+  const L = LASER.me ||= {pts:[], down:false, hover:null}, now = performance.now();
+  if(phase==="out"){ L.hover = null; send({type:"laser", who:ME, out:true}); kickFx(); return; }
   if(phase==="up"){ L.down = false; send({type:"laser", who:ME, up:true}); kickFx(); return; }
-  if(!L.down || !q) return;
-  laserPush(L, q[0], q[1], now);
-  if(conns.length && (phase==="down" || Date.now()-lastLaser > 16)){ lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1], down:phase==="down"}); }
+  if(!q) return;
+  L.hover = {x:q[0], y:q[1]};
+  if(phase==="down"){ L.pts = []; L.down = true; }
+  if(L.down) laserPush(L, q[0], q[1], now);
+  if(conns.length && (phase==="down" || Date.now()-lastLaser > (L.down ? 16 : 30))){
+    lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1], down:phase==="down", hover:!L.down});
+  }
   kickFx();
 }
-function hideLaser(){ const L = LASER.me; if(L && (L.down || L.pts.length)){ L.down = false; L.pts = []; laserDown = false; send({type:"laser", who:ME, up:true}); kickFx(); } }
+function hideLaser(){ const L = LASER.me; if(L && (L.down || L.pts.length || L.hover)){ L.down = false; L.pts = []; L.hover = null; laserDown = false; send({type:"laser", who:ME, out:true}); kickFx(); } }
 function kickFx(){ if(!fxOn){ fxOn = true; requestAnimationFrame(drawFx); } }
 function ribbon(a, now, maxW){                     /* 시간이 지날수록 가늘어지는 꼬리 띠(채운 다각형) */
   const n = a.length, L = [], R = [];
@@ -698,15 +732,14 @@ function drawFx(){
       const k = Math.min(1, (cut - a[0].t) / Math.max(1, a[1].t - a[0].t));
       a[0] = {x:a[0].x + (a[1].x-a[0].x)*k, y:a[0].y + (a[1].y-a[0].y)*k, t:cut};
     }
-    if(!Lz.down && (!a.length || a[a.length-1].t < cut)){ Lz.pts = []; continue; }
-    if(!a.length) { if(Lz.down) alive = true; continue; }
-    alive = true;
-    if(a.length >= 2){
+    if(!Lz.down && a.length && a[a.length-1].t < cut) Lz.pts = [];
+    if(Lz.down || Lz.hover || Lz.pts.length) alive = true;
+    if(Lz.pts.length >= 2){
       fctx.fillStyle = "rgba(255,40,40,.22)"; ribbon(a, now, 13);
       fctx.fillStyle = "rgba(255,55,55,.9)"; ribbon(a, now, 4.2);
     }
-    if(Lz.down){                                   /* 누르고 있을 때만 빛나는 점 */
-      const h = a[a.length-1];
+    const h = Lz.down && Lz.pts.length ? Lz.pts[Lz.pts.length-1] : Lz.hover;
+    if(h){                                         /* 빛나는 빨간 점 */
       const g = fctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 15);
       g.addColorStop(0, "rgba(255,50,50,.55)"); g.addColorStop(1, "rgba(255,0,0,0)");
       fctx.fillStyle = g; fctx.beginPath(); fctx.arc(h.x, h.y, 15, 0, 7); fctx.fill();
@@ -729,7 +762,7 @@ addEventListener("pointermove", e=>{               /* 내 커서 위치를 상�
   const inside = x>=0 && x<=1280 && y>=0 && y<=720;
   if(!inside){ if(!curOut){ curOut = true; send({type:"cur", x:null}); } return; }
   curOut = false;
-  send({type:"cur", x, y, draw:!!stroke, laser:laserDown});
+  send({type:"cur", x, y, draw:!!stroke, laser:tool==="laser" && document.body.classList.contains("drawing")});
 });
 document.addEventListener("mouseleave", ()=>{ if(conns.length){ curOut = true; send({type:"cur", x:null}); } });
 
@@ -834,9 +867,12 @@ function apply(msg, from){
   else if(t==="unblank"){ removeBlank(msg.id); }
   else if(t==="cur"){ showRcur(msg); }
   else if(t==="laser"){
-    const Lz = LASER[msg.who] ||= {pts:[], down:false}, now = performance.now();
-    if(msg.up){ Lz.down = false; }
+    const Lz = LASER[msg.who] ||= {pts:[], down:false, hover:null}, now = performance.now();
+    if(msg.out){ Lz.hover = null; Lz.down = false; }
+    else if(msg.up){ Lz.down = false; }
+    else if(msg.hover){ Lz.hover = {x:msg.x, y:msg.y}; Lz.down = false; }
     else if(msg.x!=null){
+      Lz.hover = {x:msg.x, y:msg.y};
       if(msg.down || !Lz.down){ Lz.pts = []; Lz.down = true; }
       const last = Lz.pts[Lz.pts.length-1];
       if(last){ for(let s=1;s<3;s++) laserPush(Lz, last.x + (msg.x-last.x)*s/3, last.y + (msg.y-last.y)*s/3, now - 16 + s*5); }   /* 받은 점 사이를 메워 부드럽게 */
@@ -1027,6 +1063,7 @@ addEventListener("keydown", e=>{
   if(document.body.classList.contains("drawing")){
     if(k==="e"||k==="E"){ setTool(tool==="er" ? drawBase : "er"); return; }
     if(k==="l"||k==="L"){ setTool(tool==="laser" ? drawBase : "laser"); return; }
+    if(k==="s"||k==="S"){ setTool(tool==="se" ? drawBase : "se"); return; }
     if(k==="Delete"){ clearInk(); return; }
     if(k==="Escape"){ togglePen(false); return; }
   }
