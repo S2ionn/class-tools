@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-2";
+const VERSION = "2026-10-23-3";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -79,7 +79,7 @@ const I = {
   hl: ic('<path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>'),
   er: ic('<path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/>'),
   laser: ic('<circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'),
-  circle: ic('<circle cx="12" cy="12" r="8"/>'), tri: ic('<path d="M12 4l9 16H3Z"/>'),
+  line: ic('<path d="M5 19L19 5"/>'), circle: ic('<circle cx="12" cy="12" r="8"/>'), tri: ic('<path d="M12 4l9 16H3Z"/>'),
   heart: ic('<path d="M12 20s-7-4.4-9-9a4.5 4.5 0 0 1 9-3 4.5 4.5 0 0 1 9 3c-2 4.6-9 9-9 9Z"/>'),
   undo: ic('<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
   redo: ic('<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>'),
@@ -111,6 +111,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <button class="ic" id="clearBtn" title="이 장 모두 지우기 (Delete)">${I.trash}</button>
 </div>
 <div id="shapeMenu" class="bar">
+  <button class="ic" data-shape="line" title="직선 (가로·세로로 맞춤, 꾹 누른 뒤 움직이면 자유 각도)">${I.line}</button>
   <button class="ic" data-shape="circle" title="원">${I.circle}</button>
   <button class="ic" data-shape="tri" title="세모">${I.tri}</button>
   <button class="ic" data-shape="heart" title="하트">${I.heart}</button>
@@ -443,10 +444,22 @@ function addPt(q){
     if(stroke.t==="pen" || stroke.t==="pc") holdT = setTimeout(snapStroke, 550);
   }
 }
+/* 직선은 웬만하면 가로(180°)·세로(90°)로: tol도 안쪽이면 맞춤 (90이면 늘 맞춤) */
+function hv(a, q, tol){
+  const dx = q[0]-a[0], dy = q[1]-a[1], ang = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI);   /* 0~180 */
+  const toH = Math.min(ang, 180-ang), toV = Math.abs(90-ang);
+  if(toH <= toV && toH <= tol) return [q[0], a[1], q[2]];
+  if(toV < toH && toV <= tol) return [a[0], q[1], q[2]];
+  return q;
+}
+function freeAngle(){                             /* 직선 도구: 꾹 누르고 있으면 자유 각도 */
+  if(!stroke || stroke.shape!=="line" || stroke.free) return;
+  stroke.free = true; toast("자유 각도로 그려요");
+}
 function snapStroke(){
   if(!stroke || stroke.snap || stroke.shape) return;
   const res = recognize(stroke); if(!res) return;
-  if(res.kind==="line"){ stroke.snap = "line"; stroke.pts = sampleLine(stroke.pts[0], stroke.raw || stroke.pts[stroke.pts.length-1]); }
+  if(res.kind==="line"){ stroke.snap = "line"; stroke.pts = sampleLine(stroke.pts[0], hv(stroke.pts[0], stroke.raw || stroke.pts[stroke.pts.length-1], 15)); }
   else { stroke.snap = "shape"; stroke.closed = true; stroke.pts = res.pts; }
   delete stroke.raw; drawInk(); sendLive(true);
 }
@@ -461,22 +474,28 @@ ink.addEventListener("pointerdown", e=>{
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
-  if(tool==="shape"){ stroke.shape = shapeKind; stroke.x0 = q[0]; stroke.y0 = q[1]; stroke.closed = true; }
+  if(tool==="shape"){ stroke.shape = shapeKind; stroke.x0 = q[0]; stroke.y0 = q[1]; stroke.closed = shapeKind!=="line"; }
   holdAt = q; clearTimeout(holdT);
-  if(base==="pen" || base==="pc") holdT = setTimeout(snapStroke, 700);
+  if(stroke.shape==="line") holdT = setTimeout(freeAngle, 450);
+  else if(tool!=="shape" && (base==="pen" || base==="pc")) holdT = setTimeout(snapStroke, 700);
   drawInk();
 });
 ink.addEventListener("pointermove", e=>{
   if(tool==="laser"){ laserAt(pos(e), laserDown); return; }
   if(!stroke) return;
   const q = pos(e);
-  if(stroke.shape) stroke.pts = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1]);
+  if(stroke.shape==="line"){
+    if(!holdAt || Math.hypot(q[0]-holdAt[0], q[1]-holdAt[1]) > 4){ holdAt = q; clearTimeout(holdT); if(!stroke.free) holdT = setTimeout(freeAngle, 450); }
+    const a = [stroke.x0, stroke.y0];
+    stroke.pts = sampleLine(a, stroke.free ? q : hv(a, q, 90));
+  }
+  else if(stroke.shape) stroke.pts = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1]);
   else if(stroke.t==="hl"){
     const [x0,y0] = stroke.pts[0]; let [x,y] = q;
     if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
     stroke.pts = [[x0,y0],[x,y]];
   }
-  else if(stroke.snap==="line") stroke.pts = sampleLine(stroke.pts[0], q);
+  else if(stroke.snap==="line") stroke.pts = sampleLine(stroke.pts[0], hv(stroke.pts[0], q, 15));
   else if(stroke.snap) return;
   else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>addPt(pos(x))); }
   drawInk(); sendLive();
