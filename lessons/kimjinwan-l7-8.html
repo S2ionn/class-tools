@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7·8과 본문 설명</title>
+<style>
+/* 설치된 글꼴을 먼저 쓰고, 없으면 웹 글꼴(../fonts)을 내려받아 어디서든 똑같이 보이게 함 */
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("../fonts/Cafe24Ssurround.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("../fonts/Dunggeunmiso-R.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("../fonts/Dunggeunmiso-B.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{
+  --ink:#1d2433; --sub:#5b6475; --line:#e3e6ee; --paper:#ffffff; --bg:#20242c;
+  --acc:#e8633a; --acc2:#fff1ea; --acc3:#b8441f; --mark:#ffe08a;
+}
+.l8{ --acc:#4b5bd6; --acc2:#eef0ff; --acc3:#2f3aa0; --mark:#cfe9ff; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:Body,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.cover h1,.cover .t,h2,.hd .sec,.hd .ls,.box h3,.s .n,.tag,.q .qn,.main .card div,.flow .st b,table.cmp td:first-child{font-family:Title,Body,"Malgun Gothic",sans-serif;font-weight:400}
+h2 small{font-family:Title,Body,sans-serif}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{display:none;position:absolute;inset:0;background:var(--paper);overflow:hidden;flex-direction:column}
+.slide.on{display:flex}
+
+/* header */
+.hd{height:64px;flex:none;display:flex;align-items:center;gap:16px;padding:0 48px;border-bottom:1px solid var(--line)}
+.hd .ls{font-weight:800;font-size:15px;color:#fff;background:var(--acc);padding:6px 12px;border-radius:6px;letter-spacing:.02em}
+.hd .sec{font-weight:700;font-size:19px;color:var(--ink)}
+.hd .rng{margin-left:auto;font-size:15px;color:var(--sub);font-variant-numeric:tabular-nums}
+.bd{flex:1;padding:18px 56px 38px;display:flex;flex-direction:column;justify-content:safe center;gap:16px;min-height:0}
+.ft{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;padding:0 48px;font-size:13px;color:#9aa1b0}
+.ft .pg{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* sentence */
+.s{display:grid;grid-template-columns:52px 1fr;column-gap:16px}
+.s .n{width:44px;height:44px;border-radius:50%;background:var(--acc2);color:var(--acc3);font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.s .en{font-size:25px;line-height:1.48;font-weight:500;letter-spacing:-.003em}
+.s.h .en{font-weight:800;color:var(--acc3)}
+.s .sp{display:inline-block;font-size:15px;font-weight:700;color:#fff;background:#7b8394;border-radius:5px;padding:2px 8px;margin-right:10px;vertical-align:4px}
+.s .sp.dr{background:var(--acc3)}
+.sl{color:#c2c7d2;font-weight:300;margin:0 .1em}
+mark{background:linear-gradient(transparent 58%,var(--mark) 58%);color:inherit;padding:0 1px}
+.s .nt{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px}
+.s .nt span{font-size:14.5px;line-height:1.35;color:var(--acc3);background:var(--acc2);border-radius:999px;padding:4px 11px}
+.s .ko,.s .kc{display:grid;grid-template-columns:80px 1fr;align-items:baseline;font-size:17.5px;line-height:1.5;margin-top:6px}
+.s .kc{color:#4a5263}
+.s .ko{color:var(--ink);margin-top:3px}
+.s .ko b,.s .kc b{font-size:13px;font-weight:700;border-radius:5px;padding:1px 0;text-align:center;margin-right:10px;white-space:nowrap}
+.s .kc b{color:var(--sub);background:#eef0f4}
+.s .ko b{color:#fff;background:var(--acc)}
+.s .kc .sl{color:#b7bcc7}
+.hideKo .s .ko,.hideKo .s .kc{visibility:hidden}
+img.art{display:block;object-fit:cover;border-radius:14px}
+.cover img.art{position:absolute;right:80px;top:50%;transform:translateY(-50%);width:440px;height:440px;border-radius:28px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.cover:has(img.art) .big{display:none}
+.hideNt .s .nt{visibility:hidden}
+
+/* cover */
+.cover{background:var(--acc);color:#fff;justify-content:center;padding:0 110px}
+.cover .k{font-size:22px;font-weight:600;opacity:.85}
+.cover h1{font-size:82px;font-weight:900;line-height:1.08;margin:16px 0 18px;letter-spacing:-.01em}
+.cover .t{font-size:30px;font-weight:600}
+.cover .d{margin-top:40px;font-size:19px;opacity:.85;line-height:1.6}
+.cover .big{position:absolute;right:80px;bottom:30px;font-size:300px;font-weight:900;opacity:.12;line-height:1}
+.main{background:#1d2433;color:#fff}
+.main .row{display:flex;gap:28px;margin-top:44px}
+.main .card{flex:1;border-radius:16px;padding:26px 30px;background:rgba(255,255,255,.07)}
+.main .card b{display:block;font-size:15px;opacity:.7;margin-bottom:8px}
+.main .card div{font-size:28px;font-weight:800}
+.main .card p{margin-top:8px;font-size:17px;opacity:.8}
+
+/* general content */
+h2{font-size:34px;font-weight:800;letter-spacing:-.01em}
+h2 small{display:block;font-size:17px;font-weight:600;color:var(--acc);margin-bottom:6px;letter-spacing:.02em}
+.lead{font-size:19px;color:var(--sub);line-height:1.55}
+.grid{display:grid;gap:14px}
+.box{border:1px solid var(--line);border-radius:14px;padding:16px 20px;background:#fff}
+.box.f{background:var(--acc2);border-color:transparent}
+.box h3{font-size:20px;font-weight:800;margin-bottom:6px;color:var(--acc3)}
+.box p,.box li{font-size:17px;line-height:1.55}
+.box ul{padding-left:20px}
+.box .ex{margin-top:7px;font-size:16.5px;line-height:1.45;background:#fff;border-radius:8px;padding:7px 12px;border:1px dashed var(--line)}
+.box .ex i{font-style:normal;color:var(--sub);font-size:15px;display:block}
+.tag{display:inline-block;font-size:14px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:3px 9px;margin-bottom:10px}
+.flow{display:flex;align-items:stretch;gap:10px}
+.flow .st{flex:1;border-radius:12px;background:var(--acc2);padding:16px 14px}
+.flow .st b{display:block;font-size:14px;color:var(--acc);margin-bottom:4px}
+.flow .st div{font-size:17px;font-weight:700;line-height:1.35}
+.flow .st p{font-size:14.5px;color:var(--sub);margin-top:6px;line-height:1.45}
+.flow .ar{display:flex;align-items:center;color:var(--acc);font-size:22px;font-weight:800}
+table.cmp{width:100%;border-collapse:collapse;font-size:17px}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--line);padding:13px 12px;text-align:left;vertical-align:top;line-height:1.45}
+table.cmp th{font-size:15px;color:var(--sub);font-weight:700}
+table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
+
+/* quiz */
+.q{display:grid;grid-template-columns:40px 1fr;gap:6px 14px;border:1px solid var(--line);border-radius:14px;padding:16px 20px;cursor:pointer}
+.q .qn{font-weight:900;color:var(--acc);font-size:22px}
+.q .qq{font-size:19px;line-height:1.5;font-weight:600}
+.q .qa{grid-column:2;font-size:18px;color:var(--acc3);font-weight:700;background:var(--acc2);border-radius:8px;padding:8px 12px;opacity:0;transition:opacity .2s}
+.q.open .qa{opacity:1}
+.q .hint{grid-column:2;font-size:13px;color:#a0a6b3}
+.q.open .hint{display:none}
+
+/* controls */
+#ui{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;z-index:9;opacity:.35;transition:opacity .2s}
+#ui:hover{opacity:1}
+#ui button{font:600 13px Body,"Malgun Gothic",sans-serif;background:#fff;border:0;border-radius:8px;padding:7px 11px;cursor:pointer;color:#1d2433}
+#bar{position:fixed;left:0;top:0;height:3px;background:#e8633a;z-index:9;transition:width .2s}
+
+/* ===== 판서 ===== */
+#ink{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;pointer-events:none;z-index:5;touch-action:none}
+.drawing #ink{pointer-events:auto;cursor:crosshair}
+.drawing.er #ink{cursor:cell}
+#pen{position:fixed;left:14px;bottom:12px;display:none;gap:6px;align-items:center;z-index:10;background:#1d2433;border-radius:12px;padding:6px 8px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.drawing #pen{display:flex}
+.drawing #ui{opacity:1}
+#pen button{font:600 13px Body,"Malgun Gothic",sans-serif;border:0;border-radius:8px;padding:7px 10px;cursor:pointer;background:#2e3546;color:#fff}
+#pen button.c{width:30px;height:30px;padding:0;border-radius:50%;border:3px solid transparent}
+#pen button.on{outline:3px solid #fff;outline-offset:1px}
+#pen .sep{width:1px;height:24px;background:#4a5263;margin:0 2px}
+#ui button.on{background:#e8633a;color:#fff}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff}
+  #stage{position:static;transform:none!important}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page}
+  #ui,#bar,#ink,#pen{display:none!important}
+  .q .qa{opacity:1}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage"></div>
+<canvas id="ink" width="2560" height="1440"></canvas>
+<div id="pen">
+  <button class="c on" style="background:#e5322d" data-c="#e5322d" title="빨강"></button>
+  <button class="c" style="background:#2563eb" data-c="#2563eb" title="파랑"></button>
+  <button class="c" style="background:#16a34a" data-c="#16a34a" title="초록"></button>
+  <button class="c" style="background:#111827;border-color:#6b7280" data-c="#111827" title="검정"></button>
+  <span class="sep"></span>
+  <button data-t="pen" class="on" title="펜">펜</button>
+  <button data-t="hl" title="형광펜">형광펜</button>
+  <button data-t="er" title="지우개 (E)">지우개</button>
+  <span class="sep"></span>
+  <button onclick="undoInk()" title="되돌리기 (Ctrl+Z)">되돌리기</button>
+  <button onclick="clearInk()" title="이 장 모두 지우기 (Delete)">모두 지우기</button>
+</div>
+<div id="ui">
+  <button onclick="go(cur-1)">◀</button>
+  <button onclick="go(cur+1)">▶</button>
+  <button id="penBtn" onclick="togglePen()" title="P">✏️ 판서</button>
+  <button onclick="tg('hideKo')" title="K">해석 숨기기</button>
+  <button onclick="tg('hideNt')" title="N">문법 숨기기</button>
+  <button onclick="fs()" title="F">전체화면</button>
+</div>
+
+<script>
+/* ---------- 문장 데이터 ----------
+   [ ] = 형광펜(핵심 문법), / = 끊어 읽기, sp = 화자, h = 소제목 문장 */
+const L7 = [
+ {n:1,en:"Have you ever [wondered] / [why you've bought] / things / that you don't even want or need?",ko:"여러분은 원하지도, 필요하지도 않은 물건을 왜 샀는지 궁금했던 적이 있나요?",nt:["Have you ever p.p.? : 경험 (현재완료)","why + 주어 + 동사 : wondered의 목적어 (간접의문문)","that : things를 꾸미는 목적격 관계대명사"]},
+ {n:2,en:"Let's consider / [what affects us] / [when it comes to] / buying things.",ko:"물건을 사는 것에 관해서라면, 무엇이 우리에게 영향을 주는지 생각해 봅시다.",nt:["what affects us : 의문사 what이 주어인 간접의문문 (what + 동사)","when it comes to + (동)명사 : ~에 관해서라면"]},
+ {n:3,h:1,en:"Why do I want / to buy / [what my friends bought]?",ko:"나는 왜 내 친구들이 산 것을 사고 싶어 할까?",nt:["want + to부정사 (목적어)","what = the thing(s) that : 선행사를 포함한 관계대명사"]},
+ {n:4,en:"Jeff [goes] / to the shopping center / and [sees] / a pair of soccer shoes / on display.",ko:"Jeff는 쇼핑센터에 가서 진열된 축구화 한 켤레를 본다.",nt:["goes ~ and sees : 병렬 구조","a pair of : 한 켤레의","on display : 진열된"]},
+ {n:5,en:"He recognizes / the shoes / at a glance / because more than [half of the boys] / on his soccer team / [wear] them.",ko:"그의 축구팀 소년들 중 절반 이상이 그 신발을 신기 때문에, 그는 한눈에 그 신발을 알아본다.",nt:["at a glance : 한눈에","more than : ~ 이상","half of + 복수명사 → 복수 동사 wear"]},
+ {n:6,en:"[Although] he already has / many pairs of soccer shoes, / he [ends up buying] / another new pair.",ko:"그는 이미 축구화가 여러 켤레 있지만, 결국 새 축구화를 또 한 켤레 사고 만다.",nt:["Although (= though) : 비록 ~이지만","end up + -ing : 결국 ~하게 되다","another + 단수명사 : 또 하나의"]},
+ {n:7,en:"We can use / the “bandwagon effect” / [to explain] / Jeff's behavior.",ko:"우리는 Jeff의 행동을 설명하기 위해 ‘밴드왜건 효과’를 사용할 수 있다.",nt:["to explain : 목적 ‘~하기 위해’ (to부정사 부사적 용법)","behavior : 행동"]},
+ {n:8,en:"A bandwagon is / a wagon / in a parade / [that] [encourages people / to jump] aboard and enjoy / the music.",ko:"밴드왜건은 사람들이 올라타서 음악을 즐기도록 부추기는, 퍼레이드 속 마차이다.",nt:["that : a wagon을 꾸미는 주격 관계대명사","encourage + 목적어 + to V : ~가 …하도록 부추기다","jump aboard : 올라타다"]},
+ {n:9,en:"[As] more and more people get on / the bandwagon, / others [are more likely to] / get on or follow it.",ko:"점점 더 많은 사람들이 밴드왜건에 탈수록, 다른 사람들도 그것에 올라타거나 따라갈 가능성이 더 커진다.",nt:["As : ~함에 따라, ~할수록 (접속사)","be likely to V : ~할 것 같다","others : 다른 사람들"]},
+ {n:10,en:"In this way, / people [tend to buy] / something / [just because] other people have bought / it.",ko:"이런 식으로, 사람들은 단지 다른 사람들이 샀다는 이유로 무언가를 사는 경향이 있다.",nt:["tend to V : ~하는 경향이 있다","just because : 단지 ~라는 이유로","it = something"]},
+ {n:11,h:1,en:"Why do I buy / a pair of pants and a bag / after I [have bought] / a new coat?",ko:"나는 왜 새 코트를 산 뒤에 바지와 가방을 살까?",nt:["have bought : 현재완료 (완료)"]},
+ {n:12,en:"Lisa buys / a coat / [that she really loves].",ko:"Lisa는 정말 마음에 드는 코트를 산다.",nt:["that : a coat를 꾸미는 목적격 관계대명사 (생략 가능)"]},
+ {n:13,en:"Immediately, / she realizes / [that] her pants do not [match] / her new coat.",ko:"그녀는 곧바로 자신의 바지가 새 코트와 어울리지 않는다는 것을 깨닫는다.",nt:["Immediately : 즉시","that : realizes의 목적어절을 이끄는 접속사","match : ~와 어울리다"]},
+ {n:14,en:"So, / she buys / new pants / [that go] perfectly [with] her new coat.",ko:"그래서 그녀는 새 코트와 완벽하게 어울리는 새 바지를 산다.",nt:["that : new pants를 꾸미는 주격 관계대명사 → 복수 동사 go","go with : ~와 어울리다"]},
+ {n:15,en:"But / she sees / that [none of her bags match] / her new clothes. // So, / she buys / a new bag.",ko:"하지만 그녀는 자신의 가방 중 어느 것도 새 옷과 어울리지 않는다는 것을 알게 된다. 그래서 그녀는 새 가방을 산다.",nt:["none of + 복수명사 : 아무것도 ~ 않다 (복수 동사 match도 가능)","that : sees의 목적어절 접속사"]},
+ {n:16,en:"[Most of her money is] [spent] / [on buying] the new items / [to complete] her new look.",ko:"그녀의 돈 대부분은 새로운 모습을 완성하기 위해 새 물건들을 사는 데 쓰인다.",nt:["most of + 셀 수 없는 명사 → 단수 동사 is","be spent : 수동태 / spend A on -ing : ~하는 데 A를 쓰다","to complete : 목적 ‘~하기 위해’","look : (겉)모습"]},
+ {n:17,en:"What [made Lisa / search for] new items / immediately [after buying] / a new coat?",ko:"무엇이 Lisa가 새 코트를 사자마자 새로운 물건들을 찾게 만들었을까?",nt:["make(사역동사) + 목적어 + 동사원형 : ~가 …하게 하다","search for : ~을 찾다","after buying = after she bought"]},
+ {n:18,en:"The “Diderot effect” [may] explain / it. // [Denis Diderot, a French writer], received / a new gown / [as] a gift.",ko:"‘디드로 효과’가 그것을 설명해 줄지도 모른다. 프랑스 작가 드니 디드로는 선물로 새 가운을 받았다.",nt:["may : ~일지도 모른다 (추측)","Denis Diderot = a French writer (동격)","as : ~로서 (전치사)","gown : 가운"]},
+ {n:19,en:"Soon [after receiving] the gift, / he noticed / that [all of his furniture did] not [go well with] / his new gown.",ko:"선물을 받은 직후, 그는 자신의 모든 가구가 새 가운과 잘 어울리지 않는다는 것을 알아차렸다.",nt:["after receiving = after he received","all of + 셀 수 없는 명사 furniture → 단수 취급","go well with : ~와 잘 어울리다"]},
+ {n:20,en:"So, / he [ended up replacing] / most of [it].",ko:"그래서 그는 결국 가구 대부분을 바꾸고 말았다.",nt:["end up -ing : 결국 ~하게 되다","replace : 바꾸다, 교체하다","it = his furniture"]},
+ {n:21,en:"The Diderot effect, therefore, is the concept / [that] [purchasing a new item] / often [leads to] / more unplanned purchases.",ko:"그러므로 디드로 효과는 새 물건을 구입하는 것이 종종 더 많은 계획에 없던 구매로 이어진다는 개념이다.",nt:["that : the concept의 내용을 설명하는 동격 접속사","purchasing a new item : 동명사 주어 → 단수 동사 leads","lead to : ~로 이어지다","unplanned : 계획되지 않은"]},
+ {n:22,h:1,en:"Why do I buy / things / just because they are [on sale]?",ko:"나는 왜 단지 할인 중이라는 이유로 물건을 살까?",nt:["on sale : 할인[판매] 중인"]},
+ {n:23,en:"Nathan [goes window shopping] / and sees / a pair of headphones.",ko:"Nathan은 아이쇼핑을 하러 갔다가 헤드폰 하나를 본다.",nt:["go window shopping : 진열된 상품을 구경하러 가다 (go + -ing)","goes ~ and sees : 병렬"]},
+ {n:24,en:"He checks / the price / and [finds out] / [that] they are / $200.",ko:"그는 가격을 확인하고 그것이 200달러라는 것을 알게 된다.",nt:["find out that ~ : ~라는 것을 알아내다","they = the headphones"]},
+ {n:25,en:"He thinks / [that] the headphones are / too expensive.",ko:"그는 그 헤드폰이 너무 비싸다고 생각한다.",nt:["that : thinks의 목적어절 접속사"]},
+ {n:26,en:"The sales person [approaches / him] / and says, / “You can [get a 20 percent discount] / on those headphones.”",ko:"점원이 그에게 다가와 “그 헤드폰을 20% 할인받으실 수 있어요.”라고 말한다.",nt:["approach + 목적어 : ~에게 다가가다 (전치사 X)","get a discount : 할인을 받다"]},
+ {n:27,en:"[Even though] the [discounted price] is still not / very low, / Nathan [decides / to buy] the headphones.",ko:"할인된 가격이 여전히 아주 낮지는 않지만, Nathan은 그 헤드폰을 사기로 결정한다.",nt:["Even though : 비록 ~이지만 (양보)","discounted : price를 꾸미는 과거분사","decide + to V : ~하기로 결정하다"]},
+ {n:28,en:"The situation [described above] is / an example of the “anchoring effect.”",ko:"위에서 설명한 상황은 ‘앵커링 효과’의 한 예이다.",nt:["described above : The situation을 뒤에서 꾸미는 과거분사구 (= which is described)","주어 The situation → 단수 동사 is"]},
+ {n:29,en:"The price [mentioned first] affects / our opinion of prices / [mentioned afterwards].",ko:"처음 언급된 가격은 나중에 언급되는 가격에 대한 우리의 생각에 영향을 준다.",nt:["mentioned first / mentioned afterwards : 앞의 명사를 꾸미는 과거분사구","주어 The price → 단수 동사 affects"]},
+ {n:30,en:"For example, / [if we start] / with $200, / then $160 will [seem cheap] / in comparison.",ko:"예를 들어, 200달러로 시작하면 비교했을 때 160달러는 싸 보일 것이다.",nt:["조건 부사절 : 미래 대신 현재시제 (if we start)","seem + 형용사 : ~해 보이다","in comparison : 비교해 볼 때"]},
+ {n:31,en:"Furthermore, / [as] the difference of the two prices becomes bigger, / the effect will be / more powerful.",ko:"게다가 두 가격의 차이가 커질수록 그 효과는 더 강력해질 것이다.",nt:["Furthermore : 게다가","as : ~함에 따라, ~할수록 (접속사)"]},
+ {n:32,en:"[As such], / the price [mentioned first] acts / as an “anchor” / [that] fixes our thoughts / about the price of an item.",ko:"이처럼, 처음 언급된 가격은 물건의 가격에 대한 우리의 생각을 고정하는 ‘닻’ 역할을 한다.",nt:["As such : 이와 같이","act as : ~로서 작용하다","that : an anchor를 꾸미는 주격 관계대명사"]},
+ {n:33,en:"Just [like] Jeff and his friends, / we tend to buy things / [without seriously considering] / [why we are buying] / them.",ko:"Jeff와 그의 친구들처럼, 우리는 왜 사는지 진지하게 생각하지 않고 물건을 사는 경향이 있다.",nt:["like : ~처럼 (전치사)","without + -ing : ~하지 않고","why we are buying them : considering의 목적어 (간접의문문)"]},
+ {n:34,en:"[As] these effects [have shown], / many things influence / our purchases.",ko:"이러한 효과들이 보여 주듯이, 많은 것들이 우리의 구매에 영향을 준다.",nt:["As : ~하듯이, ~대로 (접속사)","have shown : 현재완료"]},
+ {n:35,en:"[The next time you decide] / to buy something, / think / for a moment / about [why you are buying] / it.",ko:"다음번에 무언가를 사기로 결정할 때는, 그것을 왜 사는지 잠시 생각해 보세요.",nt:["The next time + 주어 + 동사 : 다음번에 ~할 때","for a moment : 잠시","about + why ~ : 전치사의 목적어 (간접의문문)"]}
+];
+
+const L8 = [
+ {n:1,sp:"Sci Teen",en:"Hi, science fans. // Today, / we're [going to talk] / about space travel.",ko:"안녕하세요, 과학 팬 여러분. 오늘은 우주여행에 대해 이야기해 볼게요.",nt:["be going to V : ~할 것이다, ~할 예정이다"]},
+ {n:2,en:"[As we all know], / there is [nothing faster] / [than] light / in the universe.",ko:"우리 모두 알다시피, 우주에서 빛보다 빠른 것은 없어요.",nt:["As : ~(이)듯이","-thing 대명사는 형용사가 뒤에서 수식 (nothing faster)","nothing + 비교급 + than = 최상급 의미 (빛이 가장 빠르다)"]},
+ {n:3,en:"So, / [if] we travel / at the speed of light, / we [should be able to] get to / another planet / in the blink of an eye, / [right?]",ko:"그러니까 빛의 속도로 여행하면 눈 깜짝할 사이에 다른 행성에 도착할 수 있겠죠, 그렇죠?",nt:["should be able to : 조동사 두 개는 연달아 못 씀 (should can ✕)","in the blink of an eye : 눈 깜짝할 사이에",", right? = shouldn't we? (확인)"]},
+ {n:4,sp:"Dr. Sci",en:"That would be / nice, / but space is / [so vast / that] it is not possible.",ko:"그러면 좋겠지만, 우주는 너무 광대해서 그건 불가능해요.",nt:["so + 형용사 + that + 주어 + 동사 : 너무 ~해서 …하다","vast : 광대한","it = 눈 깜짝할 사이에 다른 행성에 가는 것"]},
+ {n:5,en:"In the movie, Passengers, / a spaceship [headed to a different planet] / [travels] / at one-half the speed of light.",ko:"영화 ‘패신저스’에서, 다른 행성으로 향하는 우주선은 빛의 절반 속도로 이동해요.",nt:["headed to ~ : a spaceship을 꾸미는 과거분사구 (= that is headed)","주어 a spaceship → 단수 동사 travels","one-half : 2분의 1"]},
+ {n:6,en:"So / it should get to / another planet / very quickly, / [right?]",ko:"그러면 그 우주선은 다른 행성에 아주 빨리 도착해야겠죠, 그렇죠?",nt:[", right? = shouldn't it?"]},
+ {n:7,en:"But, / the passengers sleep / for 120 years / because [it is expected to take] / that much time / [to get to] a different planet.",ko:"하지만 승객들은 120년 동안 잠을 자요. 다른 행성에 도착하는 데 그만큼 오랜 시간이 걸릴 것으로 예상되기 때문이에요.",nt:["be expected to V : ~할 것으로 예상되다","It takes + 시간 + to V : ~하는 데 (시간)이 걸리다","that much : 그만큼 (부사)"]},
+ {n:8,sp:"Sci Teen",en:"120 years? // Wow, / that's / a long time! // Is there / a faster way / [to travel] through space?",ko:"120년이요? 와, 정말 긴 시간이네요! 우주를 여행하는 더 빠른 방법이 있나요?",nt:["to travel : a faster way를 꾸미는 to부정사 (형용사적 용법)","that = 120 years"]},
+ {n:9,sp:"Dr. Sci",en:"Well, / [in order to answer] / that question, / [I'd like / you / to think] about / this apple / for a second.",ko:"음, 그 질문에 답하기 위해, 여러분이 잠시 이 사과에 대해 생각해 봤으면 해요.",nt:["in order to V (= so as to V) : ~하기 위해","would like + 목적어 + to V : ~가 …하기를 바라다","for a second (= for a moment) : 잠시"]},
+ {n:10,en:"[Imagine] / a worm is / on this apple. // It detects / [something sweet] / at the bottom / and wants to move / [from] the top [to] the bottom.",ko:"이 사과 위에 벌레 한 마리가 있다고 상상해 보세요. 벌레는 맨 아래에서 달콤한 무언가를 감지하고, 꼭대기에서 맨 아래로 이동하고 싶어 해요.",nt:["Imagine ~ : 명령문 (동사원형으로 시작)","something sweet : -thing + 형용사","from A to B : A에서 B로","It = a worm"]},
+ {n:11,en:"For the worm, / the apple's surface is / [as vast as] our universe.",ko:"그 벌레에게는 사과의 표면이 우리 우주만큼 광대해요.",nt:["as + 원급 + as : ~만큼 …한 (원급 비교)","surface : 표면"]},
+ {n:12,en:"Now / the worm can [either] move / around the outer layer / [or] down a wormhole.",ko:"이제 벌레는 바깥 표면을 빙 돌아서 가거나, 벌레 구멍을 통해 아래로 내려갈 수 있어요.",nt:["either A or B : A 또는 B 둘 중 하나","or (move) down : 반복되는 move 생략","outer layer : 바깥층"]},
+ {n:13,en:"[Which / do you think / it will choose]? // Well, / it would choose / the wormhole / because it is / a shortcut.",ko:"여러분은 벌레가 어느 쪽을 선택할 거라고 생각하나요? 음, 벌레는 벌레 구멍을 선택할 거예요. 그게 지름길이니까요.",nt:["think·believe·guess·imagine + 간접의문문 → 의문사가 문장 맨 앞으로","Do you think? + Which will it choose? → Which do you think it will choose?","shortcut : 지름길"]},
+ {n:14,sp:"Sci Teen",en:"Is there / [such a shortcut] / in the universe?",ko:"우주에도 그런 지름길이 있나요?",nt:["such a(n) (+ 형용사) + 명사 : 그런 ~"]},
+ {n:15,sp:"Dr. Sci",en:"[According to] some researchers, / yes. // Einstein figured out / that space and time [are connected], / and he [called / it / space-time].",ko:"몇몇 연구자들에 따르면, 있어요. 아인슈타인은 공간과 시간이 연결되어 있다는 것을 알아냈고, 그것을 ‘시공간’이라고 불렀어요.",nt:["According to : ~에 따르면","과학적 사실 → 주절이 과거(figured out)여도 현재시제 are","are connected : 현재시제 수동태","call A B : A를 B라고 부르다"]},
+ {n:16,en:"He thought / that space-time [could actually be bent].",ko:"그는 시공간이 실제로 휘어질 수 있다고 생각했어요.",nt:["조동사가 있는 수동태 : 조동사 + be + p.p.","bend – bent – bent : 구부리다"]},
+ {n:17,en:"When it is bent, / parts [that are far away from] / each other / are suddenly closer.",ko:"시공간이 휘어지면, 서로 멀리 떨어져 있던 부분들이 갑자기 더 가까워져요.",nt:["it = space-time","that : parts를 꾸미는 주격 관계대명사","far away from : ~에서 멀리 떨어진"]},
+ {n:18,en:"[To understand] this, / take / a sheet of paper / and make / a small dot / at the top of the paper / and [another] / at the bottom of the paper.",ko:"이것을 이해하기 위해, 종이 한 장을 가지고 종이 윗부분에 작은 점을 하나, 아랫부분에 또 다른 점을 하나 찍어 보세요.",nt:["To understand : 목적 ‘~하기 위해’","this = 시공간이 휘면 먼 부분이 가까워진다는 내용","another = another dot (또 다른 하나)"]},
+ {n:19,en:"On a flat sheet of paper, / the dots are / far away from / [one another].",ko:"평평한 종이 위에서는 두 점이 서로 멀리 떨어져 있어요.",nt:["one another (= each other) : 서로","flat : 평평한"]},
+ {n:20,en:"Now, / take / the paper / and fold it / [with the dots matched up].",ko:"이제 그 종이를 잡고 두 점이 맞닿도록 접어 보세요.",nt:["with + 명사 + 분사 : ~한 채로, ~하면서","점들이 ‘맞춰지는’ 것 → 수동 → 과거분사 matched","match up : 맞추다"]},
+ {n:21,en:"[Punch / a hole / in the paper / and] the dots [will be instantly connected].",ko:"종이에 구멍을 뚫어 보세요. 그러면 두 점이 즉시 연결될 거예요.",nt:["명령문 + and ~ : …해라, 그러면 ~할 것이다","조동사 수동태 : will be connected","instantly : 즉시"]},
+ {n:22,en:"Like this, / wormholes in space [may] contain / two mouths, / [with a throat connecting] the two.",ko:"이처럼, 우주의 웜홀은 두 개의 입구와, 그 둘을 연결하는 목구멍으로 이루어져 있을지도 몰라요.",nt:["with + 명사 + 분사 : 목구멍이 ‘연결하는’ 것 → 능동 → 현재분사 connecting","may : ~일지도 모른다","contain : 포함하다"]},
+ {n:23,sp:"Sci Teen",en:"Just like a wormhole / in the apple, / right?",ko:"사과 속 벌레 구멍처럼요, 그렇죠?",nt:["just like : 꼭 ~처럼"]},
+ {n:24,en:"[If] such wormholes [existed] / in space, / we [could get] to / places / billions of light-years away / quickly!",ko:"만약 우주에 그런 웜홀이 존재한다면, 우리는 수십억 광년 떨어진 곳에도 빨리 갈 수 있을 텐데요!",nt:["가정법 과거 : If + 주어 + 동사 과거형, 주어 + could/would + 동사원형 (현재 사실의 반대)","billions of : 수십억의","light-year : 광년"]},
+ {n:25,sp:"Dr. Sci",en:"Yes, / but it's [too early / to celebrate]. // Wormholes exist / [in theory] only.",ko:"맞아요, 하지만 축하하기엔 너무 일러요. 웜홀은 이론상으로만 존재하거든요.",nt:["too + 형용사 + to V : …하기에 너무 ~한","in theory : 이론상으로"]},
+ {n:26,sp:"Sci Teen",en:"So / [all we need to do is / find] one, / right?",ko:"그럼 우리가 해야 할 일은 웜홀을 찾는 것뿐이네요, 그렇죠?",nt:["all (that) we need to do is (to) V : 우리가 할 일은 ~하는 것뿐이다 (to 생략 가능)","one = a wormhole",", right? = isn't it?"]},
+ {n:27,sp:"Dr. Sci",en:"[Even if] we find / one, / there are / many things / [to consider] / before actually [going] through / one.",ko:"설령 웜홀을 찾는다 해도, 실제로 그것을 통과하기 전에 고려해야 할 것들이 많아요.",nt:["Even if : 만약 ~라 하더라도","to consider : many things를 꾸미는 to부정사 (형용사적 용법)","before + -ing : 전치사 뒤에는 동명사"]},
+ {n:28,en:"A wormhole would be / very unstable. // [If] a spaceship [flew] / into one, / it [might be] / crushed or broken into pieces.",ko:"웜홀은 매우 불안정할 거예요. 만약 우주선이 그 안으로 날아 들어간다면, 우주선은 찌그러지거나 산산조각 날지도 몰라요.",nt:["가정법 과거 : If + flew ~, might + be ~","be crushed or broken : 수동태 병렬","unstable : 불안정한"]},
+ {n:29,sp:"Sci Teen",en:"Ouch! // That's not / a pretty picture. // So, / are we hopeless?",ko:"아야! 끔찍한 장면이네요. 그럼 우리는 희망이 없는 건가요?",nt:["That = 우주선이 찌그러지거나 산산조각 나는 장면","hopeless : 희망이 없는"]},
+ {n:30,en:"Is [traveling in space] / through a wormhole / simply an idea / [that only exists] / in theory?",ko:"웜홀을 통해 우주를 여행하는 것은 그저 이론상으로만 존재하는 생각일 뿐인가요?",nt:["traveling ~ : 동명사 주어 → 단수 동사 Is","that : an idea를 꾸미는 주격 관계대명사"]},
+ {n:31,sp:"Dr. Sci",en:"I wouldn't say / so. // [The debate] about wormholes [is] / still ongoing, / but with persistent exploration and research, / I believe / we will eventually find / one / and learn / [how to travel] / through it.",ko:"저는 그렇게 생각하지 않아요. 웜홀에 관한 논쟁은 아직 진행 중이지만, 끈질긴 탐구와 연구로 우리가 결국 웜홀을 찾아내고 그것을 통과해 여행하는 법을 알게 될 거라고 믿어요.",nt:["so = 웜홀 여행은 이론상으로만 존재한다는 것","주어 The debate → 단수 동사 is","persistent : 끈질긴, 끊임없이 지속되는","how to V : ~하는 방법","I believe (that) ~ : 접속사 that 생략"]},
+ {n:32,en:"[Look back] / at our history. // We[’ve achieved] / so many things / [that seemed impossible] / at first.",ko:"우리의 역사를 돌아보세요. 우리는 처음에는 불가능해 보였던 아주 많은 것들을 이뤄 냈어요.",nt:["look back : 돌아보다","have achieved : 현재완료 (계속·완료)","that : so many things를 꾸미는 주격 관계대명사","seem + 형용사 : ~해 보이다"]},
+ {n:33,en:"[Who knows]? // Maybe you can be / the one / [to find] the answer!",ko:"누가 알겠어요? 어쩌면 여러분이 그 답을 찾는 사람이 될지도 몰라요!",nt:["Who knows? = Nobody knows. (아무도 모른다)","to find : the one을 꾸미는 to부정사 (형용사적 용법)"]}
+];
+
+/* ---------- 끊어 해석 (교재 직독직해) ---------- */
+const KC7 = [
+ "여러분은 궁금해한 적이 있는가 / 왜 여러분이 구매했는지 / 물건들을 / 여러분이 원하지 않거나 필요하지도 않은?",
+ "생각해 보자 / 무엇이 우리에게 영향을 주는지 / ~에 관하여 / 물건들을 구매하는 것.",
+ "왜 나는 원할까 / 사는 것을 / 내 친구들이 산 것을?",
+ "Jeff는 간다 / 쇼핑센터에 / 그리고 본다 / 한 켤레의 축구화를 / 진열된.",
+ "그는 알아챈다 / 그 신발을 / 한눈에 / 왜냐하면 반 이상의 소년들이 / 그의 축구팀에서 / 그것들을 신는다.",
+ "비록 그는 이미 가지고 있지만 / 많은 켤레의 축구화를, / 그는 결국 사고 만다 / 또 다른 새 켤레를.",
+ "우리는 사용할 수 있다 / ‘밴드왜건 효과’를 / 설명하기 위해 / Jeff의 행동을.",
+ "밴드왜건은 ~이다 / 사륜마차 / 퍼레이드에서 / 사람들을 부추기는 / 올라타서 즐기도록 / 음악을.",
+ "점점 더 많은 사람들이 ~에 탈수록 / 밴드왜건, / 다른 사람들도 더 ~하기 쉽다 / 그것에 타거나 따라가기.",
+ "이런 식으로, / 사람들은 사는 경향이 있다 / 뭔가를 / 단지 다른 사람들이 샀다는 이유로 / 그것을.",
+ "왜 나는 살까 / 한 벌의 바지와 가방을 / 내가 구입한 후에 / 새 코트를?",
+ "Lisa는 산다 / 코트를 / 그녀가 정말 마음에 들어 하는.",
+ "즉시, / 그녀는 알아차린다 / 그녀의 바지가 ~와 어울리지 않는다는 것을 / 그녀의 새 코트.",
+ "그래서, / 그녀는 산다 / 새 바지를 / 그녀의 새 코트와 완전히 어울리는.",
+ "그러나 / 그녀는 안다 / 그녀의 가방 중 아무것도 ~와 어울리지 않는다는 것을 / 그녀의 새 옷들. // 그래서, / 그녀는 산다 / 새 가방을.",
+ "그녀의 돈의 대부분은 사용된다 / 새로운 물건들을 사는 데 / 그녀의 새로운 모습을 완성하기 위해.",
+ "무엇이 Lisa가 ~하게 했는가 / 새로운 물건들을 찾다 / 사고 난 직후에 / 새 코트를?",
+ "‘디드로 효과’가 설명해 줄지도 모른다 / 그것을. // 프랑스 작가인 Denis Diderot는 받았다 / 새 가운을 / 선물로.",
+ "선물을 받은 후에 곧, / 그는 알아챘다 / 그의 모든 가구들이 ~와 잘 어울리지 않는다는 것을 / 그의 새 가운.",
+ "그래서, / 그는 결국 바꾸고 말았다 / 그것의 대부분을.",
+ "그러므로 디드로 효과는 개념이다 / 새로운 물품을 구입하는 것은 / 종종 ~로 이어진다 / 더 많은 계획하지 않은 구매.",
+ "왜 나는 구입할까 / 물건들을 / 단지 그것들이 할인 중이라서?",
+ "Nathan은 진열된 상품을 구경하러 간다 / 그리고 본다 / 헤드폰 하나를.",
+ "그는 확인한다 / 가격을 / 그리고 알게 된다 / 그것은 ~라는 것을 / 200달러.",
+ "그는 생각한다 / 그 헤드폰은 ~이다 / 너무 비싼.",
+ "점원이 다가온다 / 그에게 / 그리고 말한다, / “당신은 20% 할인을 받을 수 있어요 / 그 헤드폰에.”",
+ "할인된 가격이 여전히 ~ 아님에도 불구하고 / 매우 낮은, / Nathan은 결심한다 / 헤드폰을 사기로.",
+ "위에 기술된 상황은 ~이다 / ‘앵커링 효과’의 예.",
+ "처음에 언급된 가격은 영향을 미친다 / 가격에 대한 우리의 의견에 / 이후에 언급되는.",
+ "예를 들면, / 만약 우리가 시작하면 / 200달러로, / 그러면 160달러는 싸게 보일 것이다 / 비교해 볼 때.",
+ "더욱이, / 두 가격의 차이가 더 커짐에 따라, / 그 효과는 ~일 것이다 / 더 강력한.",
+ "이와 같이, / 처음 언급된 가격은 작용한다 / ‘닻’으로서 / 우리의 생각을 고정하는 / 물건의 가격에 대한.",
+ "Jeff와 그의 친구들처럼, / 우리는 물건들을 사는 경향이 있다 / 진지하게 고려하지 않고 / 왜 우리가 사는지 / 그것들을.",
+ "이러한 효과들이 보여 주듯이, / 많은 것들이 영향을 준다 / 우리의 구매에.",
+ "다음번에 여러분이 결심할 때 / 뭔가를 사는 것을, / 생각해라 / 잠시 / 왜 당신이 사는지에 대해 / 그것을."
+];
+const KC8 = [
+ "안녕하세요, 과학 팬 여러분. // 오늘, / 우리는 얘기할 것입니다 / 우주여행에 대해서.",
+ "우리 모두 알다시피, / 더 빠른 것은 없습니다 / 빛보다 / 우주에서.",
+ "그래서, / 만약 우리가 여행한다면 / 빛의 속도로, / 우리는 ~에 도달할 수 있어야 합니다 / 다른 행성 / 눈 깜박할 사이에, / 그렇죠?",
+ "그것은 ~일 것입니다 / 좋은, / 그러나 우주는 ~입니다 / 너무 광대해서 / 그것은 가능하지 않습니다.",
+ "영화 ‘Passengers’에서, / 다른 행성으로 향하는 한 우주선이 / 이동합니다 / 빛의 절반의 속도로.",
+ "그러면 / 그것은 ~에 도달해야 합니다 / 다른 행성 / 매우 빨리, / 그렇죠?",
+ "그러나, / 승객들은 잠을 잡니다 / 120년 동안 / 왜냐하면 걸릴 것으로 예상되기 때문입니다 / 그렇게 많은 시간이 / 다른 행성에 도달하는 데.",
+ "120년이요? // 와, / 그건 ~네요 / 정말로 긴 시간! // ~가 있나요 / 더 빠른 방법이 / 우주를 통해 여행하는?",
+ "글쎄요, / 답하기 위해서 / 그 질문에, / 저는 원합니다 / 여러분이 / ~에 대해 생각해 보기를 / 이 사과 / 잠시.",
+ "상상해 보세요 / 한 마리 벌레가 있습니다 / 이 사과 위에. // 그것은 감지합니다 / 뭔가 달콤한 것을 / 맨 아래에 / 그리고 이동하고 싶어 합니다 / 맨 위에서 맨 아래로.",
+ "벌레에게, / 그 사과의 표면은 ~입니다 / 우리의 우주만큼 광대한.",
+ "이제 / 그 벌레는 이동할 수 있습니다 / 바깥 표면을 돌아서 / 또는 벌레 구멍 아래로.",
+ "어떤 것을 / 여러분은 생각하나요 / 그것이 선택할지? // 음, / 그것은 선택할 것입니다 / 벌레 구멍을 / 왜냐하면 그것은 ~이기 때문입니다 / 지름길.",
+ "~가 있나요 / 그런 지름길이 / 우주에?",
+ "몇몇 연구자들에 따르면, / 그렇습니다. // 아인슈타인은 생각해 냈습니다 / 공간과 시간이 연결되어 있다는 것을, / 그리고 그는 불렀습니다 / 그것을 / 시공간이라고.",
+ "그는 생각했습니다 / 시공간이 실제로 구부러질 수 있다고.",
+ "그것이 구부러질 때, / ~에서 멀리 떨어져 있는 부분들이 / 서로 / 갑자기 더 가까워집니다.",
+ "이것을 이해하기 위해서, / 가지고 오세요 / 한 장의 종이를 / 그리고 찍으세요 / 하나의 작은 점을 / 그 종이 윗부분에 / 그리고 또 다른 점을 / 종이 아랫부분에.",
+ "평평한 종이에서, / 그 점들은 있습니다 / ~에서 멀리 떨어져 / 서로.",
+ "이제, / 잡으세요 / 그 종이를 / 그리고 그것을 접으세요 / 점들이 맞춰진 상태로.",
+ "뚫으세요 / 구멍을 / 종이에 / 그러면 그 점들은 즉시 연결될 것입니다.",
+ "이처럼, / 우주의 웜홀은 포함할지도 모릅니다 / 두 개의 입을, / 그 둘을 연결하는 목구멍을 가진.",
+ "꼭 벌레 구멍처럼 / 사과에 있는, / 그렇죠?",
+ "만약 그런 웜홀들이 존재한다면 / 우주에, / 우리는 ~에 도달할 수 있습니다 / 장소 / 수십억 광년 떨어져 있는 / 빨리!",
+ "그렇죠, / 그러나 그건 너무 이릅니다 / 축하하기에는. // 웜홀은 존재합니다 / 오직 이론상에서만.",
+ "그러면 / 우리가 해야 할 모든 것은 ~입니다 / 그것을 찾는 것, / 그렇죠?",
+ "만약 우리가 찾는다 하더라도 / 그것을, / ~들이 있습니다 / 많은 것 / 고려해야 할 / 실제로 그걸 통과하여 가기 전에.",
+ "웜홀은 ~일 것입니다 / 매우 불안정한. // 만약 우주선이 날아간다면 / 그 안으로, / 그것은 ~일지도 모릅니다 / 부서지거나 산산조각이 난.",
+ "어이쿠! // 그것은 ~이 아닙니다 / 좋은 장면. // 그러면, / 우리는 희망이 없는 건가요?",
+ "우주에서 여행하는 것은 ~인가요 / 웜홀을 통해서 / 그저 생각 / 단지 존재하는 / 이론으로만?",
+ "저는 말하지 않겠어요 / 그렇게. // 웜홀에 관한 논쟁은 ~입니다 / 여전히 진행 중인, / 그러나 끊임없는 탐구와 연구로, / 저는 믿습니다 / 우리가 결국 찾을 거라고 / 그것을 / 그리고 배울 거라고 / 여행하는 법을 / 그것을 통해.",
+ "돌아보세요 / 우리의 역사를. // 우리는 이뤄 냈습니다 / 아주 많은 것들을 / 불가능해 보였던 / 처음에는.",
+ "누가 알까요? // 아마도 여러분이 ~될 수 있습니다 / 그 사람이 / 그 정답을 찾는!"
+];
+/* ---------- 자연 해석 (우리말답게 다듬은 문장) ---------- */
+const KO7 = [
+ "원하지도, 필요하지도 않은 물건을 왜 샀는지 궁금했던 적 있나요?",
+ "우리가 물건을 살 때 무엇이 영향을 미치는지 생각해 봅시다.",
+ "나는 왜 친구들이 산 걸 나도 사고 싶을까?",
+ "Jeff는 쇼핑센터에 갔다가 진열된 축구화 한 켤레를 본다.",
+ "축구팀 친구들 절반 넘게 그 신발을 신고 있어서, Jeff는 한눈에 알아본다.",
+ "이미 축구화가 여러 켤레 있는데도, Jeff는 결국 새 축구화를 또 사고 만다.",
+ "Jeff의 이런 행동은 ‘밴드왜건 효과’로 설명할 수 있다.",
+ "밴드왜건은 퍼레이드에서 사람들이 올라타 음악을 즐기도록 이끄는 마차다.",
+ "밴드왜건에 올라타는 사람이 많아질수록, 다른 사람들도 따라 타기 쉬워진다.",
+ "이처럼 사람들은 남들이 샀다는 이유만으로 물건을 사곤 한다.",
+ "나는 왜 새 코트를 사고 나면 바지와 가방까지 사게 될까?",
+ "Lisa는 마음에 쏙 드는 코트를 산다.",
+ "그런데 사자마자, 지금 있는 바지가 새 코트와 어울리지 않는다는 걸 깨닫는다.",
+ "그래서 새 코트에 딱 어울리는 바지를 새로 산다.",
+ "그런데 이번엔 가방 중에 새 옷과 어울리는 게 하나도 없다. 그래서 가방도 새로 산다.",
+ "새로운 스타일을 완성하느라 Lisa는 돈의 대부분을 새 물건 사는 데 쓴다.",
+ "Lisa는 왜 새 코트를 사자마자 다른 물건들을 찾아 나섰을까?",
+ "‘디드로 효과’로 설명할 수 있을지 모른다. 프랑스 작가 드니 디드로는 새 가운을 선물로 받았다.",
+ "선물을 받고 얼마 지나지 않아, 그는 집에 있는 가구가 하나같이 새 가운과 어울리지 않는다는 걸 알게 됐다.",
+ "그래서 결국 가구를 거의 다 바꾸고 말았다.",
+ "즉, 디드로 효과란 새 물건 하나를 사면 계획에 없던 물건까지 줄줄이 사게 되는 현상이다.",
+ "나는 왜 할인한다는 이유만으로 물건을 살까?",
+ "Nathan은 아이쇼핑을 하다가 헤드폰 하나를 발견한다.",
+ "가격을 확인해 보니 200달러다.",
+ "Nathan은 너무 비싸다고 생각한다.",
+ "그때 점원이 다가와 “이 헤드폰 20% 할인해 드릴게요.”라고 말한다.",
+ "할인된 가격도 여전히 싸지 않지만, Nathan은 헤드폰을 사기로 한다.",
+ "이 상황이 바로 ‘앵커링 효과’의 예다.",
+ "처음 들은 가격이 그다음에 듣는 가격을 판단하는 데 영향을 준다.",
+ "예를 들어 처음에 200달러를 보고 나면, 160달러는 상대적으로 싸게 느껴진다.",
+ "게다가 두 가격의 차이가 클수록 이 효과는 더 강해진다.",
+ "이처럼 처음 제시된 가격은 물건값에 대한 우리의 생각을 붙잡아 두는 ‘닻’ 역할을 한다.",
+ "Jeff와 친구들처럼, 우리는 왜 사는지 깊이 생각해 보지 않고 물건을 사곤 한다.",
+ "이 효과들에서 알 수 있듯, 우리의 소비에는 여러 가지가 영향을 미친다.",
+ "다음에 무언가를 사려고 할 때는, 내가 이걸 왜 사려는지 잠깐 생각해 보자."
+];
+const KO8 = [
+ "안녕하세요, 과학 팬 여러분! 오늘은 우주여행에 대해 이야기해 볼게요.",
+ "다들 알다시피 우주에서 빛보다 빠른 건 없잖아요.",
+ "그러니까 빛의 속도로 날아가면 눈 깜짝할 사이에 다른 행성에 갈 수 있겠죠?",
+ "그러면 참 좋겠지만, 우주는 너무 넓어서 그건 불가능해요.",
+ "영화 ‘패신저스’에서는 다른 행성으로 가는 우주선이 빛의 절반 속도로 날아가요.",
+ "그럼 다른 행성에 금방 도착하겠네요?",
+ "그런데 승객들은 120년 동안 잠들어 있어요. 다른 행성까지 가는 데 그만큼 걸릴 거라서요.",
+ "120년이요? 와, 엄청 길다! 우주를 더 빨리 여행하는 방법은 없나요?",
+ "음, 그 질문에 답하기 전에 잠깐 이 사과를 한번 떠올려 볼까요?",
+ "사과 위에 벌레 한 마리가 있다고 상상해 보세요. 벌레는 사과 맨 아래에 달콤한 게 있다는 걸 알아채고, 꼭대기에서 맨 아래까지 가고 싶어 해요.",
+ "벌레에게 사과 표면은 우리에게 우주만큼이나 넓어요.",
+ "이제 벌레는 껍질을 따라 빙 돌아가거나, 벌레 구멍을 따라 곧장 내려갈 수 있어요.",
+ "벌레가 어느 쪽을 고를 것 같나요? 당연히 벌레 구멍이겠죠. 그게 지름길이니까요.",
+ "우주에도 그런 지름길이 있어요?",
+ "몇몇 연구자들 말로는 있대요. 아인슈타인은 공간과 시간이 연결되어 있다는 걸 알아내고, 그걸 ‘시공간’이라고 불렀어요.",
+ "그리고 시공간이 실제로 휘어질 수 있다고 생각했죠.",
+ "시공간이 휘면, 서로 멀리 떨어져 있던 곳들이 갑자기 가까워져요.",
+ "이해하기 쉽게 종이 한 장을 준비해서, 위쪽에 작은 점 하나, 아래쪽에 점 하나를 찍어 보세요.",
+ "종이가 평평할 때는 두 점이 서로 멀리 떨어져 있죠.",
+ "이제 두 점이 딱 겹치도록 종이를 접어 보세요.",
+ "그 자리에 구멍을 뚫으면, 두 점이 바로 이어져요.",
+ "우주의 웜홀도 이렇게 입구 두 개와, 그 둘을 잇는 통로(목구멍)로 이루어져 있을지 몰라요.",
+ "사과에 난 벌레 구멍처럼요?",
+ "우주에 그런 웜홀이 있다면, 수십억 광년 떨어진 곳에도 금방 갈 수 있을 텐데요!",
+ "맞아요. 하지만 아직 좋아하기엔 일러요. 웜홀은 이론으로만 존재하거든요.",
+ "그럼 웜홀을 찾기만 하면 되는 거네요?",
+ "웜홀을 찾는다 해도, 실제로 통과하기 전에 따져 봐야 할 게 많아요.",
+ "웜홀은 아주 불안정할 거예요. 우주선이 그 안으로 날아 들어가면 찌그러지거나 산산조각 날 수도 있어요.",
+ "으악! 상상만 해도 끔찍하네요. 그럼 희망이 없는 건가요?",
+ "웜홀을 통한 우주여행은 그냥 이론 속 이야기일 뿐인가요?",
+ "꼭 그렇지는 않아요. 웜홀에 대한 논쟁은 아직 진행 중이지만, 끈기 있게 탐구하고 연구하다 보면 언젠가 웜홀을 찾아내고, 그걸 통해 여행하는 방법도 알게 될 거라고 믿어요.",
+ "우리 역사를 돌아보세요. 처음엔 불가능해 보였던 일들을 정말 많이 해냈잖아요.",
+ "누가 알아요? 어쩌면 그 답을 찾는 사람이 바로 여러분일지도 몰라요!"
+];
+L7.forEach((o,i)=>{o.kc=KC7[i]; o.ko=KO7[i];});
+L8.forEach((o,i)=>{o.kc=KC8[i]; o.ko=KO8[i];});
+
+/* ---------- 슬라이드 구성 ---------- */
+const M7 = {cls:"l7", ls:"Lesson 07", t:"Spend Wisely"};
+const M8 = {cls:"l8", ls:"Lesson 08", t:"Wonders of Space Travel"};
+const S = [];
+const sent = (m, data, sec, ns) => S.push({m, sec, ns, data});
+const page = (m, sec, html, extra) => S.push({m, sec, html, extra});
+
+/* 표지 */
+S.push({raw:`<section class="slide cover main">
+  <div class="k">중3 2학기 · 비상(김진완) · 본문 설명</div>
+  <h1>Lesson 7 · 8<br>본문 완전 정리</h1>
+  <div class="t">끊어 읽기 · 해석 · 문법 포인트</div>
+  <div class="row">
+    <div class="card"><b>Lesson 07 · Spend Wisely</b><div>Why We Buy What We Buy</div><p>우리는 왜 그것을 살까? — 소비 심리 3가지</p></div>
+    <div class="card"><b>Lesson 08 · Wonders of Space Travel</b><div>Wormholes: Fact or Theory?</div><p>웜홀은 실제일까, 이론일까?</p></div>
+  </div></section>`});
+
+/* ===== Lesson 7 ===== */
+S.push({raw:`<section class="slide cover l7">
+  <div class="k">Lesson 07 · Spend Wisely</div>
+  <h1>Why We Buy<br>What We Buy</h1>
+  <div class="t">우리는 왜 우리가 사는 것을 살까?</div>
+  <div class="d">원하지도, 필요하지도 않은 물건을 사는 이유 —<br>밴드왜건 효과 · 디드로 효과 · 앵커링 효과</div>
+  <img class="art" src="images/l7-cover.png" alt="" onerror="this.remove()">
+  <div class="big">07</div>
+</section>`});
+
+page(M7,"본문 구조 한눈에",`
+  <h2><small>OVERVIEW</small>세 개의 질문, 세 가지 효과</h2>
+  <div class="flow" style="margin-top:6px">
+    <div class="st"><b>도입 01–02</b><div>왜 필요 없는 물건을 살까?</div><p>무엇이 우리의 구매에 영향을 주는지 생각해 보자</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>Q1 · 03–10</b><div>친구들이 산 것을 사고 싶다</div><p>Jeff의 축구화<br>→ <strong>밴드왜건 효과</strong></p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>Q2 · 11–21</b><div>코트를 사니 바지·가방까지</div><p>Lisa의 쇼핑 / 디드로의 가운<br>→ <strong>디드로 효과</strong></p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>Q3 · 22–32</b><div>할인 중이라서 산다</div><p>Nathan의 헤드폰<br>→ <strong>앵커링 효과</strong></p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>마무리 33–35</b><div>사기 전에 잠시 생각하자</div><p>왜 사는지 생각해 보세요</p></div>
+  </div>
+  <p class="lead">각 질문은 <b>‘사례 → 효과 이름 → 개념 정의’</b> 순서로 전개됩니다. 시험에서는 <b>사례와 효과를 연결</b>하는 문제가 자주 나와요.</p>
+`);
+
+sent(M7,L7,"도입",[1,2]);
+sent(M7,L7,"Q1. 왜 친구들이 산 것을 사고 싶을까?",[3,4,5]);
+sent(M7,L7,"Q1. 왜 친구들이 산 것을 사고 싶을까?",[6,7]);
+sent(M7,L7,"Q1. 왜 친구들이 산 것을 사고 싶을까?",[8,9,10]);
+page(M7,"개념 정리 ① 밴드왜건 효과",`
+  <h2><small>BANDWAGON EFFECT</small>밴드왜건 효과</h2>
+  <div class="grid" style="grid-template-columns:1.1fr 1fr">
+    <div class="box f"><span class="tag">정의</span>
+      <p style="font-size:21px;line-height:1.6;font-weight:600">다른 사람들이 샀다는 <b>이유만으로</b> 물건을 사는 경향</p>
+      <div class="ex">people tend to buy something just because other people have bought it. <i>(10번 문장)</i></div>
+      <p style="margin-top:14px">‘밴드왜건’ = 퍼레이드에서 사람들이 올라타 음악을 즐기도록 부추기는 마차. 많은 사람이 탈수록 다른 사람들도 따라 탄다.</p>
+    </div>
+    <div class="box"><span class="tag">사례 · Jeff</span>
+      <img class="art" src="images/bandwagon.png" alt="" style="width:100%;height:220px;margin-bottom:10px" onerror="this.remove()">
+      <svg viewBox="0 0 460 210" width="100%" style="max-height:200px" role="img" aria-label="Jeff 사례 흐름">
+        <rect x="10" y="10" width="440" height="52" rx="10" fill="var(--acc2)"/>
+        <text x="230" y="43" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">쇼핑센터에 진열된 축구화</text>
+        <path d="M230 64v18" stroke="var(--acc)" stroke-width="3"/><path d="M222 78l8 10 8-10" fill="var(--acc)"/>
+        <rect x="10" y="90" width="440" height="52" rx="10" fill="var(--acc2)"/>
+        <text x="230" y="123" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">팀원 절반 이상이 신음 → 한눈에 알아봄</text>
+        <path d="M230 144v18" stroke="var(--acc)" stroke-width="3"/><path d="M222 158l8 10 8-10" fill="var(--acc)"/>
+        <rect x="10" y="168" width="440" height="40" rx="10" fill="var(--acc)"/>
+        <text x="230" y="194" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">이미 많은데도 결국 또 한 켤레 구매!</text>
+      </svg>
+    </div>
+  </div>
+`);
+
+sent(M7,L7,"Q2. 왜 새 코트를 산 뒤 바지와 가방을 살까?",[11,12,13]);
+sent(M7,L7,"Q2. 왜 새 코트를 산 뒤 바지와 가방을 살까?",[14,15,16]);
+sent(M7,L7,"Q2. 왜 새 코트를 산 뒤 바지와 가방을 살까?",[17,18]);
+sent(M7,L7,"Q2. 왜 새 코트를 산 뒤 바지와 가방을 살까?",[19,20,21]);
+page(M7,"개념 정리 ② 디드로 효과",`
+  <h2><small>DIDEROT EFFECT</small>디드로 효과</h2>
+  <div class="box f" style="overflow:hidden"><img class="art" src="images/diderot.png" alt="" style="float:right;width:300px;height:150px;margin-left:18px" onerror="this.remove()"><span class="tag">정의</span>
+    <p style="font-size:21px;font-weight:600">새 물건 하나를 사는 것이 <b>계획에 없던 구매로 계속 이어지는</b> 현상</p>
+    <div class="ex">purchasing a new item often leads to more unplanned purchases. <i>(21번 문장)</i></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><span class="tag">사례 · Lisa</span>
+      <div class="flow">
+        <div class="st"><b>①</b><div>새 코트</div><p>정말 마음에 듦</p></div><div class="ar">→</div>
+        <div class="st"><b>②</b><div>새 바지</div><p>바지가 코트와 안 어울림</p></div><div class="ar">→</div>
+        <div class="st"><b>③</b><div>새 가방</div><p>가방이 새 옷과 안 어울림</p></div>
+      </div>
+    </div>
+    <div class="box"><span class="tag">유래 · Denis Diderot</span>
+      <div class="flow">
+        <div class="st"><b>①</b><div>새 가운 선물</div><p>프랑스 작가</p></div><div class="ar">→</div>
+        <div class="st"><b>②</b><div>가구와 안 어울림</div><p>all of his furniture</p></div><div class="ar">→</div>
+        <div class="st"><b>③</b><div>가구 대부분 교체</div><p>ended up replacing</p></div>
+      </div>
+    </div>
+  </div>
+`);
+
+sent(M7,L7,"Q3. 왜 할인 중이라는 이유만으로 살까?",[22,23,24]);
+sent(M7,L7,"Q3. 왜 할인 중이라는 이유만으로 살까?",[25,26,27]);
+sent(M7,L7,"Q3. 왜 할인 중이라는 이유만으로 살까?",[28,29,30]);
+sent(M7,L7,"Q3. 왜 할인 중이라는 이유만으로 살까?",[31,32]);
+page(M7,"개념 정리 ③ 앵커링 효과",`
+  <h2><small>ANCHORING EFFECT</small>앵커링 효과</h2>
+  <div class="grid" style="grid-template-columns:1fr 1.05fr">
+    <div class="box f"><span class="tag">정의</span>
+      <p style="font-size:20px;line-height:1.6;font-weight:600">처음 제시된 가격이 <b>‘닻(anchor)’</b>처럼 기준이 되어, 나중 가격에 대한 판단에 영향을 주는 현상</p>
+      <div class="ex">The price mentioned first affects our opinion of prices mentioned afterwards. <i>(29번 문장)</i></div>
+      <ul style="margin-top:12px">
+        <li>두 가격의 <b>차이가 클수록</b> 효과는 <b>더 강력</b>해진다 (31)</li>
+        <li>할인 가격이 여전히 싸지 않아도 Nathan은 구매 (27)</li>
+      </ul>
+    </div>
+    <div class="box"><span class="tag">사례 · Nathan의 헤드폰</span>
+      <svg viewBox="0 0 470 280" width="100%" role="img" aria-label="200달러와 160달러 비교 막대">
+        <line x1="40" y1="240" x2="450" y2="240" stroke="#c9ced8"/>
+        <rect x="80" y="40" width="120" height="200" rx="6" fill="#c9ced8"/>
+        <text x="140" y="30" text-anchor="middle" font-size="22" font-weight="800" fill="var(--ink)">$200</text>
+        <text x="140" y="266" text-anchor="middle" font-size="16" fill="var(--sub)">처음 본 가격 = 닻</text>
+        <rect x="290" y="80" width="120" height="160" rx="6" fill="var(--acc)"/>
+        <text x="350" y="70" text-anchor="middle" font-size="22" font-weight="800" fill="var(--acc3)">$160</text>
+        <text x="350" y="266" text-anchor="middle" font-size="16" fill="var(--sub)">20% 할인 가격</text>
+        <path d="M206 120 C240 100 255 100 284 118" fill="none" stroke="var(--acc3)" stroke-width="2.5"/>
+        <path d="M276 110l10 9-13 4" fill="var(--acc3)"/>
+        <text x="245" y="160" text-anchor="middle" font-size="17" font-weight="800" fill="var(--acc3)">“싸 보인다!”</text>
+        <text x="245" y="182" text-anchor="middle" font-size="14" fill="var(--sub)">in comparison</text>
+      </svg>
+    </div>
+  </div>
+`);
+
+sent(M7,L7,"마무리",[33,34,35]);
+page(M7,"세 가지 효과 비교",`
+  <h2><small>SUMMARY</small>사례 ↔ 효과 연결하기</h2>
+  <table class="cmp">
+    <tr><th>효과</th><th>사례</th><th>핵심 내용</th><th>본문 표현</th></tr>
+    <tr><td>밴드왜건 효과</td><td>Jeff의 축구화</td><td>남들이 사니까 나도 산다</td><td>just because other people have bought it</td></tr>
+    <tr><td>디드로 효과</td><td>Lisa의 코트·바지·가방<br>Diderot의 가운·가구</td><td>새 물건 하나가 계획에 없던 구매로 이어진다</td><td>leads to more unplanned purchases</td></tr>
+    <tr><td>앵커링 효과</td><td>Nathan의 헤드폰<br>$200 → $160</td><td>처음 가격이 기준(닻)이 되어 나중 가격 판단에 영향</td><td>acts as an “anchor” that fixes our thoughts</td></tr>
+  </table>
+  <p class="lead">결론 (33–35) : 우리는 <b>왜 사는지 진지하게 생각하지 않고</b> 물건을 산다 → 다음에 살 때는 <b>잠시 왜 사는지 생각해 보자</b>.</p>
+`);
+
+page(M7,"핵심 문법 ①",`
+  <h2><small>GRAMMAR</small>Lesson 7 핵심 문법 ①</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>관계대명사 what</h3>
+      <p>what = the thing(s) that / which (선행사 포함)</p>
+      <div class="ex">Why do I want to buy <mark>what</mark> my friends bought? <i>내 친구들이 산 것</i></div>
+      <p style="margin-top:8px;font-size:15.5px;color:var(--sub)">vs. 관계대명사 that : 앞에 선행사가 있음 — a coat <b>that</b> she really loves</p>
+    </div>
+    <div class="box"><h3>간접의문문 (의문사 + 주어 + 동사)</h3>
+      <div class="ex">wondered <mark>why you've bought</mark> things</div>
+      <div class="ex">consider <mark>what affects us</mark> <i>의문사가 주어 → 의문사 + 동사</i></div>
+      <div class="ex">think about <mark>why you are buying</mark> it</div>
+    </div>
+    <div class="box"><h3>부분 표현 + of + 명사 → 수일치</h3>
+      <p>동사는 <b>of 뒤 명사</b>에 맞춘다</p>
+      <div class="ex">half of <mark>the boys wear</mark> · none of <mark>her bags match</mark></div>
+      <div class="ex">most of <mark>her money is</mark> spent · all of <mark>his furniture did</mark> not ~</div>
+    </div>
+    <div class="box"><h3>동사 + 목적어 + (to) V</h3>
+      <div class="ex">encourage people <mark>to jump</mark> aboard <i>encourage O to V</i></div>
+      <div class="ex">What made Lisa <mark>search</mark> for new items? <i>사역동사 make O + 동사원형</i></div>
+      <div class="ex">he ended up <mark>buying</mark> / <mark>replacing</mark> <i>end up + -ing</i></div>
+    </div>
+  </div>
+`);
+page(M7,"핵심 문법 ②",`
+  <h2><small>GRAMMAR</small>Lesson 7 핵심 문법 ②</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>as의 여러 가지 뜻</h3>
+      <div class="ex"><mark>As</mark> more and more people get on ~ <i>~함에 따라, ~할수록 (9, 31)</i></div>
+      <div class="ex">received a new gown <mark>as</mark> a gift <i>~로서 (전치사, 18)</i></div>
+      <div class="ex"><mark>As</mark> these effects have shown, ~ <i>~하듯이 (34)</i></div>
+      <div class="ex"><mark>As such</mark>, the price ~ / acts <mark>as</mark> an anchor <i>이와 같이 / ~로서 (32)</i></div>
+    </div>
+    <div class="box"><h3>과거분사(p.p.)의 뒤 수식</h3>
+      <p>명사 + p.p. ~ : ‘~된’ (주격 관계대명사 + be동사 생략)</p>
+      <div class="ex">The situation <mark>described above</mark> <i>= which is described above</i></div>
+      <div class="ex">The price <mark>mentioned first</mark> / prices <mark>mentioned afterwards</mark></div>
+      <div class="ex">the <mark>discounted</mark> price <i>앞에서 수식</i></div>
+    </div>
+    <div class="box"><h3>양보의 접속사</h3>
+      <div class="ex"><mark>Although</mark> he already has many pairs ~</div>
+      <div class="ex"><mark>Even though</mark> the discounted price is still not very low ~ <i>비록 ~이지만 (= though) · 뒤에 주어 + 동사</i></div>
+    </div>
+    <div class="box"><h3>꼭 외울 표현</h3>
+      <ul>
+        <li>when it comes to + (동)명사 : ~에 관해서라면</li>
+        <li>tend to V : ~하는 경향이 있다 · be likely to V</li>
+        <li>go with / match : ~와 어울리다</li>
+        <li>spend A on -ing · lead to · get a discount</li>
+        <li>The next time + 주어 + 동사 : 다음에 ~할 때</li>
+      </ul>
+    </div>
+  </div>
+`);
+page(M7,"확인 문제",`
+  <h2><small>CHECK</small>Lesson 7 확인 문제 <span style="font-size:16px;color:var(--sub);font-weight:500">— 문제를 클릭하면 정답이 보여요</span></h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="q"><div class="qn">1</div><div class="qq">팀원 절반 이상이 신는 축구화를 Jeff가 또 산 것은 어떤 효과로 설명할 수 있나요?</div><div class="hint">클릭</div><div class="qa">밴드왜건 효과 (bandwagon effect)</div></div>
+    <div class="q"><div class="qn">2</div><div class="qq">Most of her money (is / are) spent on buying the new items.</div><div class="hint">클릭</div><div class="qa">is — most of + 셀 수 없는 명사(money) → 단수</div></div>
+    <div class="q"><div class="qn">3</div><div class="qq">$200을 먼저 본 뒤 할인가 $160이 싸 보이는 현상은?</div><div class="hint">클릭</div><div class="qa">앵커링 효과 — 처음 가격이 닻(기준)이 됨</div></div>
+    <div class="q"><div class="qn">4</div><div class="qq">So, he ended up ______ most of it. (replace)</div><div class="hint">클릭</div><div class="qa">replacing — end up + -ing</div></div>
+    <div class="q"><div class="qn">5</div><div class="qq">What made Lisa (search / to search) for new items?</div><div class="hint">클릭</div><div class="qa">search — 사역동사 make + 목적어 + 동사원형</div></div>
+    <div class="q"><div class="qn">6</div><div class="qq">디드로 효과의 정의를 본문 표현으로 말해 보세요.</div><div class="hint">클릭</div><div class="qa">purchasing a new item often leads to more unplanned purchases</div></div>
+  </div>
+`);
+
+/* ===== Lesson 8 ===== */
+S.push({raw:`<section class="slide cover l8">
+  <div class="k">Lesson 08 · Wonders of Space Travel</div>
+  <h1>Wormholes:<br>Fact or Theory?</h1>
+  <div class="t">웜홀: 실제일까, 이론일까?</div>
+  <div class="d">Sci Teen과 Dr. Sci의 대화로 알아보는<br>빛보다 빠른 우주여행의 지름길</div>
+  <img class="art" src="images/l8-cover.png" alt="" onerror="this.remove()">
+  <div class="big">08</div>
+</section>`});
+
+page(M8,"본문 구조 한눈에",`
+  <h2><small>OVERVIEW</small>대화의 흐름</h2>
+  <div class="flow">
+    <div class="st"><b>01–08</b><div>빛의 속도로도 멀다</div><p>‘패신저스’ : 빛의 절반 속도로 120년</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>09–14</b><div>사과와 벌레</div><p>표면을 돌아가기 vs 벌레 구멍 = 지름길</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>15–17</b><div>아인슈타인의 시공간</div><p>시공간은 연결되어 있고 휘어질 수 있다</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>18–23</b><div>종이 실험</div><p>점 두 개 → 접기 → 구멍 = 웜홀</p></div>
+  </div>
+  <div class="flow">
+    <div class="st"><b>24–26</b><div>웜홀이 있다면?</div><p>수십억 광년 떨어진 곳도 빨리! 하지만 이론상으로만 존재</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>27–30</b><div>현실의 문제</div><p>매우 불안정 → 우주선이 찌그러지거나 산산조각</p></div>
+    <div class="ar">→</div>
+    <div class="st"><b>31–33</b><div>그래도 희망은 있다</div><p>끈질긴 탐구와 연구 → 언젠가 찾을 것. 답을 찾는 건 여러분일지도!</p></div>
+  </div>
+  <p class="lead"><b>Sci Teen</b>(질문하는 학생 진행자)과 <b>Dr. Sci</b>(설명하는 과학자)의 대화문입니다. 화자가 누구인지도 꼭 확인하세요.</p>
+`);
+
+sent(M8,L8,"빛의 속도라면?",[1,2,3]);
+sent(M8,L8,"우주는 너무 넓다",[4,5,6]);
+sent(M8,L8,"우주는 너무 넓다",[7,8]);
+sent(M8,L8,"사과와 벌레",[9,10,11]);
+sent(M8,L8,"사과와 벌레",[12,13,14]);
+page(M8,"개념 정리 ① 사과와 벌레",`
+  <h2><small>ANALOGY</small>사과 위의 벌레 = 우주 속의 우리</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr;align-items:center">
+    <svg viewBox="0 0 500 380" width="100%" role="img" aria-label="사과 표면을 도는 길과 가로지르는 벌레 구멍">
+      <circle cx="220" cy="200" r="150" fill="#ffe3e0" stroke="#e05a4f" stroke-width="4"/>
+      <path d="M220 52 C214 30 222 18 236 10" stroke="#7a5230" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M236 30 C262 12 290 20 296 34 C272 44 250 42 236 30Z" fill="#6fbf73"/>
+      <path d="M220 50 A150 150 0 0 1 370 200 A150 150 0 0 1 220 350" fill="none" stroke="#e05a4f" stroke-width="5" stroke-dasharray="10 9"/>
+      <text x="388" y="120" font-size="17" font-weight="700" fill="#b8352b">표면으로</text>
+      <text x="388" y="142" font-size="17" font-weight="700" fill="#b8352b">돌아가기</text>
+      <text x="388" y="164" font-size="15" fill="#5b6475">= 먼 길</text>
+      <line x1="220" y1="58" x2="220" y2="342" stroke="var(--acc)" stroke-width="7" stroke-linecap="round"/>
+      <rect x="120" y="182" width="88" height="36" rx="8" fill="#fff"/>
+      <text x="164" y="206" text-anchor="middle" font-size="17" font-weight="800" fill="var(--acc3)">지름길!</text>
+      <circle cx="220" cy="50" r="11" fill="#5d9e3a"/><circle cx="232" cy="47" r="4" fill="#fff"/>
+      <text x="246" y="70" font-size="15" fill="#5b6475">벌레 (top)</text>
+      <circle cx="220" cy="350" r="9" fill="#f2b632"/>
+      <text x="236" y="374" font-size="15" fill="#5b6475">달콤한 것 (bottom)</text>
+    </svg>
+    <div class="grid">
+      <div class="box"><h3>벌레에게 사과 표면은</h3><p>우리 우주만큼 광대하다 <br><span style="color:var(--sub)">as vast as our universe (11)</span></p></div>
+      <div class="box"><h3>두 가지 길</h3><p>① 바깥 표면을 빙 돌아가기 (around the outer layer)<br>② 벌레 구멍으로 내려가기 (down a wormhole)</p></div>
+      <div class="box f"><h3>벌레의 선택 → 벌레 구멍</h3><p>because it is a <b>shortcut</b> (지름길)<br>→ 우주에도 이런 지름길이 있을까? (14)</p></div>
+    </div>
+  </div>
+`);
+
+sent(M8,L8,"아인슈타인의 시공간",[15,16,17]);
+sent(M8,L8,"종이로 이해하기",[18,19,20]);
+sent(M8,L8,"종이로 이해하기",[21,22,23]);
+page(M8,"개념 정리 ② 종이 실험과 웜홀",`
+  <h2><small>EXPERIMENT</small>종이로 이해하는 웜홀</h2>
+  <svg viewBox="0 0 1160 300" width="100%" role="img" aria-label="종이에 점 두 개, 접기, 구멍 뚫기 세 단계">
+    <g>
+      <rect x="40" y="30" width="200" height="240" rx="6" fill="#fff" stroke="#9aa3b5" stroke-width="2"/>
+      <circle cx="140" cy="60" r="10" fill="var(--acc)"/><circle cx="140" cy="240" r="10" fill="var(--acc)"/>
+      <line x1="160" y1="66" x2="160" y2="234" stroke="#9aa3b5" stroke-dasharray="5 5"/>
+      <text x="172" y="155" font-size="15" fill="#5b6475">멀다</text>
+      <text x="140" y="296" text-anchor="middle" font-size="18" font-weight="800" fill="var(--ink)">① 점 두 개 찍기</text>
+    </g>
+    <path d="M270 150h50" stroke="var(--acc)" stroke-width="4"/><path d="M316 140l14 10-14 10" fill="var(--acc)"/>
+    <g>
+      <path d="M380 60 H560 A60 90 0 0 1 560 240 H380" fill="none" stroke="#9aa3b5" stroke-width="3"/>
+      <circle cx="430" cy="60" r="10" fill="var(--acc)"/><circle cx="430" cy="240" r="10" fill="var(--acc)"/>
+      <path d="M430 76v148" stroke="#9aa3b5" stroke-dasharray="5 5"/>
+      <text x="444" y="155" font-size="15" fill="#5b6475">위아래로 맞춤</text>
+      <text x="480" y="296" text-anchor="middle" font-size="18" font-weight="800" fill="var(--ink)">② 점이 맞닿게 접기</text>
+    </g>
+    <path d="M660 150h50" stroke="var(--acc)" stroke-width="4"/><path d="M706 140l14 10-14 10" fill="var(--acc)"/>
+    <g>
+      <path d="M770 60 H950 A60 90 0 0 1 950 240 H770" fill="none" stroke="#9aa3b5" stroke-width="3"/>
+      <rect x="812" y="60" width="16" height="180" fill="var(--acc)" opacity=".85"/>
+      <ellipse cx="820" cy="60" rx="20" ry="7" fill="var(--acc3)"/><ellipse cx="820" cy="240" rx="20" ry="7" fill="var(--acc3)"/>
+      <text x="850" y="52" font-size="15" font-weight="700" fill="var(--acc3)">입구 (mouth)</text>
+      <text x="850" y="155" font-size="15" font-weight="700" fill="var(--acc3)">목구멍 (throat)</text>
+      <text x="850" y="262" font-size="15" font-weight="700" fill="var(--acc3)">입구 (mouth)</text>
+      <text x="870" y="296" text-anchor="middle" font-size="18" font-weight="800" fill="var(--ink)">③ 구멍 뚫기 → 즉시 연결</text>
+    </g>
+  </svg>
+  <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="box"><p><b>평평한 종이</b> = 휘지 않은 시공간<br>두 점은 서로 멀리 떨어져 있다 (19)</p></div>
+    <div class="box"><p><b>종이 접기</b> = 시공간이 휘어짐<br>먼 부분이 갑자기 가까워진다 (17, 20)</p></div>
+    <div class="box f"><p><b>구멍</b> = 웜홀<br>두 개의 입구 + 둘을 잇는 목구멍 (22)</p></div>
+  </div>
+`);
+
+sent(M8,L8,"웜홀이 있다면?",[24,25,26]);
+sent(M8,L8,"현실의 문제",[27,28,29]);
+sent(M8,L8,"그래도 희망은 있다",[30,31]);
+sent(M8,L8,"그래도 희망은 있다",[32,33]);
+
+page(M8,"내용 정리",`
+  <h2><small>SUMMARY</small>웜홀: 사실일까, 이론일까?</h2>
+  <table class="cmp">
+    <tr><th>구분</th><th>내용</th><th>본문 표현</th></tr>
+    <tr><td>문제</td><td>빛보다 빠른 건 없지만 우주는 너무 넓다. 빛의 절반 속도로도 120년</td><td>space is so vast that it is not possible</td></tr>
+    <tr><td>아이디어</td><td>사과 속 벌레 구멍처럼 우주에도 지름길이 있을까?</td><td>Is there such a shortcut in the universe?</td></tr>
+    <tr><td>과학적 근거</td><td>아인슈타인 : 공간과 시간은 연결(시공간), 휘어질 수 있음</td><td>space-time could actually be bent</td></tr>
+    <tr><td>웜홀 구조</td><td>두 개의 입구 + 둘을 잇는 목구멍</td><td>two mouths, with a throat connecting the two</td></tr>
+    <tr><td>한계</td><td>이론상으로만 존재 · 매우 불안정 → 우주선이 부서질 수 있음</td><td>exist in theory only / very unstable</td></tr>
+    <tr><td>결론</td><td>논쟁은 진행 중, 끈질긴 탐구·연구로 결국 찾게 될 것</td><td>with persistent exploration and research</td></tr>
+  </table>
+`);
+page(M8,"핵심 문법 ①",`
+  <h2><small>GRAMMAR</small>Lesson 8 핵심 문법 ①</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>가정법 과거 (현재 사실의 반대)</h3>
+      <p>If + 주어 + <b>동사 과거형</b> ~, 주어 + <b>would/could/might + 동사원형</b></p>
+      <div class="ex">If such wormholes <mark>existed</mark> in space, we <mark>could get</mark> to places ~ <i>(24) 실제로는 존재하지 않음</i></div>
+      <div class="ex">If a spaceship <mark>flew</mark> into one, it <mark>might be</mark> crushed ~ <i>(28)</i></div>
+    </div>
+    <div class="box"><h3>with + 명사 + 분사 (~한 채로)</h3>
+      <p>명사와 분사의 관계가 <b>수동 → p.p.</b> / <b>능동 → -ing</b></p>
+      <div class="ex">with the dots <mark>matched</mark> up <i>점들이 ‘맞춰지는’ → 수동 (20)</i></div>
+      <div class="ex">with a throat <mark>connecting</mark> the two <i>목구멍이 ‘연결하는’ → 능동 (22)</i></div>
+    </div>
+    <div class="box"><h3>조동사가 있는 수동태</h3>
+      <p>조동사 + be + p.p.</p>
+      <div class="ex">space-time <mark>could</mark> actually <mark>be bent</mark> (16)</div>
+      <div class="ex">the dots <mark>will be</mark> instantly <mark>connected</mark> (21)</div>
+      <div class="ex">it <mark>might be crushed</mark> or <mark>broken</mark> into pieces (28)</div>
+    </div>
+    <div class="box"><h3>think류 동사 + 간접의문문</h3>
+      <p>Do you think? + Which will it choose?</p>
+      <div class="ex">→ <mark>Which</mark> do you think <mark>it will choose</mark>? <i>의문사가 맨 앞, 뒤는 주어 + 동사 (13)</i></div>
+      <p style="margin-top:6px;font-size:15.5px;color:var(--sub)">think · believe · guess · imagine · suppose</p>
+    </div>
+  </div>
+`);
+page(M8,"핵심 문법 ②",`
+  <h2><small>GRAMMAR</small>Lesson 8 핵심 문법 ②</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>비교·정도 구문</h3>
+      <div class="ex">space is <mark>so</mark> vast <mark>that</mark> it is not possible <i>너무 ~해서 …하다 (4)</i></div>
+      <div class="ex">it's <mark>too</mark> early <mark>to</mark> celebrate <i>…하기에 너무 ~하다 (25)</i></div>
+      <div class="ex"><mark>as</mark> vast <mark>as</mark> our universe <i>~만큼 …한 (11)</i></div>
+      <div class="ex">there is <mark>nothing faster than</mark> light <i>최상급 의미 (2)</i></div>
+    </div>
+    <div class="box"><h3>to부정사의 형용사적 용법</h3>
+      <div class="ex">a faster way <mark>to travel</mark> through space (8)</div>
+      <div class="ex">many things <mark>to consider</mark> (27)</div>
+      <div class="ex">the one <mark>to find</mark> the answer (33) <i>cf. 목적 : in order to answer (9) · To understand this (18)</i></div>
+    </div>
+    <div class="box"><h3>시제 일치의 예외</h3>
+      <p>과학적 사실 · 불변의 진리 → 주절이 과거여도 <b>현재시제</b></p>
+      <div class="ex">Einstein figured out that space and time <mark>are</mark> connected. (15)</div>
+    </div>
+    <div class="box"><h3>꼭 외울 표현</h3>
+      <ul>
+        <li>in the blink of an eye : 눈 깜짝할 사이에</li>
+        <li>be expected to V · It takes 시간 to V</li>
+        <li>would like + O + to V · either A or B</li>
+        <li>such a + 명사 · call A B · according to</li>
+        <li>all we need to do is (to) V · Even if</li>
+      </ul>
+    </div>
+  </div>
+`);
+page(M8,"확인 문제",`
+  <h2><small>CHECK</small>Lesson 8 확인 문제 <span style="font-size:16px;color:var(--sub);font-weight:500">— 문제를 클릭하면 정답이 보여요</span></h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="q"><div class="qn">1</div><div class="qq">영화 ‘패신저스’의 우주선은 어떤 속도로, 얼마 동안 이동하나요?</div><div class="hint">클릭</div><div class="qa">빛의 절반 속도(one-half the speed of light)로 120년</div></div>
+    <div class="q"><div class="qn">2</div><div class="qq">If such wormholes (exist / existed) in space, we could get to places quickly.</div><div class="hint">클릭</div><div class="qa">existed — 가정법 과거</div></div>
+    <div class="q"><div class="qn">3</div><div class="qq">Fold the paper with the dots (matching / matched) up.</div><div class="hint">클릭</div><div class="qa">matched — 점들이 맞춰지는 수동 관계</div></div>
+    <div class="q"><div class="qn">4</div><div class="qq">Do you think? + Which will it choose? → 한 문장으로</div><div class="hint">클릭</div><div class="qa">Which do you think it will choose?</div></div>
+    <div class="q"><div class="qn">5</div><div class="qq">웜홀을 통과하는 것이 위험한 이유는?</div><div class="hint">클릭</div><div class="qa">매우 불안정해서 우주선이 찌그러지거나 산산조각 날 수 있다</div></div>
+    <div class="q"><div class="qn">6</div><div class="qq">Einstein figured out that space and time (are / were) connected.</div><div class="hint">클릭</div><div class="qa">are — 과학적 사실은 항상 현재시제</div></div>
+  </div>
+`);
+
+S.push({raw:`<section class="slide cover main">
+  <div class="k">Lesson 7 · 8</div>
+  <h1>수고했어요!</h1>
+  <div class="t">본문 문장을 끊어 읽으며 다시 한 번 소리 내어 읽어 보세요.</div>
+</section>`});
+
+/* ---------- 렌더링 ---------- */
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function fmt(en){
+  return esc(en)
+    .replace(/ \/\/ /g,"  ")
+    .replace(/\[([^\]]+)\]/g,"<mark>$1</mark>")
+    .replace(/ \/ /g,' <span class="sl">/</span> ');
+}
+function sentHTML(o){
+  const sp = o.sp ? `<span class="sp ${o.sp.startsWith("Dr")?"dr":""}">${o.sp}</span>` : "";
+  return `<div class="s${o.h?" h":""}"><div class="n">${String(o.n).padStart(2,"0")}</div><div>
+    <div class="en">${sp}${fmt(o.en)}</div>
+    <div class="nt">${o.nt.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
+    <div class="kc"><b>끊어 해석</b><span>${esc(o.kc).replace(/ \/\/ /g,"  ").replace(/ \/ /g,' <span class="sl">/</span> ')}</span></div>
+    <div class="ko"><b>해석</b><span>${esc(o.ko)}</span></div></div></div>`;
+}
+const stage = document.getElementById("stage");
+let html = "";
+S.forEach((x,i)=>{
+  if(x.raw){ html += x.raw; return; }
+  const body = x.ns ? x.ns.map(n=>sentHTML(x.data[n-1])).join("") : x.html;
+  const rng = x.ns ? `${String(x.ns[0]).padStart(2,"0")}${x.ns.length>1?" – "+String(x.ns[x.ns.length-1]).padStart(2,"0"):""}` : "";
+  html += `<section class="slide ${x.m.cls}">
+    <div class="hd"><span class="ls">${x.m.ls}</span><span class="sec">${x.sec}</span><span class="rng">${rng}</span></div>
+    <div class="bd">${body}</div>
+    <div class="ft">${x.m.ls} · ${x.m.t}<span class="pg"></span></div></section>`;
+});
+stage.innerHTML = html;
+const slides = [...stage.querySelectorAll(".slide")];
+slides.forEach((s,i)=>{ const p=s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
+stage.querySelectorAll(".q").forEach(q=>q.addEventListener("click",()=>q.classList.toggle("open")));
+
+let cur = 0;
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
+  document.getElementById("bar").style.width = ((cur+1)/slides.length*100)+"%";
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+  drawInk();
+}
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.transform = ink.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+}
+/* ---------- 판서 : 슬라이드마다 따로 저장 ---------- */
+const ink = document.getElementById("ink"), ctx = ink.getContext("2d");
+const INK = {};                                   /* 슬라이드 번호 → 획 목록 */
+let tool = "pen", color = "#e5322d", stroke = null;
+const W = {pen:4, hl:24, er:40};
+function togglePen(){
+  document.body.classList.toggle("drawing");
+  document.getElementById("penBtn").classList.toggle("on", document.body.classList.contains("drawing"));
+}
+function setTool(t){
+  tool = t;
+  document.body.classList.toggle("er", t==="er");
+  document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===t));
+}
+function paint(st){
+  const p = st.pts;
+  ctx.save();
+  ctx.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
+  ctx.globalAlpha = st.t==="hl" ? .35 : 1;
+  ctx.strokeStyle = st.c; ctx.lineWidth = W[st.t];
+  ctx.lineCap = st.t==="hl" ? "butt" : "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+  if(p.length===1) ctx.lineTo(p[0][0]+.1, p[0][1]);
+  for(let i=1;i<p.length-1;i++){ const mx=(p[i][0]+p[i+1][0])/2, my=(p[i][1]+p[i+1][1])/2; ctx.quadraticCurveTo(p[i][0],p[i][1],mx,my); }
+  if(p.length>1) ctx.lineTo(p[p.length-1][0], p[p.length-1][1]);
+  ctx.stroke(); ctx.restore();
+}
+function drawInk(){
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height);
+  ctx.setTransform(2,0,0,2,0,0);
+  (INK[cur]||[]).forEach(paint);
+  if(stroke) paint(stroke);
+}
+function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720]; }
+ink.addEventListener("pointerdown", e=>{
+  ink.setPointerCapture(e.pointerId);
+  stroke = {t:tool, c:color, pts:[pos(e)]}; drawInk();
+});
+ink.addEventListener("pointermove", e=>{
+  if(!stroke) return;
+  (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(ev=>stroke.pts.push(pos(ev)));
+  drawInk();
+});
+const endStroke = ()=>{ if(!stroke) return; (INK[cur] ||= []).push(stroke); stroke = null; drawInk(); };
+ink.addEventListener("pointerup", endStroke);
+ink.addEventListener("pointercancel", endStroke);
+function undoInk(){ (INK[cur]||[]).pop(); drawInk(); }
+function clearInk(){ INK[cur] = []; drawInk(); }
+document.querySelectorAll("#pen .c").forEach(b=>b.addEventListener("click",()=>{
+  color = b.dataset.c; if(tool==="er") setTool("pen");
+  document.querySelectorAll("#pen .c").forEach(x=>x.classList.toggle("on", x===b));
+}));
+document.querySelectorAll("#pen [data-t]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.t)));
+function tg(c){ document.body.classList.toggle(c); }
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+addEventListener("resize", fit);
+addEventListener("keydown", e=>{
+  const k = e.key;
+  if((e.ctrlKey||e.metaKey) && (k==="z"||k==="Z")){ e.preventDefault(); undoInk(); return; }
+  if(k==="p"||k==="P"){ togglePen(); return; }
+  if(document.body.classList.contains("drawing")){
+    if(k==="e"||k==="E"){ setTool(tool==="er"?"pen":"er"); return; }
+    if(k==="Delete"){ clearInk(); return; }
+    if(k==="Escape"){ togglePen(); return; }
+  }
+  if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
+  else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home") go(0);
+  else if(k==="End") go(slides.length-1);
+  else if(k==="k"||k==="K") tg("hideKo");
+  else if(k==="n"||k==="N") tg("hideNt");
+  else if(k==="f"||k==="F") fs();
+});
+fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
