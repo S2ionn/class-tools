@@ -1055,18 +1055,24 @@ function paintPencil(st, g){
   const nrm = p.map((q,i)=>{ const a = p[Math.max(0,i-1)], b = p[Math.min(p.length-1,i+1)];
     const dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx,dy) || 1; return [-dy/L, dx/L]; });
   const K = Math.max(3, Math.round(w*.8));
+  /* 끝 가늘게 : 시작·끝에서 일정 길이 동안 가닥이 모이고 옅어짐 */
+  const cum = [0]; for(let i=1;i<p.length;i++) cum.push(cum[i-1] + Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]));
+  const total = cum[cum.length-1], T = Math.max(1, Math.min(w*5 + 14, total*.35));
+  const tp = i=>{ const u = Math.min(1, Math.min(cum[i], total-cum[i]) / T); return .15 + .85*u*u*(3-2*u); };
   g.save();
   g.strokeStyle = g.fillStyle = grain(st.c); g.lineCap = "round"; g.lineJoin = "round";
   g.lineWidth = Math.max(1.1, w/K*1.7);
   for(let k=0;k<K;k++){
     const off = (k/(K-1) - .5) * w * .85, shade = .75 + .35*h(k, -1);
     const at = i=>{ const j = (h(k, i) - .5) * w * .16;
-      return [p[i][0] + nrm[i][0]*(off+j), p[i][1] + nrm[i][1]*(off+j)]; };
+      const o = (off+j) * tp(i); return [p[i][0] + nrm[i][0]*o, p[i][1] + nrm[i][1]*o]; };
     if(p.length===1){ const [x,y] = at(0); g.globalAlpha = .7*shade; g.beginPath(); g.arc(x, y, g.lineWidth/2, 0, 7); g.fill(); continue; }
-    for(let s=0; s<p.length-1; s+=6){             /* 6점씩 끊어서 압력에 맞는 진하기로 */
-      const e = Math.min(p.length-1, s+6);
-      let pr = 0; for(let i=s;i<=e;i++) pr += (p[i][2] ?? .5); pr /= (e-s+1);
-      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade);
+    const lw = Math.max(1.1, w/K*1.7);
+    for(let s=0; s<p.length-1; s+=4){             /* 4점씩 끊어서 압력·끝 가늘기에 맞는 진하기와 굵기로 */
+      const e = Math.min(p.length-1, s+4);
+      let pr = 0, ta = 0; for(let i=s;i<=e;i++){ pr += (p[i][2] ?? .5); ta += tp(i); } pr /= (e-s+1); ta /= (e-s+1);
+      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade * (.45 + .55*ta));
+      g.lineWidth = lw * (.55 + .45*ta);
       g.beginPath(); const a = at(s); g.moveTo(a[0], a[1]);
       for(let i=s+1;i<=e;i++){ const b = at(i); g.lineTo(b[0], b[1]); }
       g.stroke();
