@@ -975,8 +975,8 @@ function paintPencil(st, g){
   const K = Math.max(3, Math.round(w*.8));
   /* 끝 가늘게 : 시작·끝에서 일정 길이 동안 가닥이 모이고 옅어짐 */
   const cum = [0]; for(let i=1;i<p.length;i++) cum.push(cum[i-1] + Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]));
-  const total = cum[cum.length-1], T = Math.max(1, Math.min(w*5 + 14, total*.35));
-  const tp = i=>{ const u = Math.min(1, Math.min(cum[i], total-cum[i]) / T); return .15 + .85*u*u*(3-2*u); };
+  const total = cum[cum.length-1], T = Math.max(1, Math.min(w*2.5 + 8, total*.3));
+  const tp = i=>{ const u = Math.min(1, Math.min(cum[i], total-cum[i]) / T); return .55 + .45*u*u*(3-2*u); };   /* 끝에서도 55% 굵기 → 살짝 얇고 뭉툭하게 */
   g.save();
   g.strokeStyle = g.fillStyle = grain(st.c); g.lineCap = "round"; g.lineJoin = "round";
   g.lineWidth = Math.max(1.1, w/K*1.7);
@@ -989,8 +989,8 @@ function paintPencil(st, g){
     for(let s=0; s<p.length-1; s+=4){             /* 4점씩 끊어서 압력·끝 가늘기에 맞는 진하기와 굵기로 */
       const e = Math.min(p.length-1, s+4);
       let pr = 0, ta = 0; for(let i=s;i<=e;i++){ pr += (p[i][2] ?? .5); ta += tp(i); } pr /= (e-s+1); ta /= (e-s+1);
-      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade * (.45 + .55*ta));
-      g.lineWidth = lw * (.55 + .45*ta);
+      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade * (.8 + .2*ta));
+      g.lineWidth = lw * (.85 + .15*ta);
       g.beginPath(); const a = at(s); g.moveTo(a[0], a[1]);
       for(let i=s+1;i<=e;i++){ const b = at(i); g.lineTo(b[0], b[1]); }
       g.stroke();
