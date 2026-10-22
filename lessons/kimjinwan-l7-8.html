@@ -104,64 +104,17 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 .q.open .hint{display:none}
 
 /* controls */
+#ui{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;z-index:9;opacity:.35;transition:opacity .2s}
+#ui:hover{opacity:1}
+#ui button{font:600 13px Body,"Malgun Gothic",sans-serif;background:#fff;border:0;border-radius:8px;padding:7px 11px;cursor:pointer;color:#1d2433}
 #bar{position:fixed;left:0;top:0;height:3px;background:#e8633a;z-index:9;transition:width .2s}
-
-/* ===== 판서 ===== */
-#ink{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;pointer-events:none;z-index:5;touch-action:none}
-.drawing #ink{pointer-events:auto;cursor:crosshair}
-.drawing.er #ink{cursor:cell}
-
-/* ===== 같이 쓰기 ===== */
-#co{position:fixed;right:14px;bottom:56px;width:300px;display:none;flex-direction:column;gap:10px;z-index:11;background:#1d2433;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:500 14px Body,"Malgun Gothic",sans-serif}
-#co.open{display:flex}
-#co .row{display:flex;gap:6px}
-#co button{font:600 13px Body,"Malgun Gothic",sans-serif;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;background:#2e3546;color:#fff;flex:1}
-#co button.main{background:#e8633a}
-#co input{flex:1;min-width:0;font:700 17px Body,"Malgun Gothic",sans-serif;letter-spacing:.03em;border:0;border-radius:10px;padding:7px 12px;background:#fff;color:#1d2433}
-#co .code{font:800 28px Title,Body,sans-serif;letter-spacing:.04em;text-align:center;background:#2e3546;border-radius:10px;padding:6px 0}
-#co .st{font-size:13px;color:#c7ccd6;line-height:1.45}
-#co .st b{color:#7ee08a}
-#co .x{position:absolute;right:10px;top:6px;background:none;flex:none;padding:4px 6px;font-size:16px;color:#9aa1b0}
-
-/* ===== 버튼 디자인 ===== */
-.bar{position:fixed;bottom:10px;display:flex;align-items:center;gap:1px;z-index:9;background:rgba(29,36,51,.94);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
-#ui{right:14px;opacity:.55;transition:opacity .2s}
-#ui:hover,.drawing #ui,#ui:has(.live){opacity:1}
-#pen{left:12px;display:none;z-index:10}
-.drawing #pen{display:flex}
-.bar button{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:0;border-radius:9px;background:transparent;color:#d5d9e2;font:600 13.5px Body,"Malgun Gothic",sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
-.bar button:hover{background:rgba(255,255,255,.1);color:#fff}
-.bar button.ic{width:32px;padding:0;justify-content:center}
-.bar button.on{background:#fff;color:#1d2433}
-.bar svg{width:17px;height:17px;flex:none}
-.bar .sep{width:1px;height:20px;background:rgba(255,255,255,.14);margin:0 3px}
-#coBtn.live{background:#16a34a;color:#fff}
-/* 해석·문법을 숨기면 눈 감은 아이콘 + 흐린 글씨 */
-#ui .off{display:none}
-.hideKo #koBtn .on-i,.hideNt #ntBtn .on-i{display:none}
-.hideKo #koBtn .off,.hideNt #ntBtn .off{display:block}
-.hideKo #koBtn,.hideNt #ntBtn{color:#7d8699}
-/* 판서 도구 막대 */
-#pen #colors,#pen #sizes{display:flex;gap:1px;align-items:center;padding:0 2px}
-#pen button.c{width:20px;height:20px;padding:0;margin:0 3px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);transition:transform .15s}
-#pen button.c:hover{transform:scale(1.12)}
-#pen button.c.on{box-shadow:0 0 0 2px #1d2433,0 0 0 3.5px #fff}
-#pen .pick{position:relative;display:block;width:20px;height:20px;margin:0 3px;border-radius:50%;cursor:pointer;background:conic-gradient(#ff4d4d,#ffd84d,#5ee35e,#4dd8ff,#5b6bff,#e44dff,#ff4d4d);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .15s}
-#pen .pick:hover{transform:scale(1.12)}
-#pen .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
-#pen button.s{width:28px;padding:0;justify-content:center}
-#pen button.s.on{background:rgba(255,255,255,.16)}
-#pen button.s i{display:block;border-radius:50%}
-@media (max-width:860px){#pen{bottom:58px}}
-#co{bottom:62px}
-#co button{border-radius:10px;padding:9px 10px}
 
 @media print{
   @page{size:1280px 720px;margin:0}
   html,body{overflow:visible;background:#fff}
   #stage{position:static;transform:none!important}
   .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page}
-  #ui,#bar,#ink,#pen,#co{display:none!important}
+  #ui,#bar{display:none}
   .q .qa{opacity:1}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
@@ -170,46 +123,12 @@ table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
 <body>
 <div id="bar"></div>
 <div id="stage"></div>
-<canvas id="ink" width="2560" height="1440"></canvas>
-<div id="pen" class="bar">
-  <span id="colors"></span>
-  <span class="sep"></span>
-  <span id="sizes"></span>
-  <span class="sep"></span>
-  <button data-t="pen" class="ic on" title="펜"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
-  <button class="ic" data-t="pc" title="색연필"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.2 6.8a2.8 2.8 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8l-1.3 4.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5Z"/><path d="M15 5l4 4"/></svg></button>
-  <button class="ic" data-t="hl" title="형광펜 (곧은 선)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
-  <button class="ic" data-t="er" title="지우개 (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21l-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21"/><path d="M22 21H7"/><path d="M5 11l9 9"/></svg></button>
-  <span class="sep"></span>
-  <button class="ic" onclick="undoInk()" title="되돌리기 (Ctrl+Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
-  <button class="ic" onclick="clearInk()" title="이 장 모두 지우기 (Delete)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-</div>
-<div id="co">
-  <button class="x" onclick="coPanel(false)" title="닫기">✕</button>
-  <b style="font-size:16px">같이 쓰기</b>
-  <div class="st">같은 링크를 연 두 사람의 판서와 슬라이드 넘김이 실시간으로 맞춰져요.</div>
-  <div id="coIdle">
-    <div class="st" style="margin-bottom:6px">방 이름 (영어·숫자)</div>
-    <div class="row"><input id="coIn" maxlength="16" placeholder="예: dahyun" autocomplete="off" onkeydown="event.stopPropagation(); if(event.key==='Enter') coStart(this.value)"><button class="main" onclick="coStart(coIn.value)" style="flex:none;padding:9px 16px">시작</button></div>
-  </div>
-  <div id="coOn" style="display:none">
-    <div class="code" id="coCode"></div>
-    <div class="st" id="coSt" style="margin-top:8px"></div>
-    <div class="row" style="margin-top:8px"><button class="main" onclick="coCopy()" id="coCopyBtn">수업방에 올릴 링크 복사</button></div>
-    <div class="st" style="margin-top:8px">이 링크를 수업방에 한 번 올려 두면, 선생님과 학생이 언제 들어오든 자동으로 연결돼요.</div>
-    <div class="row" style="margin-top:8px"><button onclick="coLeave()">나가기</button></div>
-  </div>
-</div>
-<div id="ui" class="bar">
-  <button class="ic" onclick="go(cur-1)" title="이전 (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-  <button class="ic" onclick="go(cur+1)" title="다음 (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
-  <span class="sep"></span>
-  <button id="penBtn" onclick="togglePen()" title="판서 (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>판서</span></button>
-  <button id="coBtn" onclick="coPanel()" title="같이 쓰기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>같이 쓰기</span></button>
-  <span class="sep"></span>
-  <button id="koBtn" onclick="tg('hideKo')" title="해석 보이기/숨기기 (K)"><svg class="on-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg><span>해석</span></button>
-  <button id="ntBtn" onclick="tg('hideNt')" title="문법 보이기/숨기기 (N)"><svg class="on-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg><span>문법</span></button>
-  <button class="ic" onclick="fs()" title="전체화면 (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+<div id="ui">
+  <button onclick="go(cur-1)">◀</button>
+  <button onclick="go(cur+1)">▶</button>
+  <button onclick="tg('hideKo')" title="K">해석 숨기기</button>
+  <button onclick="tg('hideNt')" title="N">문법 숨기기</button>
+  <button onclick="fs()" title="F">전체화면</button>
 </div>
 
 <script>
@@ -879,361 +798,16 @@ function go(i){
   slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
   document.getElementById("bar").style.width = ((cur+1)/slides.length*100)+"%";
   try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
-  drawInk();
-  if(!remoteGo){ if(coLoaded) touched = true; coSend({type:"go", k:skey()}); }
 }
 function fit(){
   const s = Math.min(innerWidth/1280, innerHeight/720);
-  stage.style.transform = ink.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
 }
-/* ---------- 판서 : 슬라이드마다 따로 저장 ---------- */
-const ink = document.getElementById("ink"), ctx = ink.getContext("2d");
-const INK = {};                                   /* 슬라이드 번호 → 획 목록 */
-/* 펜과 형광펜은 색 목록이 따로, 굵기는 도구마다 따로 기억 */
-const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], pc:["#e0524d","#f08c2e","#3f74d6","#3c9a5f","#5b5f68"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
-const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[20,40,80]};
-const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:1}};
-let tool = "pen", stroke = null;
-const palOf = t => t==="hl" || t==="pc" ? t : "pen";
-/* 색연필 : 종이 결 무늬(여러 겹의 잡음)를 색으로 칠해 씀. 같은 색이면 두 기기에서 늘 같은 무늬 */
-const GRAIN = {}, CUSTOM = {};
-const colorOf = k => sel[k].c < PAL[k].length ? PAL[k][sel[k].c] : (CUSTOM[k] || PAL[k][0]);
-const PAPER = (()=>{                              /* 0~1 종이 결 값 (128×128, 이어 붙여도 이음새 없음) */
-  const N = 128, out = new Float32Array(N*N);
-  let s = 20261023; const rnd = ()=> (s = (s*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
-  const grid = g => { const a = Array.from({length:g*g}, rnd);
-    return (x, y)=>{ const fx = x/N*g, fy = y/N*g, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx-x0, ty = fy-y0;
-      const v = (i, j)=>a[((j+g)%g)*g + (i+g)%g];
-      return (v(x0,y0)*(1-tx) + v(x0+1,y0)*tx)*(1-ty) + (v(x0,y0+1)*(1-tx) + v(x0+1,y0+1)*tx)*ty; }; };
-  const n8 = grid(8), n32 = grid(32), n64 = grid(64);
-  for(let y=0;y<N;y++) for(let x=0;x<N;x++){
-    const streak = .5 + .5*Math.sin((x*.9 + y*.35) + n8(x,y)*6);   /* 비스듬한 종이 섬유 결 */
-    out[y*N+x] = .34*rnd() + .26*n64(x,y) + .2*n32(x,y) + .1*n8(x,y) + .1*streak;
-  }
-  return out;
-})();
-function grain(c){
-  if(GRAIN[c]) return GRAIN[c];
-  const N = 128, cv = document.createElement("canvas"); cv.width = cv.height = N;
-  const g = cv.getContext("2d"), img = g.createImageData(N, N);
-  const [r, gg, b] = [1,3,5].map(i=>parseInt(c.slice(i, i+2), 16));
-  for(let i=0;i<N*N;i++){
-    const a = Math.max(0, Math.min(1, (PAPER[i] - .36) * 3.2));   /* 결이 높은 곳에만 색이 묻음 */
-    img.data.set([r, gg, b, a*255], i*4);
-  }
-  g.putImageData(img, 0, 0);
-  const p = ctx.createPattern(cv, "repeat");
-  p.setTransform?.(new DOMMatrix([.5,0,0,.5,0,0]));   /* 화면 2배 해상도에 맞춰 입자를 곱게 */
-  return GRAIN[c] = p;
-}
-function togglePen(){
-  document.body.classList.toggle("drawing");
-  document.getElementById("penBtn").classList.toggle("on", document.body.classList.contains("drawing"));
-}
-let shownK = "";
-function buildBar(){
-  const k = palOf(tool), box = document.getElementById("colors");
-  if(k!==shownK){                                 /* 도구의 색 목록이 바뀔 때만 다시 그림 (색 고르는 창이 닫히지 않게) */
-    shownK = k;
-    box.innerHTML = PAL[k].map((c,i)=>`<button class="c" data-c="${i}" style="background:${c}"></button>`).join("")
-      + `<button class="c" data-c="${PAL[k].length}" title="직접 고른 색"></button>`
-      + `<label class="pick" title="색 직접 고르기"><input type="color" value="${colorOf(k)}"></label>`;
-  }
-  const cs = box.querySelectorAll(".c"), cu = cs[cs.length-1];
-  cu.style.display = CUSTOM[k] ? "" : "none"; if(CUSTOM[k]) cu.style.background = CUSTOM[k];
-  cs.forEach((b,i)=>b.classList.toggle("on", tool!=="er" && sel[k].c===i));
-  const ws = SIZES[tool], hc = colorOf("hl"), cc = colorOf(k);
-  document.getElementById("sizes").innerHTML = ws.map((w,i)=>{
-    const d = Math.round(4 + i*12/(ws.length-1));      /* 버튼 안 점 크기 4~16px */
-    const look = tool==="hl" ? `width:18px;height:${Math.max(4,d-3)}px;border-radius:2px;background:${hc}`
-               : tool==="er" ? `width:${d}px;height:${d}px;background:none;border:2px solid #fff`
-               : `width:${d}px;height:${d}px;background:${cc};box-shadow:0 0 0 1px rgba(255,255,255,.35)`;
-    return `<button class="s${sel[tool].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
-  }).join("");
-  document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===tool));
-  document.body.classList.toggle("er", tool==="er");
-}
-document.getElementById("pen").addEventListener("input", e=>{
-  if(e.target.type!=="color") return;
-  if(tool==="er") tool = "pen";
-  const k = palOf(tool); CUSTOM[k] = e.target.value; sel[k].c = PAL[k].length; buildBar();
-});
-function setTool(t){ tool = t; buildBar(); }
-document.getElementById("pen").addEventListener("click", e=>{
-  const b = e.target.closest("button"); if(!b) return;
-  if(b.dataset.t) setTool(b.dataset.t);
-  else if(b.dataset.c){ if(tool==="er") tool = "pen"; sel[palOf(tool)].c = +b.dataset.c; buildBar(); }
-  else if(b.dataset.s){ sel[tool].s = +b.dataset.s; buildBar(); }
-});
-/* 색연필 한 획 = 가는 여러 가닥. 가닥마다 살짝 흔들리고, 펜 압력(마우스는 보통)에 따라 진하기가 달라짐 */
-function paintPencil(st, g){
-  const p = st.pts, w = st.w;
-  let seed = 7; for(const ch of String(st.id||"")) seed = (seed*31 + ch.charCodeAt(0)) % 9973;
-  const h = (k, i)=>{ const v = Math.sin(k*12.9898 + i*78.233 + seed*.618) * 43758.5453; return v - Math.floor(v); };
-  const nrm = p.map((q,i)=>{ const a = p[Math.max(0,i-1)], b = p[Math.min(p.length-1,i+1)];
-    const dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx,dy) || 1; return [-dy/L, dx/L]; });
-  const K = Math.max(3, Math.round(w*.8));
-  /* 끝 가늘게 : 시작·끝에서 일정 길이 동안 가닥이 모이고 옅어짐 */
-  const cum = [0]; for(let i=1;i<p.length;i++) cum.push(cum[i-1] + Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]));
-  const total = cum[cum.length-1], T = Math.max(1, Math.min(w*2.5 + 8, total*.3));
-  const tp = i=>{ const u = Math.min(1, Math.min(cum[i], total-cum[i]) / T); return .55 + .45*u*u*(3-2*u); };   /* 끝에서도 55% 굵기 → 살짝 얇고 뭉툭하게 */
-  g.save();
-  g.strokeStyle = g.fillStyle = grain(st.c); g.lineCap = "round"; g.lineJoin = "round";
-  g.lineWidth = Math.max(1.1, w/K*1.7);
-  for(let k=0;k<K;k++){
-    const off = (k/(K-1) - .5) * w * .85, shade = .75 + .35*h(k, -1);
-    const at = i=>{ const j = (h(k, i) - .5) * w * .16;
-      const o = (off+j) * tp(i); return [p[i][0] + nrm[i][0]*o, p[i][1] + nrm[i][1]*o]; };
-    if(p.length===1){ const [x,y] = at(0); g.globalAlpha = .7*shade; g.beginPath(); g.arc(x, y, g.lineWidth/2, 0, 7); g.fill(); continue; }
-    const lw = Math.max(1.1, w/K*1.7);
-    for(let s=0; s<p.length-1; s+=4){             /* 4점씩 끊어서 압력·끝 가늘기에 맞는 진하기와 굵기로 */
-      const e = Math.min(p.length-1, s+4);
-      let pr = 0, ta = 0; for(let i=s;i<=e;i++){ pr += (p[i][2] ?? .5); ta += tp(i); } pr /= (e-s+1); ta /= (e-s+1);
-      g.globalAlpha = Math.min(1, (.42 + .9*pr) * shade * (.8 + .2*ta));
-      g.lineWidth = lw * (.85 + .15*ta);
-      g.beginPath(); const a = at(s); g.moveTo(a[0], a[1]);
-      for(let i=s+1;i<=e;i++){ const b = at(i); g.lineTo(b[0], b[1]); }
-      g.stroke();
-    }
-  }
-  g.restore();
-}
-function paint(st, g = ctx){
-  if(st.t==="pc") return paintPencil(st, g);
-  const p = st.pts;
-  g.save();
-  g.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
-  g.globalAlpha = st.t==="hl" ? .45 : 1;
-  g.strokeStyle = st.c; g.lineWidth = st.w;
-  g.lineCap = st.t==="hl" ? "butt" : "round"; g.lineJoin = "round";
-  g.beginPath(); g.moveTo(p[0][0], p[0][1]);
-  if(p.length===1) g.lineTo(p[0][0]+.1, p[0][1]);
-  for(let i=1;i<p.length-1;i++){ const mx=(p[i][0]+p[i+1][0])/2, my=(p[i][1]+p[i+1][1])/2; g.quadraticCurveTo(p[i][0],p[i][1],mx,my); }
-  if(p.length>1) g.lineTo(p[p.length-1][0], p[p.length-1][1]);
-  g.stroke(); g.restore();
-}
-/* 다 그은 획은 따로 한 장에 모아 두고, 긋는 중에는 그 장 + 지금 획만 다시 그림 (색연필이 많아도 느려지지 않게) */
-const done = document.createElement("canvas"); done.width = ink.width; done.height = ink.height;
-const dctx = done.getContext("2d"); let doneSig = "";
-function drawInk(){
-  const k = skey(), arr = INK[k] || [], sig = k + ":" + arr.length + ":" + (arr.length ? arr[arr.length-1].id : "");
-  if(sig !== doneSig){
-    doneSig = sig;
-    dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,done.width,done.height);
-    dctx.setTransform(2,0,0,2,0,0); arr.forEach(st=>paint(st, dctx));
-  }
-  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height); ctx.drawImage(done, 0, 0);
-  ctx.setTransform(2,0,0,2,0,0);
-  Object.values(LIVE).forEach(st=>{ if(st.k===k) paint(st); });
-  if(stroke) paint(stroke);
-}
-function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720, e.pointerType==="pen" && e.pressure ? e.pressure : .5]; }
-ink.addEventListener("pointerdown", e=>{
-  if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
-  try{ ink.setPointerCapture(e.pointerId); }catch(err){}
-  const c = tool==="er" ? "#000" : colorOf(palOf(tool));
-  stroke = {t:tool, c, w:SIZES[tool][sel[tool].s], pts:[pos(e)], k:skey(), id:ME+Date.now().toString(36), o:ME}; drawInk();
-});
-ink.addEventListener("pointermove", e=>{
-  if(!stroke) return;
-  if(stroke.t==="hl"){                             /* 형광펜은 시작점에서 곧은 선, 거의 수평이면 딱 수평으로 */
-    const [x0,y0] = stroke.pts[0]; let [x,y] = pos(e);
-    if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
-    stroke.pts = [[x0,y0],[x,y]];
-  } else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>addPt(pos(x))); }
-  drawInk();
-  if(conns.length && Date.now()-lastLive > 40){ lastLive = Date.now(); coSend({type:"live", who:ME, st:stroke}); }
-});
-/* 선 보정 : 손떨림을 줄이도록 새 점을 이전 점 쪽으로 살짝 끌어당겨 찍음 */
-const SMOOTH = .42;                               /* 1이면 보정 없음, 작을수록 더 매끈 */
-function addPt(q){
-  const L = stroke.pts[stroke.pts.length-1], lp = L[2] ?? .5, qp = q[2] ?? .5;
-  const s = [L[0] + (q[0]-L[0])*SMOOTH, L[1] + (q[1]-L[1])*SMOOTH, lp + (qp-lp)*SMOOTH];
-  stroke.raw = q;
-  if(Math.hypot(s[0]-L[0], s[1]-L[1]) >= .8) stroke.pts.push(s);   /* 너무 촘촘한 점은 건너뜀 */
-}
-const endStroke = ()=>{
-  if(!stroke) return;
-  if(stroke.raw){                                 /* 보정 때문에 덜 따라온 끝부분을 실제 끝점까지 이어 줌 */
-    const L = stroke.pts[stroke.pts.length-1], q = stroke.raw;
-    for(let i=1;i<=3;i++) stroke.pts.push([L[0]+(q[0]-L[0])*i/3, L[1]+(q[1]-L[1])*i/3, L[2] ?? .5]);
-    delete stroke.raw;
-  }
-  if(stroke.t!=="hl" || stroke.pts.length>1){ touched = true; (INK[stroke.k] ||= []).push(stroke); coSend({type:"add", who:ME, st:stroke}); }   /* 형광펜은 클릭만 하면 버림 */
-  stroke = null; drawInk();
-};
-ink.addEventListener("pointerup", endStroke);
-ink.addEventListener("pointercancel", endStroke);
-function undoInk(){                              /* 내가 그은 마지막 획만 되돌림 */
-  const k = skey(), a = INK[k]||[];
-  for(let j=a.length-1;j>=0;j--) if(!a[j].o || a[j].o===ME){ coSend({type:"del", k, id:a[j].id}); a.splice(j,1); break; }
-  drawInk();
-}
-function clearInk(){ const k = skey(); INK[k] = []; coSend({type:"clear", k}); drawInk(); }
-buildBar();
-
-/* ---------- 같이 쓰기 : 같은 링크(방 이름)를 연 두 기기를 PeerJS로 직접 연결 ----------
-   먼저 들어온 쪽이 방을 맡고, 나중에 들어온 쪽이 거기에 붙음. 한쪽이 나가면 남은 쪽이 방을 이어받음 */
-const ME = Math.random().toString(36).slice(2,8);
-const LIVE = {};                                  /* 상대가 지금 긋고 있는 획 */
-let peer = null, conns = [], isHost = false, room = "", active = false, retryT = 0, autoOpen = false, remoteGo = false, lastLive = 0;
-let touched = /^#([2-9]|\d\d)/.test(location.hash), coLoaded = false;   /* 이 화면에서 슬라이드를 넘기거나 그린 적이 있는지 */
-setTimeout(()=>coLoaded = true, 1500);
-/* 슬라이드 번호 대신 내용으로 이름을 붙여, 기기마다 장 나눔이 달라도 같은 장을 찾게 함 */
-const baseKey = x => x.ns ? `${x.m.ls}#${x.ns.join(",")}` : x.raw ? "raw" : `${x.m.ls}|${x.sec}`;
-function skey(i = cur){
-  const src = typeof SS !== "undefined" ? SS : S, x = src[i];
-  if(!x) return "i" + i;
-  const b = baseKey(x); let n = 0;
-  for(let j=0;j<i;j++) if(baseKey(src[j])===b) n++;
-  return b + "~" + n;
-}
-function goKey(k){
-  const src = typeof SS !== "undefined" ? SS : S;
-  let i = slides.findIndex((_,j)=>skey(j)===k);
-  if(i<0){                                        /* 장 나눔이 다르면 첫 문장 번호가 들어 있는 장으로 */
-    const m = k.match(/^(.+)#(\d+)/);
-    if(m) i = src.findIndex(x=>x.ns && x.m.ls===m[1] && x.ns.includes(+m[2]));
-  }
-  if(i>=0 && i!==cur){ remoteGo = true; go(i); remoteGo = false; }
-}
-function coSend(msg, except){
-  conns.forEach(c=>{ if(c!==except && c.open) try{ c.send(msg); }catch(e){} });
-}
-function coApply(msg, from){
-  if(msg.type==="sync"){                          /* 획 id 기준으로 합치기 */
-    for(const [k, arr] of Object.entries(msg.ink||{})){
-      const mine = INK[k] ||= [], ids = new Set(mine.map(s=>s.id));
-      arr.forEach(s=>{ if(!ids.has(s.id)) mine.push(s); });
-    }
-    if(msg.touched && (!touched || msg.host)) goKey(msg.k);   /* 막 들어온 쪽이 상대 화면을 첫 장으로 돌리지 않게 */
-  }
-  else if(msg.type==="live"){ LIVE[msg.who] = msg.st; }
-  else if(msg.type==="add"){ delete LIVE[msg.who]; (INK[msg.st.k] ||= []).push(msg.st); }
-  else if(msg.type==="del"){ const a = INK[msg.k]||[]; const j = a.findIndex(s=>s.id===msg.id); if(j>=0) a.splice(j,1); }
-  else if(msg.type==="clear"){ INK[msg.k] = []; }
-  else if(msg.type==="go"){ goKey(msg.k); }
-  if(isHost && msg.type!=="sync") coSend(msg, from);   /* 방을 맡은 쪽이 다른 참여자에게 전달 */
-  drawInk();
-}
-/* 방 주소 = 페이지 제목 + 방 이름 → 7과·8과는 같은 방 이름이라도 서로 다른 방 */
-function pid(){ let h = 5381; for(const ch of document.title) h = (h*33 ^ ch.codePointAt(0))>>>0; return `s2ionn-${h.toString(36)}-${room}`; }
-const setSt = h => document.getElementById("coSt").innerHTML = h;
-function coStatus(){
-  const n = conns.filter(c=>c.open).length;
-  if(active) setSt(n ? "<b>● 연결됨</b> · 함께 쓰는 중" : isHost ? "상대가 들어오기를 기다리는 중…" : "연결하는 중…");
-  document.getElementById("coBtn").classList.toggle("live", n>0);
-  if(n && autoOpen){ autoOpen = false; setTimeout(()=>coPanel(false), 1500); }
-}
-function coPanel(open = !document.getElementById("co").classList.contains("open")){
-  document.getElementById("co").classList.toggle("open", open);
-}
-function coUI(){
-  document.getElementById("coIdle").style.display = active ? "none" : "";
-  document.getElementById("coOn").style.display = active ? "" : "none";
-  document.getElementById("coCode").textContent = room;
-  coStatus();
-}
-function loadPeer(){
-  return window.Peer ? Promise.resolve() : new Promise((ok, no)=>{
-    const s = document.createElement("script");
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js";
-    s.onload = ok; s.onerror = ()=>{ s.remove(); no(new Error("load")); }; document.head.appendChild(s);
-  });
-}
-function dropPeer(){
-  const old = conns; conns = [];                  /* 먼저 비워서 close 이벤트가 재접속을 일으키지 않게 */
-  old.forEach(c=>{ try{ c.close(); }catch(e){} });
-  if(peer){ const p = peer; peer = null; try{ p.destroy(); }catch(e){} }
-}
-function coWire(c){
-  c.on("open", ()=>{
-    if(!conns.includes(c)) conns.push(c);
-    c.send({type:"sync", ink:INK, k:skey(), touched, host:isHost});
-    coStatus();
-  });
-  c.on("data", m=>coApply(m, c));
-  c.on("close", ()=>{
-    if(!conns.includes(c)) return;
-    conns = conns.filter(x=>x!==c); Object.keys(LIVE).forEach(k=>delete LIVE[k]); drawInk(); coStatus();
-    if(!isHost && active){ clearTimeout(retryT); retryT = setTimeout(coEnter, 1000); }   /* 방을 맡던 쪽이 나가면 이어받기 */
-  });
-  c.on("error", ()=>{});
-}
-async function coEnter(){
-  clearTimeout(retryT); if(!active) return;
-  try{ await loadPeer(); }catch(e){ setSt("인터넷 연결을 확인해 주세요. 다시 시도하는 중…"); retryT = setTimeout(coEnter, 5000); return; }
-  if(!active) return;
-  dropPeer(); isHost = false; coStatus();
-  const p = peer = new Peer(pid());               /* 방을 맡아 보기 */
-  p.on("open", ()=>{ if(p===peer){ isHost = true; coStatus(); } });
-  p.on("connection", c=>{ if(p===peer) coWire(c); });
-  p.on("disconnected", ()=>{ if(p===peer && active) try{ p.reconnect(); }catch(e){} });
-  p.on("error", err=>{
-    if(p!==peer) return;
-    if(err.type==="unavailable-id") coJoin();     /* 이미 상대가 맡고 있으면 붙기 */
-    else{ setSt("연결 오류 · 다시 시도하는 중…"); retryT = setTimeout(coEnter, 3000); }
-  });
-}
-function coJoin(){
-  dropPeer(); isHost = false;
-  const p = peer = new Peer();
-  p.on("open", ()=>{
-    if(p!==peer) return;
-    const c = p.connect(pid(), {reliable:true});
-    coWire(c);
-    setTimeout(()=>{ if(p===peer && !c.open) coEnter(); }, 8000);   /* 응답이 없으면 처음부터 다시 */
-  });
-  p.on("error", ()=>{ if(p===peer){ clearTimeout(retryT); retryT = setTimeout(coEnter, 2000); } });
-}
-function coStart(name){
-  name = String(name||"").toLowerCase().replace(/[^a-z0-9]/g, "");
-  if(name.length<2){ alert("방 이름은 영어나 숫자로 2글자 이상 적어 주세요."); return; }
-  room = name; active = true;
-  try{ localStorage.setItem("coRoom", name); }catch(e){}
-  try{ const u = new URL(location.href); u.searchParams.set("room", name); history.replaceState(null, "", u); }catch(e){}
-  coUI(); coEnter();
-}
-function coLeave(){
-  active = false; clearTimeout(retryT); dropPeer(); isHost = false;
-  try{ const u = new URL(location.href); u.searchParams.delete("room"); history.replaceState(null, "", u); }catch(e){}
-  coUI();
-}
-function coCopy(){
-  const url = location.origin + location.pathname + "?room=" + room;
-  const done = ()=>{ const b = document.getElementById("coCopyBtn"); b.textContent = "복사했어요!"; setTimeout(()=>b.textContent = "수업방에 올릴 링크 복사", 1500); };
-  const ask = ()=>prompt("이 링크를 복사해서 수업방에 올리세요", url);
-  try{ navigator.clipboard.writeText(url).then(done, ask); }catch(e){ ask(); }
-}
-addEventListener("beforeunload", ()=>{ if(peer) peer.destroy(); });
-try{ document.getElementById("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
-const roomQ = new URLSearchParams(location.search).get("room");
-if(roomQ){ autoOpen = true; coPanel(true); coStart(roomQ); }
 function tg(c){ document.body.classList.toggle(c); }
-function fs(){
-  const d = document, el = d.documentElement;
-  if(d.fullscreenElement || d.webkitFullscreenElement){ (d.exitFullscreen || d.webkitExitFullscreen).call(d); return; }
-  const req = el.requestFullscreen || el.webkitRequestFullscreen;
-  const fallback = ()=>{                          /* 다른 사이트 화면 안에 들어 있으면 전체화면이 막혀 있음 → 새 창으로 */
-    if(window.top !== window) window.open(location.href, "_blank");
-    else alert("이 브라우저에서는 전체화면 버튼이 막혀 있어요. PC라면 키보드의 F11을 눌러 보세요.");
-  };
-  if(!req || d.fullscreenEnabled === false || d.webkitFullscreenEnabled === false) return fallback();
-  let done = false;
-  const p = (()=>{ try{ return req.call(el); }catch(e){ return Promise.reject(e); } })();
-  if(p && p.then) p.then(()=>done = true, ()=>{ done = true; fallback(); });
-  setTimeout(()=>{ if(!done && !(d.fullscreenElement || d.webkitFullscreenElement)) fallback(); }, 1500);   /* 응답이 없을 때도 */
-}
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
 addEventListener("resize", fit);
 addEventListener("keydown", e=>{
   const k = e.key;
-  if((e.ctrlKey||e.metaKey) && (k==="z"||k==="Z")){ e.preventDefault(); undoInk(); return; }
-  if(k==="p"||k==="P"){ togglePen(); return; }
-  if(document.body.classList.contains("drawing")){
-    if(k==="e"||k==="E"){ setTool(tool==="er"?"pen":"er"); return; }
-    if(k==="Delete"){ clearInk(); return; }
-    if(k==="Escape"){ togglePen(); return; }
-  }
   if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
   else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
   else if(k==="Home") go(0);
@@ -1245,5 +819,6 @@ addEventListener("keydown", e=>{
 fit();
 go((parseInt(location.hash.slice(1))||1)-1);
 </script>
+<script src="https://s2ionn.github.io/class-tools/board.js"></script>
 </body>
 </html>
