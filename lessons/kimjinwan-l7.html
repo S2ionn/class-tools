@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>7과 본문 설명</title>
 <style>
-/* 이 컴퓨터에 설치된 글꼴 사용 (다른 PC에서는 맑은 고딕으로 대체) */
-@font-face{font-family:"Title";font-weight:100 900;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("file:///C:/Users/kimsi/AppData/Local/Microsoft/Windows/Fonts/Cafe24Ssurround-v2.0.otf")}
-@font-face{font-family:"Body";font-weight:100 500;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("file:///C:/Users/kimsi/AppData/Local/Microsoft/Windows/Fonts/Hakgyoansim%20Dunggeunmiso%20TTF%20R.ttf")}
-@font-face{font-family:"Body";font-weight:600 900;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("file:///C:/Users/kimsi/AppData/Local/Microsoft/Windows/Fonts/Hakgyoansim%20Dunggeunmiso%20TTF%20B.ttf")}
+/* 설치된 글꼴을 먼저 쓰고, 없으면 웹 글꼴(../fonts)을 내려받아 어디서든 똑같이 보이게 함 */
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("../fonts/Cafe24Ssurround.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("../fonts/Dunggeunmiso-R.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("../fonts/Dunggeunmiso-B.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
 :root{
   --ink:#1d2433; --sub:#5b6475; --line:#e3e6ee; --paper:#ffffff; --bg:#20242c;
   --acc:#e8633a; --acc2:#fff1ea; --acc3:#b8441f; --mark:#ffe08a;
@@ -130,12 +130,25 @@ table.cmp{font-size:19px}table.cmp th{font-size:16px}
 .q{padding:12px 18px;gap:4px 14px}.q .qn{font-size:24px}.q .qq{font-size:21px;line-height:1.4}.q .qa{font-size:20px;padding:6px 12px}
 #bar{position:fixed;left:0;top:0;height:3px;background:#e8633a;z-index:9;transition:width .2s}
 
+/* ===== 판서 ===== */
+#ink{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;pointer-events:none;z-index:5;touch-action:none}
+.drawing #ink{pointer-events:auto;cursor:crosshair}
+.drawing.er #ink{cursor:cell}
+#pen{position:fixed;left:14px;bottom:12px;display:none;gap:6px;align-items:center;z-index:10;background:#1d2433;border-radius:12px;padding:6px 8px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.drawing #pen{display:flex}
+.drawing #ui{opacity:1}
+#pen button{font:600 13px Body,"Malgun Gothic",sans-serif;border:0;border-radius:8px;padding:7px 10px;cursor:pointer;background:#2e3546;color:#fff}
+#pen button.c{width:30px;height:30px;padding:0;border-radius:50%;border:3px solid transparent}
+#pen button.on{outline:3px solid #fff;outline-offset:1px}
+#pen .sep{width:1px;height:24px;background:#4a5263;margin:0 2px}
+#ui button.on{background:#e8633a;color:#fff}
+
 @media print{
   @page{size:1280px 720px;margin:0}
   html,body{overflow:visible;background:#fff}
   #stage{position:static;transform:none!important}
   .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page}
-  #ui,#bar{display:none}
+  #ui,#bar,#ink,#pen{display:none!important}
   .q .qa{opacity:1}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
@@ -144,9 +157,24 @@ table.cmp{font-size:19px}table.cmp th{font-size:16px}
 <body>
 <div id="bar"></div>
 <div id="stage"></div>
+<canvas id="ink" width="2560" height="1440"></canvas>
+<div id="pen">
+  <button class="c on" style="background:#e5322d" data-c="#e5322d" title="빨강"></button>
+  <button class="c" style="background:#2563eb" data-c="#2563eb" title="파랑"></button>
+  <button class="c" style="background:#16a34a" data-c="#16a34a" title="초록"></button>
+  <button class="c" style="background:#111827;border-color:#6b7280" data-c="#111827" title="검정"></button>
+  <span class="sep"></span>
+  <button data-t="pen" class="on" title="펜">펜</button>
+  <button data-t="hl" title="형광펜">형광펜</button>
+  <button data-t="er" title="지우개 (E)">지우개</button>
+  <span class="sep"></span>
+  <button onclick="undoInk()" title="되돌리기 (Ctrl+Z)">되돌리기</button>
+  <button onclick="clearInk()" title="이 장 모두 지우기 (Delete)">모두 지우기</button>
+</div>
 <div id="ui">
   <button onclick="go(cur-1)">◀</button>
   <button onclick="go(cur+1)">▶</button>
+  <button id="penBtn" onclick="togglePen()" title="P">✏️ 판서</button>
   <button onclick="tg('hideKo')" title="K">해석 숨기기</button>
   <button onclick="tg('hideNt')" title="N">문법 숨기기</button>
   <button onclick="fs()" title="F">전체화면</button>
@@ -879,16 +907,78 @@ function go(i){
   slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
   document.getElementById("bar").style.width = ((cur+1)/slides.length*100)+"%";
   try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+  drawInk();
 }
 function fit(){
   const s = Math.min(innerWidth/1280, innerHeight/720);
-  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+  stage.style.transform = ink.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
 }
+
+/* ---------- 판서 : 슬라이드마다 따로 저장 ---------- */
+const ink = document.getElementById("ink"), ctx = ink.getContext("2d");
+const INK = {};                                   /* 슬라이드 번호 → 획 목록 */
+let tool = "pen", color = "#e5322d", stroke = null;
+const W = {pen:4, hl:24, er:40};
+function togglePen(){
+  document.body.classList.toggle("drawing");
+  document.getElementById("penBtn").classList.toggle("on", document.body.classList.contains("drawing"));
+}
+function setTool(t){
+  tool = t;
+  document.body.classList.toggle("er", t==="er");
+  document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===t));
+}
+function paint(st){
+  const p = st.pts;
+  ctx.save();
+  ctx.globalCompositeOperation = st.t==="er" ? "destination-out" : "source-over";
+  ctx.globalAlpha = st.t==="hl" ? .35 : 1;
+  ctx.strokeStyle = st.c; ctx.lineWidth = W[st.t];
+  ctx.lineCap = st.t==="hl" ? "butt" : "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+  if(p.length===1) ctx.lineTo(p[0][0]+.1, p[0][1]);
+  for(let i=1;i<p.length-1;i++){ const mx=(p[i][0]+p[i+1][0])/2, my=(p[i][1]+p[i+1][1])/2; ctx.quadraticCurveTo(p[i][0],p[i][1],mx,my); }
+  if(p.length>1) ctx.lineTo(p[p.length-1][0], p[p.length-1][1]);
+  ctx.stroke(); ctx.restore();
+}
+function drawInk(){
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height);
+  ctx.setTransform(2,0,0,2,0,0);
+  (INK[cur]||[]).forEach(paint);
+  if(stroke) paint(stroke);
+}
+function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720]; }
+ink.addEventListener("pointerdown", e=>{
+  ink.setPointerCapture(e.pointerId);
+  stroke = {t:tool, c:color, pts:[pos(e)]}; drawInk();
+});
+ink.addEventListener("pointermove", e=>{
+  if(!stroke) return;
+  (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(ev=>stroke.pts.push(pos(ev)));
+  drawInk();
+});
+const endStroke = ()=>{ if(!stroke) return; (INK[cur] ||= []).push(stroke); stroke = null; drawInk(); };
+ink.addEventListener("pointerup", endStroke);
+ink.addEventListener("pointercancel", endStroke);
+function undoInk(){ (INK[cur]||[]).pop(); drawInk(); }
+function clearInk(){ INK[cur] = []; drawInk(); }
+document.querySelectorAll("#pen .c").forEach(b=>b.addEventListener("click",()=>{
+  color = b.dataset.c; if(tool==="er") setTool("pen");
+  document.querySelectorAll("#pen .c").forEach(x=>x.classList.toggle("on", x===b));
+}));
+document.querySelectorAll("#pen [data-t]").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.t)));
 function tg(c){ document.body.classList.toggle(c); }
 function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
 addEventListener("resize", fit);
 addEventListener("keydown", e=>{
   const k = e.key;
+  if((e.ctrlKey||e.metaKey) && (k==="z"||k==="Z")){ e.preventDefault(); undoInk(); return; }
+  if(k==="p"||k==="P"){ togglePen(); return; }
+  if(document.body.classList.contains("drawing")){
+    if(k==="e"||k==="E"){ setTool(tool==="er"?"pen":"er"); return; }
+    if(k==="Delete"){ clearInk(); return; }
+    if(k==="Escape"){ togglePen(); return; }
+  }
   if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
   else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
   else if(k==="Home") go(0);
