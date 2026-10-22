@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-7";
+const VERSION = "2026-10-23-8";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -14,7 +14,8 @@ const CSS = `
 #ink{touch-action:none}
 .drawing #ink{pointer-events:auto;cursor:crosshair}
 .drawing.er #ink{cursor:cell}
-.drawing.laser #ink{cursor:none}
+.drawing.laser #ink{cursor:crosshair}
+.drawing.lasering #ink{cursor:none}
 #fx{pointer-events:none}
 .rcur{position:absolute;left:0;top:0;display:none;pointer-events:none;transform:translate(-3px,-2px)}
 .rcur svg{width:22px;height:22px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
@@ -174,7 +175,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
   <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd></li>
-  <li><b>레이저</b> <kbd>L</kbd> 움직이면 빨간 점이 따라와요. 흔적은 바로 사라져요 (상대 화면에도 보여요)</li>
+  <li><b>레이저</b> <kbd>L</kbd> 누르고 있는 동안 빨간 점이 따라와요. 떼면 꼬리가 사라져요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
   <h4>꾹 누르기</h4>
@@ -590,7 +591,7 @@ ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
   const q = pos(e);
-  if(tool==="laser"){ laserDown = true; laserAt(q); return; }
+  if(tool==="laser"){ laserDown = true; document.body.classList.add("lasering"); laserAt(q, "down"); return; }
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
@@ -602,7 +603,7 @@ ink.addEventListener("pointerdown", e=>{
   drawInk();
 });
 ink.addEventListener("pointermove", e=>{
-  if(tool==="laser"){ laserAt(pos(e)); return; }
+  if(tool==="laser"){ if(laserDown){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>laserAt(pos(x), "move")); } return; }
   if(!stroke) return;
   const q = pos(e);
   if(stroke.shape==="line"){
@@ -622,7 +623,8 @@ ink.addEventListener("pointermove", e=>{
   drawInk(); sendLive();
 });
 const endStroke = ()=>{
-  laserDown = false; clearTimeout(holdT); holdAt = null;
+  if(laserDown){ laserDown = false; document.body.classList.remove("lasering"); laserAt(null, "up"); }
+  clearTimeout(holdT); holdAt = null;
   if(!stroke) return;
   if(stroke.raw){                                 /* 보정 때문에 덜 따라온 끝부분을 실제 끝점까지 이어 줌 */
     const L = stroke.pts[stroke.pts.length-1], q = stroke.raw;
@@ -635,7 +637,7 @@ const endStroke = ()=>{
 };
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
-ink.addEventListener("pointerleave", ()=>{ if(tool==="laser") laserAt(null); });
+
 
 function myLast(k){ const a = INK[k]||[]; for(let j=a.length-1;j>=0;j--) if(!a[j].o || a[j].o===ME) return j; return -1; }
 function undoInk(){                               /* 내가 그은 마지막 획만 되돌림 */
@@ -652,47 +654,65 @@ function redoInk(){
 function clearInk(){ const k = skey(); INK[k] = []; REDO[k] = []; send({type:"clear", k}); drawInk(); }
 
 /* ---------- 레이저·상대 커서 ---------- */
-const LASER = {};                                 /* 누구 → [{x,y,t}] */
+const LASER = {};                                 /* 누구 → {pts:[{x,y,t}], down} */
 let laserDown = false, fxOn = false, lastLaser = 0;
-/* 레이저: 레이저 도구일 때 움직이기만 해도(누르지 않아도) 빨간 점이 따라오고 짧은 꼬리가 생겼다 사라짐 */
-function laserAt(q){
-  const a = LASER.me ||= [];
-  if(!q){ LASER.me = []; send({type:"laser", who:ME, x:null}); kickFx(); return; }
-  a.push({x:q[0], y:q[1], t:performance.now()});
-  if(a.length > 80) a.splice(0, a.length-80);
-  if(conns.length && Date.now()-lastLaser > 16){ lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1]}); }
+const LIFE = 320;                                 /* 꼬리가 남아 있는 시간(ms) */
+/* 레이저: 누르고 있는 동안만 빨간 점이 따라오고, 떼면 꼬리가 부드럽게 줄어들며 사라짐 */
+function laserPush(L, x, y, now){
+  const a = L.pts, last = a[a.length-1];
+  if(last && Math.hypot(x-last.x, y-last.y) < .6){ last.t = now; return; }
+  a.push({x, y, t:now}); if(a.length > 120) a.splice(0, a.length-120);
+}
+function laserAt(q, phase){                        /* phase: "down" | "move" | "up" */
+  const L = LASER.me ||= {pts:[], down:false}, now = performance.now();
+  if(phase==="down"){ L.pts = []; L.down = true; }
+  if(phase==="up"){ L.down = false; send({type:"laser", who:ME, up:true}); kickFx(); return; }
+  if(!L.down || !q) return;
+  laserPush(L, q[0], q[1], now);
+  if(conns.length && (phase==="down" || Date.now()-lastLaser > 16)){ lastLaser = Date.now(); send({type:"laser", who:ME, x:q[0], y:q[1], down:phase==="down"}); }
   kickFx();
 }
-function hideLaser(){ if(LASER.me && LASER.me.length){ LASER.me = []; send({type:"laser", who:ME, x:null}); kickFx(); } }
+function hideLaser(){ const L = LASER.me; if(L && (L.down || L.pts.length)){ L.down = false; L.pts = []; laserDown = false; send({type:"laser", who:ME, up:true}); kickFx(); } }
 function kickFx(){ if(!fxOn){ fxOn = true; requestAnimationFrame(drawFx); } }
+function ribbon(a, now, maxW){                     /* 시간이 지날수록 가늘어지는 꼬리 띠(채운 다각형) */
+  const n = a.length, L = [], R = [];
+  for(let i=0;i<n;i++){
+    const p = a[i], q0 = a[Math.max(0,i-1)], q1 = a[Math.min(n-1,i+1)];
+    let dx = q1.x-q0.x, dy = q1.y-q0.y; const d = Math.hypot(dx,dy) || 1; dx /= d; dy /= d;
+    const f = Math.max(0, 1 - (now - p.t)/LIFE), w = maxW * Math.pow(f, .7) / 2;
+    L.push([p.x - dy*w, p.y + dx*w]); R.push([p.x + dy*w, p.y - dx*w]);
+  }
+  fctx.beginPath(); fctx.moveTo(L[0][0], L[0][1]);
+  for(let i=1;i<n;i++) fctx.lineTo(L[i][0], L[i][1]);
+  for(let i=n-1;i>=0;i--) fctx.lineTo(R[i][0], R[i][1]);
+  fctx.closePath(); fctx.fill();
+}
 function drawFx(){
-  const now = performance.now(), LIFE = 420;
+  const now = performance.now(), cut = now - LIFE;
   fctx.setTransform(1,0,0,1,0,0); fctx.clearRect(0,0,fx.width,fx.height); fctx.setTransform(2,0,0,2,0,0);
   let alive = false;
   for(const who in LASER){
-    const a = LASER[who]; while(a.length > 1 && now - a[0].t > LIFE) a.shift();
-    if(!a.length) continue;
-    alive = true;
-    const h = a[a.length-1];
-    if(a.length > 1){                              /* 꼬리: 한 줄로 매끈하게, 끝으로 갈수록 투명하게 */
-      const tl = a[0];
-      fctx.save(); fctx.lineCap = "round"; fctx.lineJoin = "round";
-      fctx.beginPath(); fctx.moveTo(tl.x, tl.y);
-      for(let i=1;i<a.length-1;i++){ const mx = (a[i].x+a[i+1].x)/2, my = (a[i].y+a[i+1].y)/2; fctx.quadraticCurveTo(a[i].x, a[i].y, mx, my); }
-      fctx.lineTo(h.x, h.y);
-      const gr = fctx.createLinearGradient(tl.x, tl.y, h.x, h.y);
-      gr.addColorStop(0, "rgba(255,40,40,0)"); gr.addColorStop(1, "rgba(255,40,40,.5)");
-      fctx.strokeStyle = gr; fctx.lineWidth = 9; fctx.shadowColor = "rgba(255,0,0,.6)"; fctx.shadowBlur = 12; fctx.stroke();
-      const gc = fctx.createLinearGradient(tl.x, tl.y, h.x, h.y);
-      gc.addColorStop(0, "rgba(255,90,90,0)"); gc.addColorStop(1, "rgba(255,70,70,.95)");
-      fctx.strokeStyle = gc; fctx.lineWidth = 3.2; fctx.shadowBlur = 0; fctx.stroke();
-      fctx.restore();
+    const Lz = LASER[who], a = Lz.pts;
+    while(a.length > 2 && a[1].t < cut) a.shift();               /* 오래된 점은 버리되 */
+    if(a.length >= 2 && a[0].t < cut){                            /* 맨 끝은 시간에 맞춰 조금씩 당겨 부드럽게 줄어듦 */
+      const k = Math.min(1, (cut - a[0].t) / Math.max(1, a[1].t - a[0].t));
+      a[0] = {x:a[0].x + (a[1].x-a[0].x)*k, y:a[0].y + (a[1].y-a[0].y)*k, t:cut};
     }
-    fctx.save();                                   /* 머리: 빛나는 빨간 점 */
-    fctx.shadowColor = "rgba(255,0,0,.9)"; fctx.shadowBlur = 18;
-    fctx.fillStyle = "#ff2b2b"; fctx.beginPath(); fctx.arc(h.x, h.y, 5.5, 0, 7); fctx.fill();
-    fctx.shadowBlur = 0; fctx.fillStyle = "rgba(255,235,235,.95)"; fctx.beginPath(); fctx.arc(h.x, h.y, 2.2, 0, 7); fctx.fill();
-    fctx.restore();
+    if(!Lz.down && (!a.length || a[a.length-1].t < cut)){ Lz.pts = []; continue; }
+    if(!a.length) { if(Lz.down) alive = true; continue; }
+    alive = true;
+    if(a.length >= 2){
+      fctx.fillStyle = "rgba(255,40,40,.22)"; ribbon(a, now, 13);
+      fctx.fillStyle = "rgba(255,55,55,.9)"; ribbon(a, now, 4.2);
+    }
+    if(Lz.down){                                   /* 누르고 있을 때만 빛나는 점 */
+      const h = a[a.length-1];
+      const g = fctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 15);
+      g.addColorStop(0, "rgba(255,50,50,.55)"); g.addColorStop(1, "rgba(255,0,0,0)");
+      fctx.fillStyle = g; fctx.beginPath(); fctx.arc(h.x, h.y, 15, 0, 7); fctx.fill();
+      fctx.fillStyle = "#ff2b2b"; fctx.beginPath(); fctx.arc(h.x, h.y, 5, 0, 7); fctx.fill();
+      fctx.fillStyle = "rgba(255,236,236,.95)"; fctx.beginPath(); fctx.arc(h.x, h.y, 1.9, 0, 7); fctx.fill();
+    }
   }
   if(alive) requestAnimationFrame(drawFx); else fxOn = false;
 }
@@ -709,7 +729,7 @@ addEventListener("pointermove", e=>{               /* 내 커서 위치를 상�
   const inside = x>=0 && x<=1280 && y>=0 && y<=720;
   if(!inside){ if(!curOut){ curOut = true; send({type:"cur", x:null}); } return; }
   curOut = false;
-  send({type:"cur", x, y, draw:!!stroke, laser:tool==="laser" && document.body.classList.contains("drawing")});
+  send({type:"cur", x, y, draw:!!stroke, laser:laserDown});
 });
 document.addEventListener("mouseleave", ()=>{ if(conns.length){ curOut = true; send({type:"cur", x:null}); } });
 
@@ -814,8 +834,14 @@ function apply(msg, from){
   else if(t==="unblank"){ removeBlank(msg.id); }
   else if(t==="cur"){ showRcur(msg); }
   else if(t==="laser"){
-    const a = LASER[msg.who] ||= [];
-    if(msg.x==null) a.length = 0; else { a.push({x:msg.x, y:msg.y, t:performance.now()}); if(a.length > 80) a.splice(0, a.length-80); }
+    const Lz = LASER[msg.who] ||= {pts:[], down:false}, now = performance.now();
+    if(msg.up){ Lz.down = false; }
+    else if(msg.x!=null){
+      if(msg.down || !Lz.down){ Lz.pts = []; Lz.down = true; }
+      const last = Lz.pts[Lz.pts.length-1];
+      if(last){ for(let s=1;s<3;s++) laserPush(Lz, last.x + (msg.x-last.x)*s/3, last.y + (msg.y-last.y)*s/3, now - 16 + s*5); }   /* 받은 점 사이를 메워 부드럽게 */
+      laserPush(Lz, msg.x, msg.y, now);
+    }
     kickFx();
   }
   if(isHost && t!=="sync") send(msg, from);
