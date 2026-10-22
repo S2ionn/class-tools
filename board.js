@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-9";
+const VERSION = "2026-10-23-10";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -13,7 +13,7 @@ const CSS = `
 #bd canvas{position:absolute;inset:0;width:1280px;height:720px}
 #ink{touch-action:none}
 .drawing #ink{pointer-events:auto;cursor:crosshair}
-.drawing.er #ink{cursor:cell}
+.drawing.er #ink{cursor:none}
 .drawing.laser #ink{cursor:none}
 #fx{pointer-events:none}
 .rcur{position:absolute;left:0;top:0;display:none;pointer-events:none;transform:translate(-3px,-2px)}
@@ -46,8 +46,8 @@ const CSS = `
 #pen button.s{width:28px;padding:0;justify-content:center}
 #pen button.s.on{background:rgba(255,255,255,.16)}
 #pen button.s i{display:block;border-radius:50%}
-#shapeMenu{position:fixed;display:none;gap:2px;padding:4px;z-index:12}
-#shapeMenu.open{display:flex}
+#shapeMenu,#eraseMenu{position:fixed;display:none;gap:2px;padding:4px;z-index:12}
+#shapeMenu.open,#eraseMenu.open{display:flex}
 @media (max-width:1180px){#pen{bottom:58px}}
 #co{position:fixed;right:14px;bottom:62px;width:300px;display:none;flex-direction:column;gap:10px;z-index:11;background:#1d2433;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:500 14px Body,"Malgun Gothic",sans-serif}
 #co.open{display:flex}
@@ -128,14 +128,17 @@ document.body.insertAdjacentHTML("beforeend", `
   <button class="ic on" data-t="pen" title="펜">${I.pen}</button>
   <button class="ic" data-t="pc" title="색연필">${I.pc}</button>
   <button class="ic" data-t="hl" title="형광펜 (곧은 선)">${I.hl}</button>
-  <button class="ic" data-t="er" title="지우개 (E)">${I.er}</button>
-  <button class="ic" data-t="se" title="획 지우개 — 닿은 선을 통째로 지워요 (S)">${I.se}</button>
+  <button class="ic" id="eraseBtn" title="지우개 — 눌러서 종류 고르기 (E)">${I.er}</button>
   <button class="ic" data-t="laser" title="레이저 포인터 (L)">${I.laser}</button>
   <button class="ic" data-t="shape" id="shapeBtn" title="도형">${I.circle}</button>
   <span class="sep"></span>
   <button class="ic" id="undoBtn" title="되돌리기 (Ctrl+Z)">${I.undo}</button>
   <button class="ic" id="redoBtn" title="다시 실행 (Ctrl+Y)">${I.redo}</button>
   <button class="ic" id="clearBtn" title="이 장 모두 지우기 (Delete)">${I.trash}</button>
+</div>
+<div id="eraseMenu" class="bar">
+  <button data-em="er" title="문지른 곳만 지워요 (E)">${I.er}<span>지우개</span></button>
+  <button data-em="se" title="닿은 선을 통째로 지워요 (S)">${I.se}<span>획 지우개</span></button>
 </div>
 <div id="shapeMenu" class="bar">
   <button class="ic" data-shape="line" title="직선 (가로·세로로 맞춤, 꾹 누른 뒤 움직이면 자유 각도)">${I.line}</button>
@@ -175,7 +178,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>펜과 마우스로만 써져요. 손가락·손바닥이 닿아도 그려지지 않아요</li></ul>
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
-  <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> 문지른 곳만 · <b>획 지우개</b> <kbd>S</kbd> 닿은 선을 통째로</li>
+  <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> — 지우개 버튼을 누르면 <b>지우개</b>(문지른 곳만) / <b>획 지우개</b>(<kbd>S</kbd>, 닿은 선을 통째로) 고르기. 크기는 점 크기 버튼</li>
   <li><b>레이저</b> <kbd>L</kbd> 평소엔 빨간 점이 커서 대신 따라다니고, 누르고 움직이면 꼬리가 생겨요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
@@ -188,7 +191,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>저장하지 않은 필기가 있을 때 창을 닫으면 "나가시겠어요?"가 떠요. <b>머무르기</b>를 누르면 PDF 저장 창이 나와요</li></ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
-  <li>되돌리기는 내가 그은 선만 지워요</li></ul>
+  <li>되돌리기는 내가 한 일만 하나씩 돌려요 — 내가 그은 선, 획 지우개로 지운 선, 모두 지우기</li></ul>
   <h4>슬라이드</h4>
   <ul><li>넘기기 <kbd>←</kbd> <kbd>→</kbd> · 해석 숨기기 <kbd>K</kbd> · 문법 숨기기 <kbd>N</kbd> · 전체화면 <kbd>F</kbd></li>
   <li><b>빈 칠판</b> 칠판 버튼 → 지금 장 다음에 빈 장 추가. 지울 때는 "칠판 지우기"를 두 번</li></ul>
@@ -284,20 +287,21 @@ function goKey(k){ const i = indexOfKey(k); if(i>=0 && i!==cur){ remoteGo = true
 /* ---------- 판서 상태 ---------- */
 const INK = {}, REDO = {};                         /* 슬라이드 이름 → 획 목록 / 내가 되돌린 획 */
 const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], pc:["#d93a2b","#ee7f1f","#2f66cf","#2f8f52","#4d515a"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
-const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[20,40,80]};
-const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:1}};
+const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[10,20,36,60,100], se:[3,10,22]};   /* se = 선에 닿았다고 보는 거리 */
+const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:2}, se:{s:1}};
+let eraseMode = "er";
 const CUSTOM = {};
 let tool = "pen", drawBase = "pen", shapeKind = "circle", stroke = null;
 const ME = Math.random().toString(36).slice(2,8);
 const CID = (()=>{ try{ let c = localStorage.getItem("boardCid"); if(!c){ c = Math.random().toString(36).slice(2,10); localStorage.setItem("boardCid", c); } return c; }catch(e){ return "t" + ME; } })();
 const palOf = t => t==="hl" || t==="pc" ? t : "pen";
-const sizeOf = t => t==="shape" || t==="laser" || t==="se" ? drawBase : t;   /* 도형은 마지막에 쓴 펜/색연필 모양을 따름 */
+const sizeOf = t => t==="shape" || t==="laser" ? drawBase : t;   /* 도형은 마지막에 쓴 펜/색연필 모양을 따름 */
 const colorOf = k => sel[k].c < PAL[k].length ? PAL[k][sel[k].c] : (CUSTOM[k] || PAL[k][0]);
 
 function togglePen(on = !document.body.classList.contains("drawing")){
   document.body.classList.toggle("drawing", on);
   $("penBtn").classList.toggle("on", on);
-  if(!on){ $("shapeMenu").classList.remove("open"); hideLaser(); }
+  if(!on){ $("shapeMenu").classList.remove("open"); $("eraseMenu").classList.remove("open"); hideLaser(); ERING = null; }
 }
 let shownK = "";
 function buildBar(){
@@ -315,19 +319,21 @@ function buildBar(){
   $("sizes").innerHTML = ws.map((w,i)=>{
     const d = Math.round(4 + i*12/(ws.length-1));
     const look = st==="hl" ? `width:18px;height:${Math.max(4,d-3)}px;border-radius:2px;background:${cc}`
-               : st==="er" ? `width:${d}px;height:${d}px;background:none;border:2px solid #fff`
+               : st==="er" || st==="se" ? `width:${d}px;height:${d}px;background:none;border:2px ${st==="se" ? "dashed" : "solid"} #fff`
                : `width:${d}px;height:${d}px;background:${cc};box-shadow:0 0 0 1px rgba(255,255,255,.35)`;
     return `<button class="s${sel[st].s===i?" on":""}" data-s="${i}" title="굵기 ${i+1}"><i style="${look}"></i></button>`;
   }).join("");
-  $("sizes").style.visibility = tool==="laser" || tool==="se" ? "hidden" : "";
+  $("sizes").style.visibility = tool==="laser" ? "hidden" : "";
   document.querySelectorAll("#pen [data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===tool));
   $("shapeBtn").innerHTML = I[shapeKind];
   document.body.classList.toggle("er", tool==="er" || tool==="se");
   document.body.classList.toggle("laser", tool==="laser");
-  $("undoBtn").style.opacity = myLast(skey()) >= 0 ? "" : ".4";
-  $("redoBtn").style.opacity = (REDO[skey()]||[]).length ? "" : ".4";
+  $("eraseBtn").classList.toggle("on", tool==="er" || tool==="se"); $("eraseBtn").innerHTML = I[eraseMode];
+  document.querySelectorAll("#eraseMenu [data-em]").forEach(b=>b.classList.toggle("on", b.dataset.em===eraseMode));
+  buildUndoState();
 }
 function setTool(t){
+  if(t==="er" || t==="se") eraseMode = t;
   tool = t;
   if(t==="pen" || t==="pc") drawBase = t;
   if(t!=="laser") hideLaser();
@@ -335,13 +341,19 @@ function setTool(t){
 }
 $("pen").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
-  if(b.id==="shapeBtn"){
+  if(b.id==="eraseBtn"){
+    const m = $("eraseMenu"), r = b.getBoundingClientRect();
+    $("shapeMenu").classList.remove("open"); setTool(eraseMode);
+    m.classList.toggle("open"); m.style.left = (r.left - 60) + "px"; m.style.bottom = (innerHeight - r.top + 8) + "px";
+    return;
+  }
+  if(b.id==="shapeBtn"){ $("eraseMenu").classList.remove("open");
     const m = $("shapeMenu"), r = b.getBoundingClientRect();
     setTool("shape");
     m.classList.toggle("open"); m.style.left = (r.left - 40) + "px"; m.style.bottom = (innerHeight - r.top + 8) + "px";
     return;
   }
-  $("shapeMenu").classList.remove("open");
+  $("shapeMenu").classList.remove("open"); $("eraseMenu").classList.remove("open");
   if(b.dataset.t) setTool(b.dataset.t);
   else if(b.dataset.c){ if(["er","laser","se"].includes(tool)) setTool(drawBase); sel[palOf(sizeOf(tool))].c = +b.dataset.c; buildBar(); }
   else if(b.dataset.s){ sel[sizeOf(tool)].s = +b.dataset.s; buildBar(); }
@@ -350,6 +362,10 @@ $("pen").addEventListener("input", e=>{
   if(e.target.type!=="color") return;
   if(["er","laser","se"].includes(tool)) setTool(drawBase);
   const k = palOf(sizeOf(tool)); CUSTOM[k] = e.target.value; sel[k].c = PAL[k].length; buildBar();
+});
+$("eraseMenu").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  setTool(b.dataset.em); $("eraseMenu").classList.remove("open");
 });
 $("shapeMenu").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
@@ -418,6 +434,7 @@ function paintPencil(st, g){
   g.restore();
 }
 function paint(st, g = ctx){
+  if(!st.pts || !st.pts.length) return;           /* 도형을 막 끌기 시작해 아직 점이 없을 때 */
   if(st.t==="pc") return paintPencil(st, g);
   const p = st.pts;
   g.save();
@@ -448,7 +465,7 @@ function drawInk(){
   if(document.body.classList.contains("drawing")) buildUndoState();
 }
 function buildUndoState(){
-  $("undoBtn").style.opacity = myLast(skey()) >= 0 ? "" : ".4";
+  $("undoBtn").style.opacity = (UNDO[skey()]||[]).length ? "" : ".4";
   $("redoBtn").style.opacity = (REDO[skey()]||[]).length ? "" : ".4";
 }
 
@@ -593,7 +610,7 @@ ink.addEventListener("pointerdown", e=>{
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
   const q = pos(e);
   if(tool==="laser"){ laserDown = true; laserAt(q, "down"); return; }
-  if(tool==="se"){ seDown = true; seLast = null; eraseAt(q); return; }
+  if(tool==="se"){ seDown = true; seLast = null; seGone = []; eraseAt(q); return; }
   const base = tool==="shape" ? drawBase : tool, k = palOf(base);
   const c = base==="er" ? "#000" : colorOf(k);
   stroke = {t:base, c, w:SIZES[base][sel[base].s], pts:[q], k:skey(), id:ME + Date.now().toString(36), o:ME};
@@ -614,7 +631,7 @@ ink.addEventListener("pointermove", e=>{
     const a = [stroke.x0, stroke.y0];
     stroke.pts = underline(a, stroke.free ? q : hv(a, q, 90));
   }
-  else if(stroke.shape) stroke.pts = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1], stroke.t);
+  else if(stroke.shape){ const sp = shapePts(stroke.shape, stroke.x0, stroke.y0, q[0], q[1], stroke.t); stroke.pts = sp.length > 1 ? sp : [[stroke.x0, stroke.y0, .5]]; }
   else if(stroke.t==="hl"){
     const [x0,y0] = stroke.pts[0]; let [x,y] = q;
     if(Math.abs(y-y0) < Math.abs(x-x0)*0.27) y = y0;
@@ -627,7 +644,7 @@ ink.addEventListener("pointermove", e=>{
 });
 const endStroke = ()=>{
   if(laserDown){ laserDown = false; laserAt(null, "up"); }
-  seDown = false;
+  if(seDown){ seDown = false; if(seGone.length) pushAct(skey(), {a:"rm", list:seGone}); seGone = []; buildUndoState(); }
   clearTimeout(holdT); holdAt = null;
   if(!stroke) return;
   if(stroke.raw){                                 /* 보정 때문에 덜 따라온 끝부분을 실제 끝점까지 이어 줌 */
@@ -636,14 +653,20 @@ const endStroke = ()=>{
     delete stroke.raw;
   }
   const keep = stroke.t==="hl" || stroke.shape ? stroke.pts.length>1 : true;   /* 형광펜·도형은 클릭만 하면 버림 */
-  if(keep){ touched = true; (INK[stroke.k] ||= []).push(stroke); REDO[stroke.k] = []; send({type:"add", who:ME, st:stroke}); }
+  if(keep){ touched = true; (INK[stroke.k] ||= []).push(stroke); pushAct(stroke.k, {a:"add", st:stroke}); send({type:"add", who:ME, st:stroke}); }
   stroke = null; drawInk();
 };
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
-ink.addEventListener("pointerleave", ()=>{ if(tool==="laser" && !laserDown) laserAt(null, "out"); });
+ink.addEventListener("pointerleave", ()=>{ if(tool==="laser" && !laserDown) laserAt(null, "out"); ERING = null; kickFx(); });
+/* 지우개 크기 고리: 지우개를 쓸 때 커서 자리에 지워질 크기만큼 동그라미(획 지우개는 점선) */
+let ERING = null;
+ink.addEventListener("pointermove", e=>{
+  if(tool!=="er" && tool!=="se"){ if(ERING){ ERING = null; kickFx(); } return; }
+  const q = pos(e); ERING = {x:q[0], y:q[1], r: tool==="er" ? SIZES.er[sel.er.s]/2 : Math.max(4, SIZES.se[sel.se.s]), se: tool==="se"}; kickFx();
+});
 /* 획 지우개: 지나간 자리에 닿은 선을 통째로 지움(내 선·상대 선 모두). 문지르는 지우개 자국은 건드리지 않음 */
-let seDown = false, seLast = null;
+let seDown = false, seLast = null, seGone = [];
 function segDist(px, py, a, b){
   const dx = b[0]-a[0], dy = b[1]-a[1], L = dx*dx + dy*dy;
   const u = L ? Math.max(0, Math.min(1, ((px-a[0])*dx + (py-a[1])*dy) / L)) : 0;
@@ -659,28 +682,47 @@ function eraseOne(q){
   let hit = false;
   for(let j=arr.length-1;j>=0;j--){
     const st = arr[j]; if(st.t==="er") continue;
-    const R = 7 + st.w/2, p = st.pts;
+    const R = SIZES.se[sel.se.s] + st.w/2, p = st.pts;
     let on = p.length===1 ? Math.hypot(q[0]-p[0][0], q[1]-p[0][1]) <= R : false;
     for(let i=1;i<p.length && !on;i++) if(segDist(q[0], q[1], p[i-1], p[i]) <= R) on = true;
-    if(on){ arr.splice(j,1); send({type:"del", k, id:st.id}); hit = true; }
+    if(on){ seGone.push({st, i:j}); arr.splice(j,1); send({type:"del", k, id:st.id}); hit = true; }
   }
   if(hit){ touched = true; drawInk(); }
 }
 
 
-function myLast(k){ const a = INK[k]||[]; for(let j=a.length-1;j>=0;j--) if(!a[j].o || a[j].o===ME) return j; return -1; }
-function undoInk(){                               /* 내가 그은 마지막 획만 되돌림 */
-  const k = skey(), a = INK[k]||[], j = myLast(k);
-  if(j<0) return;
-  const [st] = a.splice(j,1); (REDO[k] ||= []).push(st);
-  send({type:"del", k, id:st.id}); drawInk();
+/* 되돌리기·다시 실행: 내가 한 일(긋기, 획 지우기, 모두 지우기)을 장마다 순서대로 기억 */
+const UNDO = {};                                   /* 슬라이드 이름 → [{a:"add", st} | {a:"rm", list:[{st, i}]}] (지운 순서대로) */
+function pushAct(k, act){ (UNDO[k] ||= []).push(act); REDO[k] = []; }
+function removeIds(k, ids){ const a = INK[k] || []; for(let j=a.length-1;j>=0;j--) if(ids.has(a[j].id)){ send({type:"del", k, id:a[j].id}); a.splice(j,1); } }
+function undoInk(){
+  const k = skey(), u = UNDO[k] || [], a = INK[k] ||= [];
+  while(u.length){
+    const act = u.pop();
+    if(act.a==="add"){
+      const j = a.findIndex(s=>s.id===act.st.id); if(j<0) continue;   /* 상대가 이미 지운 선이면 건너뜀 */
+      a.splice(j,1); send({type:"del", k, id:act.st.id});
+    } else {                                       /* 지운 선 되살리기: 지운 순서의 반대로 제자리에 */
+      for(let n=act.list.length-1;n>=0;n--){ const {st, i} = act.list[n];
+        if(a.some(s=>s.id===st.id)) continue; a.splice(Math.min(i, a.length), 0, st); send({type:"add", who:ME, st}); }
+    }
+    (REDO[k] ||= []).push(act); break;
+  }
+  drawInk();
 }
 function redoInk(){
-  const k = skey(), r = REDO[k]||[]; if(!r.length) return;
-  const st = r.pop(); (INK[k] ||= []).push(st);
-  send({type:"add", who:ME, st}); drawInk();
+  const k = skey(), r = REDO[k] || []; if(!r.length) return;
+  const act = r.pop(), a = INK[k] ||= [];
+  if(act.a==="add"){ if(!a.some(s=>s.id===act.st.id)){ a.push(act.st); send({type:"add", who:ME, st:act.st}); } }
+  else removeIds(k, new Set(act.list.map(x=>x.st.id)));
+  (UNDO[k] ||= []).push(act); drawInk();
 }
-function clearInk(){ const k = skey(); INK[k] = []; REDO[k] = []; send({type:"clear", k}); drawInk(); }
+function clearInk(){
+  const k = skey(), a = INK[k] || []; if(!a.length) return;
+  pushAct(k, {a:"rm", list:a.map((st,i)=>({st, i})).reverse()});
+  INK[k] = []; send({type:"clear", k}); drawInk();
+}
+
 
 /* ---------- 레이저·상대 커서 ---------- */
 const LASER = {};                                 /* 누구 → {pts:[{x,y,t}], down} */
@@ -746,6 +788,12 @@ function drawFx(){
       fctx.fillStyle = "#ff2b2b"; fctx.beginPath(); fctx.arc(h.x, h.y, 5, 0, 7); fctx.fill();
       fctx.fillStyle = "rgba(255,236,236,.95)"; fctx.beginPath(); fctx.arc(h.x, h.y, 1.9, 0, 7); fctx.fill();
     }
+  }
+  if(ERING && document.body.classList.contains("drawing")){
+    alive = true;
+    fctx.save(); fctx.lineWidth = 3; fctx.strokeStyle = "rgba(255,255,255,.9)"; fctx.setLineDash(ERING.se ? [5,4] : []);
+    fctx.beginPath(); fctx.arc(ERING.x, ERING.y, ERING.r, 0, 7); fctx.stroke();
+    fctx.lineWidth = 1.4; fctx.strokeStyle = "rgba(29,36,51,.85)"; fctx.stroke(); fctx.restore();
   }
   if(alive) requestAnimationFrame(drawFx); else fxOn = false;
 }
@@ -1061,7 +1109,7 @@ addEventListener("keydown", e=>{
   if(k==="?"){ helpOpen(); return; }
   if(k==="p"||k==="P"){ togglePen(); return; }
   if(document.body.classList.contains("drawing")){
-    if(k==="e"||k==="E"){ setTool(tool==="er" ? drawBase : "er"); return; }
+    if(k==="e"||k==="E"){ setTool(tool==="er" || tool==="se" ? drawBase : eraseMode); return; }
     if(k==="l"||k==="L"){ setTool(tool==="laser" ? drawBase : "laser"); return; }
     if(k==="s"||k==="S"){ setTool(tool==="se" ? drawBase : "se"); return; }
     if(k==="Delete"){ clearInk(); return; }
@@ -1072,5 +1120,5 @@ addEventListener("keydown", e=>{
 buildBar(); drawInk();
 const roomQ = new URLSearchParams(location.search).get("room");
 if(roomQ){ autoOpen = true; coPanel(true); coStart(roomQ); }
-window.Board = {VERSION, INK, REDO, QUIZ, BLANKS, setTool, togglePen, skey, recognize, rdp, get state(){ return {tool, LOCK, CID, isHost, conns:conns.length, cur}; }, sel, insertBlank};
+window.Board = {VERSION, INK, REDO, UNDO, QUIZ, BLANKS, setTool, togglePen, skey, recognize, rdp, get state(){ return {tool, LOCK, CID, isHost, conns:conns.length, cur}; }, sel, insertBlank};
 })();
