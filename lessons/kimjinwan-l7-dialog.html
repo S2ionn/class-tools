@@ -139,6 +139,16 @@ table.cmp{font-size:19px}table.cmp th{font-size:16px}
   .q .qa{opacity:1}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* ===== 전체 대화 한 장 ===== */
+.dlg{display:flex;flex-direction:column;gap:9px}
+.dlg .ln{display:grid;grid-template-columns:34px 40px 1fr;column-gap:10px;align-items:start}
+.dlg .no{font-family:Title,Body,sans-serif;font-size:15px;color:var(--acc3);background:var(--acc2);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.dlg .who{font-weight:800;font-size:16px;color:#fff;background:#7b8394;border-radius:6px;text-align:center;padding:3px 0;margin-top:4px}
+.dlg .who.w{background:var(--acc3)}
+.dlg .e{font-size:23px;line-height:1.38;font-weight:500}
+.dlg .k{font-size:16.5px;line-height:1.4;color:var(--sub);margin-top:1px}
+.hideKo .dlg .k{visibility:hidden}
 </style>
 </head>
 <body>
@@ -973,13 +983,32 @@ page(M7,"의사소통 기능 ② 후회 표현하기",`
   </div>
 `);
 
+/* 대화마다 번호를 1부터 다시 */
+const DSEC = [[1,8],[9,14],[15,19],[20,27],[28,32],[33,36],[37,43],[44,49]];
+DSEC.forEach(([a,b])=>{ for(let n=a;n<=b;n++) L7[n-1].dn = n-a+1; });
+/* 대화 전체를 한 장에: 영어(핵심 표현 형광펜) + 우리말 해석 */
+function scriptHTML(a, b){
+  const e = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/ \/\/ /g," ").replace(/ \/ /g," ").replace(/\[([^\]]+)\]/g,"<mark>$1</mark>");
+  let h = '<div class="dlg">';
+  for(let n=a;n<=b;n++){ const o = L7[n-1];
+    h += `<div class="ln"><div class="no">${String(o.dn).padStart(2,"0")}</div><div class="who${o.sp==="W"?" w":""}">${o.sp}</div><div><div class="e">${e(o.en)}</div><div class="k">${e(o.ko)}</div></div></div>`; }
+  return h + '</div>';
+}
+page(M7,"01 Communication · 노트북이 마음에 안 들어요 · 전체 대화",scriptHTML(1,8));
 sent(M7,L7,"01 Communication · 노트북이 마음에 안 들어요",[1,2,3,4,5,6,7,8]);
+page(M7,"02 Listen & Talk 1 · 별무늬 모자 · 전체 대화",scriptHTML(9,14));
 sent(M7,L7,"02 Listen & Talk 1 · 별무늬 모자",[9,10,11,12,13,14]);
+page(M7,"03 Listen & Talk 1 · 등산 배낭 · 전체 대화",scriptHTML(15,19));
 sent(M7,L7,"03 Listen & Talk 1 · 등산 배낭",[15,16,17,18,19]);
+page(M7,"04 Listen & Talk 1 · 새 스피커 · 전체 대화",scriptHTML(20,27));
 sent(M7,L7,"04 Listen & Talk 1 · 새 스피커",[20,21,22,23,24,25,26,27]);
+page(M7,"05 Listen & Talk 2 · 꽉 끼는 코트 · 전체 대화",scriptHTML(28,32));
 sent(M7,L7,"05 Listen & Talk 2 · 꽉 끼는 코트",[28,29,30,31,32]);
+page(M7,"06 Listen & Talk 2 · 다 써 버린 용돈 · 전체 대화",scriptHTML(33,36));
 sent(M7,L7,"06 Listen & Talk 2 · 다 써 버린 용돈",[33,34,35,36]);
+page(M7,"07 Listen & Talk 2 · 할인 중인 휴대폰 · 전체 대화",scriptHTML(37,43));
 sent(M7,L7,"07 Listen & Talk 2 · 할인 중인 휴대폰",[37,38,39,40,41,42,43]);
+page(M7,"08 Wrap Up · 동생 티셔츠 · 전체 대화",scriptHTML(44,49));
 sent(M7,L7,"08 Wrap Up · 동생 티셔츠",[44,45,46,47,48,49]);
 
 page(M7,"대화문 핵심 문법",`
@@ -1226,7 +1255,7 @@ function fmt(en){
 }
 function sentHTML(o){
   const sp = o.sp ? `<span class="sp ${o.sp.startsWith("Dr")||o.sp==="W"?"dr":""}">${o.sp}</span>` : "";
-  return `<div class="s${o.h?" h":""}"><div class="n">${String(o.n).padStart(2,"0")}</div><div>
+  return `<div class="s${o.h?" h":""}"><div class="n">${String(o.dn||o.n).padStart(2,"0")}</div><div>
     <div class="en">${sp}${fmt(o.en)}</div>
     <div class="nt">${o.nt.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
     <div class="kc"><b>끊어 해석</b><span>${esc(o.kc).replace(/ \/\/ /g,"  ").replace(/ \/ /g,' <span class="sl">/</span> ')}</span></div>
@@ -1243,7 +1272,8 @@ let slides = [];
 function slideHTML(x){
   if(x.raw) return x.raw;
   const body = x.ns ? x.ns.map(n=>sentHTML(x.data[n-1])).join("") : x.html;
-  const rng = x.ns ? `${String(x.ns[0]).padStart(2,"0")}${x.ns.length>1?" – "+String(x.ns[x.ns.length-1]).padStart(2,"0"):""}` : "";
+  const dn = n => String(x.data[n-1].dn || n).padStart(2,"0");   /* 대화문은 대화마다 번호가 1부터 */
+  const rng = x.ns ? `${dn(x.ns[0])}${x.ns.length>1?" – "+dn(x.ns[x.ns.length-1]):""}` : "";
   return `<section class="slide ${x.m.cls}">
     <div class="hd"><span class="ls">${x.m.ls}</span><span class="sec">${x.sec}</span><span class="rng">${rng}</span></div>
     <div class="bd">${body}</div>
