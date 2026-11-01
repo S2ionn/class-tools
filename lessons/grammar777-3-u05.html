@@ -114,7 +114,6 @@ table.t.sm th,table.t.sm td{padding:6px 12px}
 .sum h4{font-size:25px}
 .sum .dot{color:#1d8fd6;font-weight:700;font-size:24px}
 .sum ul{list-style:none;padding-left:18px}
-.sum li:before{content:"• "}
 .sum .bl{min-width:90px}
 /* 표지 */
 .cover{justify-content:center;padding:0 120px;border-top:14px solid var(--acc)}
@@ -129,6 +128,8 @@ table.t.sm th,table.t.sm td{padding:6px 12px}
   #ui,#bar{display:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+.fx{display:inline-block;width:1em;height:1em;line-height:1em;text-align:center;vertical-align:-.12em}
+.sum li:before{content:"";display:inline-block;width:.32em;height:.32em;border-radius:50%;background:currentColor;margin:0 .55em 0 .1em;vertical-align:.2em}
 </style>
 </head>
 <body>
@@ -207,6 +208,14 @@ stage.innerHTML = SS.map(x=> x.sec==="cover"
   ? `<section class="slide cover"><div class="s">초등영문법 777 3권</div><h1>${UNIT}</h1><div class="u">${NAME}</div></section>`
   : `<section class="slide"><div class="hd">초등영문법 777 3권<b>${UNIT} ${NAME}</b><span class="lab">${x.lab||""}</span><span class="pg"></span></div><div class="bd ${x.cls||""}">${x.html}</div>${x.q?`<div class="q">정답</div>`:""}</section>`).join("");
 SS.forEach(x=>{ x.m = {ls:UNIT}; delete x.html; });
+/* 혜민체에 없는 기호는 기기마다 다른 글꼴로 그려져 폭이 달라짐 → 폭을 고정해 기기끼리 글자 위치를 맞춤 (상대 필기가 어긋나 보이지 않게) */
+(function(){
+  const re = /[•⇨✓代]/, tw = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT), list = [];
+  while(tw.nextNode()) if(re.test(tw.currentNode.data)) list.push(tw.currentNode);
+  list.forEach(n=>{ const box = document.createElement("span");
+    box.innerHTML = n.data.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/[•⇨✓代]/g, c=>`<span class="fx">${c}</span>`);
+    n.replaceWith(...box.childNodes); });
+})();
 let slides = [...stage.querySelectorAll(".slide")];
 slides.forEach((s,i)=>{ const p = s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
 stage.querySelectorAll(".q").forEach(q=>q.addEventListener("click", ()=>q.classList.toggle("open")));
