@@ -60,6 +60,12 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);word-break:k
 .mk.o{border-radius:22px}.mk.s{border-radius:2px}
 .slide:has(.q.open) .mk.o,.slide:has(.q.open) .mk.s{border-color:var(--ans)}
 .slide:has(.q.open) tr.ar td{color:var(--ans);font-weight:700}
+.mt{position:relative;margin:14px 0 0 20px;font-size:31px}
+.mt svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.mt line{stroke:var(--ans);stroke-width:3;opacity:0}
+.slide:has(.q.open) .mt line{opacity:1}
+.mt .r{position:absolute;white-space:nowrap;line-height:48px}
+.mt .dt2{position:absolute;width:12px;height:12px;border-radius:50%;background:#6b7280}
 .lt{display:inline-block;width:46px;height:46px;border:2px solid #9aa1ad;border-radius:8px;text-align:center;line-height:42px;font-size:28px;margin:4px 10px}
 /* 정답: 누르면 열림 */
 .q{position:absolute;right:40px;bottom:30px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;border:2px solid var(--line);border-radius:10px;padding:8px 18px;font-size:22px;color:var(--sub);background:#fff}
@@ -101,6 +107,11 @@ const fill = s => s
   .replace(/___/g, `<span class="bl"><i></i></span>`);
 
 const GX = {};
+/* 선잇기: L·R 목록, M[i] = 왼쪽 i가 이어질 오른쪽 번호(0부터). 정답을 열면 파란 선 */
+const match = (L, R, M, w1=330, gap=250) => { const H = 64, n = Math.max(L.length, R.length), X1 = w1, X2 = w1 + gap;
+  return `<div class="mt" style="width:${X2+380}px;height:${H*n}px"><svg>${M.map((j,i)=>`<line class="ln" x1="${X1+6}" y1="${i*H+24}" x2="${X2+6}" y2="${j*H+24}"/>`).join("")}</svg>`
+  + L.map((x,i)=>`<div class="r" style="left:0;top:${i*H}px">${x}</div><span class="dt2" style="left:${X1}px;top:${i*H+18}px"></span>`).join("")
+  + R.map((x,i)=>`<span class="dt2" style="left:${X2}px;top:${i*H+18}px"></span><div class="r" style="left:${X2+34}px;top:${i*H}px">${x}</div>`).join("") + `</div>`; };
 const pic = (k, h) => `<img src="${IMG[k]}" style="height:${h}px;vertical-align:middle" alt="">`;
 // 진단평가 및 교내평가 대비 실전테스트 | UNIT 06~10
 const bogi = s => `<div class="bogi"><b>[보기]</b><span>${s}</span></div>`;
@@ -122,7 +133,7 @@ const Q = [
  {g:"03-04", img:"q3", imgh:300, wr:`He [[w:was taking]] a shower. (take)${ko("그는 샤워를 하는 중이었다.")}`, ans:"was taking"},
  {g:"03-04", img:"q4", imgh:280, wr:`We are [[w:playing]] baseball. (play)${ko("우리는 야구를 하는 중이다.")}`, ans:"playing"},
  {t:"다음 문장이 완성되도록 관계있는 것끼리 연결하세요.",
-  box:`<div style="display:grid;grid-template-columns:auto 1fr;gap:6px 160px">① Amy went<span>ⓐ her cousins.</span>② Sarah will meet<span>ⓑ steak and rice.</span>③ Henry ate<span>ⓒ to school.</span></div>`, ans:"① – ⓒ, ② – ⓐ, ③ – ⓑ"},
+  pre:match(["① Amy went","② Sarah will meet","③ Henry ate"], ["ⓐ her cousins.","ⓑ steak and rice.","ⓒ to school."], [2,0,1]), ans:"① – ⓒ, ② – ⓐ, ③ – ⓑ"},
  {t:"다음 동사의 현재형과 과거형이 바르게 짝지어지지 <u>않은</u> 것을 고르세요.",
   pre:`<table class="dt"><tr><th></th><th style="min-width:220px">현재형</th><th style="min-width:220px">과거형</th></tr>
   <tr><td>①</td><td>drink</td><td>drank</td></tr><tr><td>②</td><td>walk</td><td>walked</td></tr><tr class="ar"><td>③</td><td>break</td><td>breaked</td></tr><tr><td>④</td><td>have</td><td>had</td></tr></table>`, ans:"③"},
