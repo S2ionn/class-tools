@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-10-23-10";
+const VERSION = "2026-11-01";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -188,6 +188,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>글자 밑에 가로선을 그으면 글자 바로 밑에 붙어요 (밑줄)</li></ul>
   <h4>저장</h4>
   <ul><li>아래 막대의 저장(↓) 버튼 → <b>필기한 장만</b> 또는 <b>전체 슬라이드</b>를 PDF로. 인쇄 창에서 대상을 "PDF로 저장"으로</li>
+  <li>필기는 이 기기(브라우저)에 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요</li>
   <li>저장하지 않은 필기가 있을 때 창을 닫으면 "나가시겠어요?"가 떠요. <b>머무르기</b>를 누르면 PDF 저장 창이 나와요</li></ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
@@ -1086,6 +1087,33 @@ addEventListener("beforeunload", e=>{
 });
 
 try{ $("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
+
+/* ---------- 필기 자동 저장 : 이 기기(브라우저)에 페이지마다 저장, 다시 열면 그대로 ---------- */
+const STORE = "boardInk:" + location.pathname + "|" + document.title;
+let storedSig = "", storeWarned = false;
+const storeSig = () => inkSig() + "#" + BLANKS.map(b=>b.id).join(",");
+function storeInk(){
+  const sig = storeSig(); if(sig===storedSig) return;
+  const ink = {}; for(const [k,a] of Object.entries(INK)) if(a.length) ink[k] = a;
+  try{
+    if(!Object.keys(ink).length && !BLANKS.length) localStorage.removeItem(STORE);
+    else localStorage.setItem(STORE, JSON.stringify({v:1, ink, blanks:BLANKS}, (k,v)=>typeof v==="number" ? Math.round(v*10)/10 : v));
+    storedSig = sig;
+  }catch(e){ if(!storeWarned){ storeWarned = true; toast("이 기기에 필기를 더 저장할 자리가 없어요. PDF로 저장해 두세요."); } }
+}
+(function loadInk(){
+  let d = null; try{ d = JSON.parse(localStorage.getItem(STORE) || "null"); }catch(e){}
+  if(!d || !d.ink) return;
+  (d.blanks||[]).forEach(b=>insertBlank(b.id, b.after, false));
+  for(const [k, arr] of Object.entries(d.ink)){
+    const mine = INK[k] ||= [], ids = new Set(mine.map(s=>s.id));
+    arr.forEach(s=>{ if(!ids.has(s.id)) mine.push(s); });
+  }
+  storedSig = storeSig(); savedSig = inkSig();   /* 불러온 필기만으로는 "PDF로 저장할까요?"를 묻지 않음 */
+})();
+setInterval(storeInk, 1500);
+addEventListener("pagehide", storeInk);
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) storeInk(); });
 
 /* ---------- 버튼·단축키 ---------- */
 $("prevBtn").onclick = ()=>window.go(cur-1);
