@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-01-2";
+const VERSION = "2026-11-01-3";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -179,6 +179,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
   <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> — 지우개 버튼을 누르면 <b>지우개</b>(문지른 곳만) / <b>획 지우개</b>(<kbd>S</kbd>, 닿은 선을 통째로) 고르기. 크기는 점 크기 버튼</li>
+  <li><b>펜 지우개</b> 펜 뒤쪽 지우개나 옆 버튼을 누른 채 대면 지우개, 떼면 원래 펜으로 (지우개 종류는 지우개 버튼에서 고른 것)</li>
   <li><b>레이저</b> <kbd>L</kbd> 평소엔 빨간 점이 커서 대신 따라다니고, 누르고 움직이면 꼬리가 생겨요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
@@ -660,6 +661,16 @@ const endStroke = ()=>{
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
 ink.addEventListener("pointerleave", ()=>{ if(tool==="laser" && !laserDown) laserAt(null, "out"); ERING = null; kickFx(); });
+/* 펜 지우개: 펜 뒤쪽 지우개(buttons 32)나 옆 버튼(buttons 2)을 누른 채 대면 그 한 번만 지우개, 떼면 원래 도구로 */
+let penSwap = null;
+const penErase = e => e.pointerType==="pen" && ((e.buttons & 32) || (e.buttons & 2) || e.button===5 || e.button===2);
+ink.addEventListener("pointerdown", e=>{
+  if(penErase(e) && tool!=="er" && tool!=="se"){ penSwap = tool; setTool(eraseMode); }
+}, true);                                          /* 그리기 처리보다 먼저 */
+const penBack = ()=>{ if(penSwap){ const t = penSwap; penSwap = null; setTool(t); ERING = null; kickFx(); } };
+ink.addEventListener("pointerup", penBack);
+ink.addEventListener("pointercancel", penBack);
+ink.addEventListener("contextmenu", e=>e.preventDefault());   /* 펜 옆 버튼이 오른쪽 클릭 메뉴를 띄우지 않게 */
 /* 지우개 크기 고리: 지우개를 쓸 때 커서 자리에 지워질 크기만큼 동그라미(획 지우개는 점선) */
 let ERING = null;
 ink.addEventListener("pointermove", e=>{
