@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-01-3";
+const VERSION = "2026-11-02";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -179,6 +179,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <h4>도구 (왼쪽 아래 막대)</h4>
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
   <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> — 지우개 버튼을 누르면 <b>지우개</b>(문지른 곳만) / <b>획 지우개</b>(<kbd>S</kbd>, 닿은 선을 통째로) 고르기. 크기는 점 크기 버튼</li>
+  <li><b>판서 중 버튼</b> 판서를 켠 채로도 슬라이드 안의 버튼(정답 등)을 콕 찍으면 눌려요. 끌면 그대로 그려져요</li>
   <li><b>펜 지우개</b> 펜 뒤쪽 지우개나 옆 버튼을 누른 채 대면 지우개, 떼면 원래 펜으로 (지우개 종류는 지우개 버튼에서 고른 것)</li>
   <li><b>레이저</b> <kbd>L</kbd> 평소엔 빨간 점이 커서 대신 따라다니고, 누르고 움직이면 꼬리가 생겨요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
@@ -671,6 +672,17 @@ const penBack = ()=>{ if(penSwap){ const t = penSwap; penSwap = null; setTool(t)
 ink.addEventListener("pointerup", penBack);
 ink.addEventListener("pointercancel", penBack);
 ink.addEventListener("contextmenu", e=>e.preventDefault());   /* 펜 옆 버튼이 오른쪽 클릭 메뉴를 띄우지 않게 */
+/* 판서 중에도 슬라이드 안 버튼(정답 등)이 눌리게: 그림판 아래 누를 수 있는 것을 콕 찍으면(짧게, 거의 안 움직이고) 점은 버리고 그것을 누름 */
+const TAPPABLE = ".q, button, a[href], [onclick], input, select, label, summary, [role=button]";
+let tapAt = null;
+const tapTarget = (x, y) => { for(const el of document.elementsFromPoint(x, y)){ if(bd.contains(el)) continue; const t = el.closest(TAPPABLE); if(t && stage.contains(t)) return t; } return null; };
+ink.addEventListener("pointerdown", e=>{ tapAt = e.pointerType==="touch" ? null : {x:e.clientX, y:e.clientY, t:performance.now(), el:tapTarget(e.clientX, e.clientY)}; }, true);
+ink.addEventListener("pointerup", e=>{
+  const p = tapAt; tapAt = null;
+  if(!p || !p.el || performance.now()-p.t > 400 || Math.hypot(e.clientX-p.x, e.clientY-p.y) > 8) return;
+  if(stroke){ stroke = null; clearTimeout(holdT); holdAt = null; send({type:"live", who:ME, st:{k:null}}); drawInk(); }
+  p.el.click();
+}, true);                                          /* 그리기 끝내기(endStroke)보다 먼저 */
 /* 지우개 크기 고리: 지우개를 쓸 때 커서 자리에 지워질 크기만큼 동그라미(획 지우개는 점선) */
 let ERING = null;
 ink.addEventListener("pointermove", e=>{
