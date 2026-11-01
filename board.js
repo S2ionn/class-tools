@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-01";
+const VERSION = "2026-11-01-2";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -189,7 +189,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <h4>저장</h4>
   <ul><li>아래 막대의 저장(↓) 버튼 → <b>필기한 장만</b> 또는 <b>전체 슬라이드</b>를 PDF로. 인쇄 창에서 대상을 "PDF로 저장"으로</li>
   <li>필기는 이 기기(브라우저)에 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요</li>
-  <li>저장하지 않은 필기가 있을 때 창을 닫으면 "나가시겠어요?"가 떠요. <b>머무르기</b>를 누르면 PDF 저장 창이 나와요</li></ul>
+</ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
   <li>되돌리기는 내가 한 일만 하나씩 돌려요 — 내가 그은 선, 획 지우개로 지운 선, 모두 지우기</li></ul>
@@ -1078,13 +1078,7 @@ $("saveAll").onclick = ()=>savePdf(false);
 $("saveNo").onclick = ()=>{ saveAsk(false); savedSig = inkSig(); };   /* 저장 안 함 → 이번 필기로는 다시 묻지 않음 */
 $("saveX").onclick = ()=>saveAsk(false);
 $("saveAsk").addEventListener("click", e=>{ if(e.target.id==="saveAsk") saveAsk(false); });
-/* 창을 닫거나 새로고침할 때: 저장 안 한 필기가 있으면 브라우저의 "나가시겠어요?"를 띄우고,
-   머무르기를 고르면 바로 PDF 저장 창을 보여 줌 (브라우저는 닫힐 때 직접 만든 창을 띄우지 못하게 막음) */
-addEventListener("beforeunload", e=>{
-  if(!unsaved()) return;
-  e.preventDefault(); e.returnValue = "";
-  setTimeout(()=>saveAsk(true, true), 200);
-});
+/* 창을 닫을 때는 묻지 않음 — 필기는 자동 저장되므로 */
 
 try{ $("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
 
