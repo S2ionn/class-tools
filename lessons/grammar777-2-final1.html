@@ -83,6 +83,8 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);word-break:k
   #ui,#bar{display:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+.fx{display:inline-block;width:1em;height:1em;line-height:1em;text-align:center;vertical-align:-.12em}
+.sum li:before{content:"";display:inline-block;width:.32em;height:.32em;border-radius:50%;background:currentColor;margin:0 .55em 0 .1em;vertical-align:.2em}
 </style>
 </head>
 <body>
@@ -185,6 +187,14 @@ const stage = document.getElementById("stage");
 stage.innerHTML = SS.map((x,i)=> x.cls==="cover"
   ? `<section class="slide cover">${x.html}</section>`
   : `<section class="slide"><div class="hd">초등영문법 777 2권<b>총괄평가 1회</b><span class="pg"></span></div><div class="bd">${x.html}</div><div class="q">정답<span class="qa">${x.ans}</span></div></section>`).join("");
+/* 혜민체에 없는 기호는 기기마다 다른 글꼴로 그려져 폭이 달라짐 → 폭을 고정해 기기끼리 글자 위치를 맞춤 (상대 필기가 어긋나 보이지 않게) */
+(function(){
+  const re = /[•⇨✓代]/, tw = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT), list = [];
+  while(tw.nextNode()) if(re.test(tw.currentNode.data)) list.push(tw.currentNode);
+  list.forEach(n=>{ const box = document.createElement("span");
+    box.innerHTML = n.data.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/[•⇨✓代]/g, c=>`<span class="fx">${c}</span>`);
+    n.replaceWith(...box.childNodes); });
+})();
 let slides = [...stage.querySelectorAll(".slide")];
 slides.forEach((s,i)=>{ const p = s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
 stage.querySelectorAll(".q").forEach(q=>q.addEventListener("click", ()=>q.classList.toggle("open")));
