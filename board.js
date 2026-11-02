@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-02-2";
+const VERSION = "2026-11-02-3";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -190,7 +190,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>글자 밑에 가로선을 그으면 글자 바로 밑에 붙어요 (밑줄)</li></ul>
   <h4>저장</h4>
   <ul><li>아래 막대의 저장(↓) 버튼 → <b>필기한 장만</b> 또는 <b>전체 슬라이드</b>를 PDF로. 인쇄 창에서 대상을 "PDF로 저장"으로</li>
-  <li>필기는 이 기기(브라우저)에 슬라이드마다 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요. 다른 기기에서 쓴 필기는 같이 쓰기로 연결하면 합쳐져요</li>
+  <li>필기는 이 기기(브라우저)에 슬라이드마다 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요. 같이 쓰기 방 링크(?room=방이름)로 열면 필기가 인터넷에도 저장돼서, 다른 기기에서 같은 방 링크로 열어도 그대로 있어요</li>
 </ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
@@ -1041,10 +1041,10 @@ function coStart(name){
   room = name; active = true;
   try{ localStorage.setItem("coRoom", name); }catch(e){}
   try{ const u = new URL(location.href); u.searchParams.set("room", name); history.replaceState(null, "", u); }catch(e){}
-  coUI(); enter();
+  coUI(); enter(); cloudJoin();
 }
 function coLeave(){
-  active = false; clearTimeout(retryT); dropPeer(); isHost = false; LOCK = null;
+  cloudRoom = ""; active = false; clearTimeout(retryT); dropPeer(); isHost = false; LOCK = null;
   try{ const u = new URL(location.href); u.searchParams.delete("room"); history.replaceState(null, "", u); }catch(e){}
   coUI();
 }
@@ -1147,6 +1147,53 @@ function applyInkRecord(d){
   try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
 })();
 setInterval(storeInk, 1500);
+
+/* ---------- 기기 간 저장 (Firebase Realtime Database) ----------
+   같이 쓰기 방에 들어가 있으면 필기를 그 방 이름으로 인터넷에도 저장. 다른 기기에서 같은 방 링크로 열면 불러옴.
+   이 기기에서 지난 저장 뒤로 바뀐 게 없으면 인터넷 것을 그대로 쓰고(다른 기기에서 지운 것도 반영), 바뀐 게 있으면 합침 */
+const CLOUD_DB = "https://class-tools-a213a-default-rtdb.asia-southeast1.firebasedatabase.app";                               /* Firebase Realtime Database 주소. 비어 있으면 기기 간 저장 안 함 */
+const pageHash = () => { let h = 5381; for(const ch of document.title) h = (h*33 ^ ch.codePointAt(0))>>>0; return h.toString(36); };
+const cloudUrl = r => `${CLOUD_DB}/ink/${pageHash()}/${r}.json`;
+const syncKey = r => STORE + "|cloud:" + r;
+let cloudRoom = "", cloudSig = "", cloudBusy = false, cloudWarned = false;
+function cloudFail(){ if(!cloudWarned){ cloudWarned = true; toast("필기를 인터넷에 저장하지 못했어요. 이 기기에는 저장돼 있어요."); } }
+function replaceInk(rec){
+  BLANKS.slice().forEach(b=>{ if(!(rec.blanks||[]).some(x=>x.id===b.id)) removeBlank(b.id); });
+  Object.keys(INK).forEach(k=>{ INK[k] = []; });
+  applyInkRecord(rec);
+}
+async function cloudJoin(){
+  const r = room; if(!CLOUD_DB || !r) return;
+  cloudRoom = "";
+  let rec = null, last = null;
+  try{ const res = await fetch(cloudUrl(r), {cache:"no-store"}); if(!res.ok) throw 0; rec = await res.json(); }catch(e){ cloudFail(); return; }
+  while(!inkLoaded) await new Promise(ok=>setTimeout(ok, 100));
+  try{ last = await idbGet(syncKey(r)); }catch(e){}
+  if(room!==r || !active) return;
+  if(rec && rec.ink){
+    if(last!=null && last===storeSig()) replaceInk(rec); else applyInkRecord(rec);
+    doneSig = ""; drawInk(); toast("인터넷에 저장된 필기를 불러왔어요.");
+  }
+  cloudRoom = r; cloudSig = ""; cloudPush();
+}
+async function cloudPush(){
+  const r = cloudRoom; if(!r || r!==room || cloudBusy) return;
+  const sig = storeSig(); if(sig===cloudSig) return;
+  cloudBusy = true;
+  try{
+    const rec = inkRecord();
+    const res = await fetch(cloudUrl(r), rec ? {method:"PUT", body:JSON.stringify(rec)} : {method:"DELETE"});
+    if(!res.ok) throw 0;
+    cloudSig = sig; idbPut(syncKey(r), sig).catch(()=>{});
+  }catch(e){ cloudFail(); }
+  cloudBusy = false;
+}
+setInterval(cloudPush, 3000);
+addEventListener("pagehide", ()=>{                 /* 닫을 때 못 올린 것이 있으면 마지막으로 한 번 */
+  if(!cloudRoom || cloudRoom!==room || storeSig()===cloudSig) return;
+  const rec = inkRecord();
+  try{ navigator.sendBeacon(cloudUrl(cloudRoom) + "?x-http-method-override=" + (rec ? "PUT" : "DELETE"), rec ? JSON.stringify(rec) : ""); }catch(e){}
+});
 addEventListener("pagehide", ()=>storeInk(true));
 document.addEventListener("visibilitychange", ()=>{ if(document.hidden) storeInk(true); });
 
