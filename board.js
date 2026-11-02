@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-02";
+const VERSION = "2026-11-02-2";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -190,7 +190,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>글자 밑에 가로선을 그으면 글자 바로 밑에 붙어요 (밑줄)</li></ul>
   <h4>저장</h4>
   <ul><li>아래 막대의 저장(↓) 버튼 → <b>필기한 장만</b> 또는 <b>전체 슬라이드</b>를 PDF로. 인쇄 창에서 대상을 "PDF로 저장"으로</li>
-  <li>필기는 이 기기(브라우저)에 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요</li>
+  <li>필기는 이 기기(브라우저)에 슬라이드마다 저장돼요. 창을 닫거나 새로고침해도, 다음에 같은 링크로 열면 그대로 있어요. 다른 기기에서 쓴 필기는 같이 쓰기로 연결하면 합쳐져요</li>
 </ul>
   <h4>고치기</h4>
   <ul><li>되돌리기 <kbd>Ctrl</kbd>+<kbd>Z</kbd> · 다시 실행 <kbd>Ctrl</kbd>+<kbd>Y</kbd> · 이 장 모두 지우기 휴지통 / <kbd>Delete</kbd></li>
@@ -1105,32 +1105,50 @@ $("saveAsk").addEventListener("click", e=>{ if(e.target.id==="saveAsk") saveAsk(
 
 try{ $("coIn").value = localStorage.getItem("coRoom") || ""; }catch(e){}
 
-/* ---------- 필기 자동 저장 : 이 기기(브라우저)에 페이지마다 저장, 다시 열면 그대로 ---------- */
+/* ---------- 필기 자동 저장 : 이 기기(브라우저)에 페이지마다 저장, 다시 열면 그대로 ----------
+   IndexedDB에 저장(같은 사이트의 모든 슬라이드가 함께 쓰는 localStorage 5MB 한도에 걸리지 않게).
+   창을 닫는 순간엔 비동기 저장이 끝나지 못할 수 있어 localStorage에도 같은 내용을 한 번 더 써 둠(넘치면 건너뜀).
+   불러올 때는 둘 중 더 최근 것(t)을 씀. 브라우저가 공간이 모자라도 지우지 않게 persist()를 요청 */
 const STORE = "boardInk:" + location.pathname + "|" + document.title;
-let storedSig = "", storeWarned = false;
+let storedSig = "", storeWarned = false, inkLoaded = false;
 const storeSig = () => inkSig() + "#" + BLANKS.map(b=>b.id).join(",");
-function storeInk(){
-  const sig = storeSig(); if(sig===storedSig) return;
+const idb = (()=>{ let p = null; return ()=> p ||= new Promise((ok, no)=>{
+  try{ const r = indexedDB.open("boardInk", 1); r.onupgradeneeded = ()=>r.result.createObjectStore("ink"); r.onsuccess = ()=>ok(r.result); r.onerror = ()=>no(r.error); }catch(e){ no(e); } }); })();
+const idbGet = k => idb().then(db=>new Promise((ok, no)=>{ const q = db.transaction("ink").objectStore("ink").get(k); q.onsuccess = ()=>ok(q.result); q.onerror = ()=>no(q.error); }));
+const idbPut = (k, v) => idb().then(db=>new Promise((ok, no)=>{ const tx = db.transaction("ink", "readwrite"); v==null ? tx.objectStore("ink").delete(k) : tx.objectStore("ink").put(v, k); tx.oncomplete = ok; tx.onerror = ()=>no(tx.error); }));
+const round1 = (k,v)=>typeof v==="number" ? Math.round(v*10)/10 : v;
+function inkRecord(){
   const ink = {}; for(const [k,a] of Object.entries(INK)) if(a.length) ink[k] = a;
-  try{
-    if(!Object.keys(ink).length && !BLANKS.length) localStorage.removeItem(STORE);
-    else localStorage.setItem(STORE, JSON.stringify({v:1, ink, blanks:BLANKS}, (k,v)=>typeof v==="number" ? Math.round(v*10)/10 : v));
-    storedSig = sig;
-  }catch(e){ if(!storeWarned){ storeWarned = true; toast("이 기기에 필기를 더 저장할 자리가 없어요. PDF로 저장해 두세요."); } }
+  return Object.keys(ink).length || BLANKS.length ? JSON.parse(JSON.stringify({v:2, t:Date.now(), ink, blanks:BLANKS}, round1)) : null;
 }
-(function loadInk(){
-  let d = null; try{ d = JSON.parse(localStorage.getItem(STORE) || "null"); }catch(e){}
-  if(!d || !d.ink) return;
+function storeInk(closing){
+  if(!inkLoaded) return;                           /* 불러오기 전에 빈 내용으로 덮어쓰지 않게 */
+  const sig = storeSig(); if(sig===storedSig && !closing) return;
+  const rec = inkRecord();
+  idbPut(STORE, rec).then(()=>{ storedSig = sig; }).catch(()=>{ if(!storeWarned){ storeWarned = true; toast("이 기기에 필기를 저장하지 못했어요. PDF로 저장해 두세요."); } });
+  if(closing) try{ rec ? localStorage.setItem(STORE, JSON.stringify(rec)) : localStorage.removeItem(STORE); }catch(e){}
+}
+function applyInkRecord(d){
   (d.blanks||[]).forEach(b=>insertBlank(b.id, b.after, false));
-  for(const [k, arr] of Object.entries(d.ink)){
+  for(const [k, arr] of Object.entries(d.ink||{})){
     const mine = INK[k] ||= [], ids = new Set(mine.map(s=>s.id));
     arr.forEach(s=>{ if(!ids.has(s.id)) mine.push(s); });
   }
-  storedSig = storeSig(); savedSig = inkSig();   /* 불러온 필기만으로는 "PDF로 저장할까요?"를 묻지 않음 */
+}
+(async function loadInk(){
+  let a = null, b = null;
+  try{ a = await idbGet(STORE); }catch(e){}
+  try{ b = JSON.parse(localStorage.getItem(STORE) || "null"); }catch(e){}
+  const d = [a, b].filter(x=>x && x.ink).sort((x,y)=>(y.t||0)-(x.t||0))[0];
+  if(d){ applyInkRecord(d); doneSig = ""; drawInk(); }
+  storedSig = d ? "" : storeSig(); savedSig = inkSig();   /* 불러온 필기만으로는 "PDF로 저장할까요?"를 묻지 않음 */
+  inkLoaded = true; storeInk();                    /* 예전 localStorage 저장분을 IndexedDB로 옮김 */
+  try{ localStorage.removeItem(STORE); }catch(e){}
+  try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
 })();
 setInterval(storeInk, 1500);
-addEventListener("pagehide", storeInk);
-document.addEventListener("visibilitychange", ()=>{ if(document.hidden) storeInk(); });
+addEventListener("pagehide", ()=>storeInk(true));
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) storeInk(true); });
 
 /* ---------- 버튼·단축키 ---------- */
 $("prevBtn").onclick = ()=>window.go(cur-1);
