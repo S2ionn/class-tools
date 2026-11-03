@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리딩바이트2 Unit 02 요지·주장 파악하기</title>
+<style>
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:100 500;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:600 900;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{
+  --ink:#2f3448; --sub:#7d8199; --line:#e3e1ea; --paper:#FFFDF6; --bg:#2a2d3d;
+  --navy:#6f7296; --brown:#6f7296; --yel:#E2D4E0; --yel2:#efe7f0; --red:#c05a7a;
+  --green:#7C7E9D; --teal:#8a8fb0; --tealbg:#e4e6ef; --purple:#4C5372; --purplebg:#ece4ee;
+  --dot:#6f7296; --pop:#f1ecf3; --cream:#f0eef5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;word-break:keep-all}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{display:none;position:absolute;inset:0;background:var(--paper);overflow:hidden}
+.slide.on{display:block}
+.ft{position:absolute;left:28px;bottom:14px;font-size:13px;color:#8f93aa}
+.ft b{color:#3e4560;font-weight:700}
+.pg{position:absolute;left:250px;bottom:14px;font-size:13px;color:#8f93aa;font-variant-numeric:tabular-nums}
+.bp{position:absolute;right:28px;top:20px;font:700 20px Hyemin,sans-serif;color:#3e4560}
+
+/* 표지 */
+.cover{background:#FFFDF6}
+.cover .side{position:absolute;right:0;top:0;bottom:0;width:430px;background:#7C7E9D;color:#fff;padding:64px 56px}
+.cover .side .pt{font:400 26px Title,sans-serif;color:#E2D4E0;letter-spacing:.04em}
+.cover .side .pt b{font-weight:400;font-size:64px;display:block;line-height:1;margin-top:6px}
+.cover .side h2{font:400 44px/1.25 Title,sans-serif;margin-top:28px}
+.cover .side ol{list-style:none;position:absolute;left:56px;right:56px;bottom:120px;border-top:1.5px solid rgba(255,255,255,.45)}
+.cover .side li{display:flex;justify-content:space-between;font:700 19px/1 Hyemin,sans-serif;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.25)}
+.cover .side li.on{color:#E2D4E0}
+.cover .main{position:absolute;left:96px;top:0;bottom:0;width:640px;display:flex;flex-direction:column;justify-content:center}
+.cover .bk{font:700 20px Hyemin,sans-serif;color:#8f93aa;letter-spacing:.02em}
+.cover .un{font:400 34px Title,sans-serif;color:#949AB1;margin-top:46px}
+.cover h1{font:400 92px/1.1 Title,sans-serif;color:#4C5372;margin-top:6px}
+.cover .rule{width:72px;height:6px;background:#E2D4E0;border-radius:3px;margin:30px 0 26px}
+.cover .rd3{display:flex;gap:10px}
+.cover .rd3 span{font:700 18px Hyemin,sans-serif;color:#4C5372;background:#E2D4E0;border-radius:999px;padding:7px 18px}
+
+/* PART 소개 */
+.intro{background:#f3eef4;padding:56px 90px}
+.intro .q3{display:grid;gap:26px;max-width:880px}
+.intro h3{display:inline-block;font:900 25px Hyemin,sans-serif;color:#fff;background:var(--navy);border:0;border-radius:999px;padding:4px 26px;margin-bottom:10px}
+.intro p,.intro li{font-size:21px;line-height:1.6;color:var(--ink)}
+.intro ul{list-style:none;display:grid;gap:4px}
+.intro li{padding-left:30px;position:relative}
+.intro li::before{content:"";position:absolute;left:4px;top:10px;width:13px;height:8px;border-left:3px solid var(--red);border-bottom:3px solid var(--red);transform:rotate(-45deg)}
+.intro .types{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:center;margin:6px 0 0 30px;max-width:520px}
+.intro .types b{font-size:21px;color:var(--ink)}
+.intro .types s{border-bottom:2px dotted #b9bdd0;text-decoration:none;height:0}
+.intro .types span{font:700 15px Hyemin,sans-serif;color:#fff;background:var(--brown);padding:3px 18px 3px 12px;clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%)}
+.intro .types span em{color:var(--yel);font-style:normal}
+
+/* 본문(READING) */
+.rd{display:grid;grid-template-columns:240px 1fr;height:100%}
+.rd .side{background:var(--cream);border-right:1px solid var(--line);padding:34px 22px 0 34px;position:relative}
+.tagR{font:400 20px Title,sans-serif;color:var(--navy);background:var(--yel);border-radius:999px;padding:3px 14px;display:inline-block}
+.bigN{font:900 120px/1 Title,sans-serif;color:var(--navy);margin-top:6px}
+.bigN span{color:#fff;-webkit-text-stroke:0}
+.gichul{display:inline-block;margin-top:14px;font:700 14px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:4px 12px}
+.hash{margin-top:34px}
+.hash h4{font:900 16px Hyemin,sans-serif;color:var(--navy)}
+.hash h4 span{background:var(--yel2);padding:0 3px}
+.hash div{border-bottom:2px dashed #949AB1;height:44px;line-height:52px;font-size:17px;color:#8f93aa}
+.hash p{font:400 14px Hyemin,sans-serif;color:#6a6f8e;margin-top:8px;line-height:1.5}
+.hash .q{margin-top:12px}
+.rd .main{padding:30px 50px 40px 40px}
+.psg{font-size:24px;line-height:2;color:var(--ink);text-align:justify}
+.nm{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--dot);color:#fff;font:700 11px Hyemin,sans-serif;align-items:center;justify-content:center;vertical-align:11px;margin:0 3px 0 6px}
+.nm:first-child{margin-left:0}
+.psg.one{text-align:left;display:grid;gap:0}
+.psg.one .ps1{position:relative;padding-left:34px;line-height:1.5;padding:4px 0 5px 36px;border-bottom:1px solid #ebe8f0}
+.psg.one .ps1:last-child{border-bottom:0}
+.psg.one .ps1 .nm{position:absolute;left:0;top:calc(4px + .38em);margin:0;width:22px;height:22px;font-size:12px;vertical-align:0}
+.rd{position:relative}
+.fn{position:absolute;left:34px;bottom:48px;text-align:left!important;font-size:15px;color:#5a6080;margin-top:6px}
+
+/* 문제 */
+.qs{padding:40px 70px 40px 70px;display:grid;gap:30px;align-content:start}
+.qi{display:grid;grid-template-columns:56px 1fr;column-gap:10px}
+.qi .no{font:900 40px/1 Hyemin,sans-serif;color:var(--navy);text-align:center}
+.qi .bdg{display:block;margin:6px auto 0;width:40px;font:700 13px/1.2 Hyemin,sans-serif;color:#fff;text-align:center;padding:5px 2px;border-radius:6px 6px 14px 14px}
+.bdg.g{background:var(--green)}.bdg.r{background:var(--red)}
+.qi .tag2{display:block;font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:2px 8px;width:max-content;margin:0 auto 4px}
+.qi .tx{font-size:23px;line-height:1.55;padding-top:4px}
+.qi .tx u{text-underline-offset:4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:4px 40px;margin-top:10px;font-size:22px;font-family:Hyemin,sans-serif}
+.opts.one{grid-template-columns:1fr}
+.opts.en{font-family:Hyemin,sans-serif;font-size:23px}
+.ln{margin-top:10px;font-size:23px}
+.wd{text-align:right;font-size:22px;margin-top:4px}
+
+/* 정답 가리기 */
+.q{cursor:pointer}
+.q i{font-style:normal;visibility:hidden;color:#e0262f;font-weight:700}
+.q.open i{visibility:visible}
+.b{display:inline-block;min-width:110px;border-bottom:1.5px solid var(--navy);text-align:center;padding:0 6px;line-height:1.25}
+.b.w{min-width:520px}.b.m{min-width:260px}.b.s{min-width:70px}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-left:14px;vertical-align:2px}
+.chip b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--navy);border-radius:5px;padding:2px 8px}
+.chip.open b{background:#e0262f}
+.chip i{font-size:20px}
+.ok{display:inline-flex;width:1.2em;height:1.2em;align-items:center;justify-content:center;border-radius:50%;vertical-align:-.12em;margin:0 .04em;text-indent:0}
+.slide:has(.chip.open) .ok{color:#e0262f;font-weight:900;box-shadow:0 0 0 2.5px #e0262f;background:#fff0f0}
+@media print{.ok{color:#e0262f;box-shadow:0 0 0 2.5px #e0262f}}
+
+/* 구조 이해 표 */
+.tbl{display:grid;gap:8px;margin-top:12px}
+.tbl .r{display:grid;grid-template-columns:200px 1fr;border:1px solid var(--line);background:#fff;border-radius:6px;overflow:hidden}
+.tbl .h{display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;padding:8px;line-height:1.3}
+.tbl .c{padding:12px 20px;font-size:22px;line-height:1.8}
+.c1{background:#f0e8ef;color:#4C5372}.c2{background:#e8e9f1;color:#4C5372}.c3{background:#eadcea;color:#6a5a78}.c4{background:#dfe2ec;color:#4C5372}.c5{background:#eadcea;color:#6a5a78}
+.tbl sup{font-size:12px;margin-right:1px}
+.tbl .b{min-width:96px}
+.tbl .ar{display:block;text-align:center;line-height:.6;font-size:18px}
+
+
+/* 번호별 해설 */
+.exq{display:inline-flex;margin-left:8px;vertical-align:2px}
+.exq>b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:5px;padding:2px 8px}
+.exq.open>b{background:var(--red)}
+.exq .pan{display:none;position:fixed;right:36px;top:92px;width:620px;max-height:560px;overflow:auto;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:12px 20px 14px;z-index:3;font:700 19px/1.6 Hyemin,sans-serif;color:var(--ink);text-align:left;text-indent:0;white-space:normal}
+.exq.lo .pan{top:auto;bottom:56px}
+.exq.open .pan{display:block}
+.pan .pt{display:block;font:700 16px Hyemin,sans-serif;color:var(--red);margin-bottom:4px}
+.pan .lb{display:inline-block;font:700 14px/1.5 Hyemin,sans-serif;color:#fff;background:var(--purple);border-radius:4px;padding:0 7px;margin-right:6px;vertical-align:1px}
+.pan .lb.o{background:var(--teal)}
+.pan .ko{display:block;color:#5a6080;margin-top:4px}
+.pan u{text-decoration:underline dotted var(--red);text-underline-offset:4px;text-decoration-thickness:2px}
+.pan .tbl{margin-top:6px;gap:5px}
+.pan .tbl .r{grid-template-columns:120px 1fr}
+.pan .tbl .h{font-size:16px;padding:6px}
+.pan .tbl .c{font-size:17px;line-height:1.6;padding:6px 12px}
+
+
+/* Unit 02 추가 */
+.qs.tight .tbl .c{font-size:20.5px;line-height:1.6;padding:7px 18px}
+.qs.tight .tbl{gap:6px}
+.cover .rd3{flex-wrap:wrap;max-width:600px}
+.cover .rd3 span{white-space:nowrap}
+.tbl .tth{text-align:center;font-size:21px;padding:8px;border-radius:6px;background:#dfe2ec;color:#4C5372;font-weight:700}
+.bxq{margin-top:12px;border:1.5px solid var(--line);border-radius:12px;padding:10px 20px;font-size:23px;line-height:1.8;background:#fff}
+.flow{display:grid;gap:8px;margin-top:12px}
+.flow .fw{text-align:center;border-radius:10px;padding:10px 16px;font-size:22px;line-height:1.7}
+.flow .f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.flow .fh{text-align:center;border-radius:10px 10px 0 0;padding:6px;font-size:21px}
+.flow .fc{border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:10px 14px;font-size:22px;line-height:1.7;background:#fff;text-align:center}
+.sen .nm.in{position:static;display:inline-flex;vertical-align:.35em;margin:0 6px 0 12px}
+.bk1{display:inline-block;font-size:15px;color:#fff;background:#7C7E9D;border-radius:5px;padding:0 8px;vertical-align:2px}
+.bogi{margin:12px 0 0 46px;border:1.5px dashed #b9bdd0;border-radius:12px;padding:8px 20px;display:flex;justify-content:space-around;font-size:22px}
+.sb{position:absolute;left:90px;right:90px;top:80px;border-left:4px solid #7C7E9D;padding:6px 0 6px 32px}
+.sbh{display:flex;align-items:center;gap:18px;font:700 26px Hyemin,sans-serif;color:var(--ink);margin-bottom:22px}
+.sbh span{font:400 26px Title,sans-serif;color:#fff;background:#7C7E9D;border-radius:14px 14px 0 0;padding:6px 22px 4px}
+.sbh span b{font-weight:400;color:#E2D4E0}
+.sb p{font-size:23px;line-height:1.95;text-align:justify}
+
+/* Read Closely */
+.rch{position:absolute;left:0;top:24px;right:40px;height:88px}
+.rch .tab{position:absolute;left:0;top:0;z-index:2;width:262px;height:88px;background:#4C5372;border-radius:0 44px 44px 0;box-shadow:6px 0 0 var(--paper);padding:10px 0 0 48px;font:400 30px/1 Title,sans-serif;color:#fff}
+.rch .tab span{display:block;color:#E2D4E0}
+.rch .tab span+span{color:#fff;margin-top:3px;font-size:34px}
+.rch .ins{position:absolute;left:200px;right:0;top:16px;z-index:1;height:56px;background:#ece6f0;color:#3e4560;border-radius:28px;font:700 20px Hyemin,sans-serif;display:flex;align-items:center;justify-content:flex-end;padding-right:30px;gap:2px}
+.wv{text-decoration:underline wavy var(--red);text-underline-offset:5px;text-decoration-thickness:1.5px}
+.bx{border:1.5px solid var(--red);border-radius:7px;padding:0 4px}
+.red{color:var(--red)}
+.rc{position:absolute;left:0;right:0;top:128px;bottom:56px;display:grid;grid-template-columns:1fr 250px;column-gap:30px;padding:0 40px 0 76px}
+.rc .ss{display:flex;flex-direction:column;gap:2px}
+.sen{font:700 28px/1.45 Hyemin,sans-serif;color:var(--ink);position:relative;padding-left:4px}
+.sen .nm{position:absolute;left:-32px;top:.32em;margin:0;width:24px;height:24px;font-size:13px;background:#7C7E9D}
+.wl{height:34px;border-bottom:1.5px dashed #d8d3e3}
+.wls{position:relative}
+.wls .ko,.wls .kx{position:absolute;left:4px;right:0;top:4px;font:700 18px/34px Hyemin,sans-serif;color:var(--red)}
+.wls .ko .sl{color:#b9bdd0;margin:0 .15em}
+.wls .kx{display:none}
+.hideKo .wls .ko{visibility:hidden}
+.hideKo .wls .kx{display:block}
+.hl{background:var(--tealbg);padding:0 2px}
+.hp{background:var(--purplebg);padding:0 2px}
+.tip{font:500 16px/1.6 Hyemin,sans-serif;color:#3e4560;margin:8px 0 6px;padding:9px 16px;background:#f3eef4;border:1px solid #e2d4e0;border-radius:12px}
+.tip .lb{display:inline-block;font:700 15px Hyemin,sans-serif;color:#fff;border-radius:999px;padding:0 10px;margin-right:8px}
+.tip .lb.p{background:#4C5372}.tip .lb.t{background:#7C7E9D}
+.tip .ex{padding-left:18px;position:relative}
+.tip .ex::before{content:"";position:absolute;left:5px;top:11px;width:5px;height:5px;border-radius:50%;background:#6a6f8e}
+.tip u{text-underline-offset:4px;text-decoration-color:#8f93aa}
+.wds{background:#f3eef4;border-radius:16px;padding:14px 16px 12px;align-self:start;max-height:100%;overflow:hidden}
+.wds:empty{display:none}
+.wds h5{display:block;font:400 20px Title,sans-serif;color:#4C5372;padding-bottom:8px;margin-bottom:6px;border-bottom:2px solid #E2D4E0}
+.wds ul{list-style:none;display:grid;gap:0}
+.wds li{font-size:16.5px;line-height:1.35;color:#5a6080;padding:4px 0;border-bottom:1px dashed #e2d4e0}
+.wds li:last-child{border-bottom:0}
+.wds li b{color:#2f3448;font-weight:700;margin-right:4px}
+.wds li em{font-style:italic;color:#2f3448;margin-right:3px}
+.ps{display:inline-flex;width:17px;height:17px;border:0;background:#949AB1;color:#fff!important;border-radius:50%;font-size:10.5px;align-items:center;justify-content:center;vertical-align:1px;margin-right:3px;color:#5a6080}
+
+/* Memory POP */
+.mph{position:absolute;left:0;top:30px;height:62px;width:420px;background:var(--navy);border-radius:0 14px 14px 0;font:400 38px/62px Title,sans-serif;color:#fff;padding-left:100px}
+.mph span{color:var(--yel)}
+.mph .pop{position:absolute;right:-56px;top:-14px;width:84px;height:62px;border:3px solid var(--navy);border-radius:50%;background:#fff;color:var(--navy);font-size:22px;line-height:56px;text-align:center}
+.mp{position:absolute;left:0;right:0;top:122px;bottom:40px;padding:0 90px;display:grid;gap:26px;align-content:start}
+.mq h4{display:flex;gap:14px;font:700 23px Hyemin,sans-serif;align-items:baseline}
+.mq h4 .no{font:900 32px/1 Title,sans-serif;color:var(--red)}
+.mq ol{list-style:none;padding-left:46px;display:grid;gap:12px;margin-top:14px}
+.mq li{font-size:23px;line-height:1.55}
+.mq li .ko{display:block}
+.mq li .en{display:block;padding-left:28px}
+.mq u{text-underline-offset:4px}
+.pinkbg{position:absolute;inset:0;background:var(--pop)}
+.su{position:absolute;right:120px;top:26px;background:var(--navy);color:#fff;border-radius:12px;padding:6px 18px;font:400 22px/1.15 Title,sans-serif;text-align:center}
+.su span{color:var(--yel);display:block}
+.ab{position:absolute;left:90px;right:90px;top:96px;display:grid;gap:12px}
+.ab h4{display:flex;gap:14px;align-items:center;font:700 22px Hyemin,sans-serif}
+.ab h4 .c{display:inline-flex;width:44px;height:44px;border-radius:50%;background:var(--teal);color:#fff;font:900 26px Hyemin,sans-serif;align-items:center;justify-content:center}
+.ab p{font-size:22px;line-height:1.95;text-indent:1em;text-align:justify}
+.ab u{text-underline-offset:5px}
+
+@media print{
+  html,body{background:#fff;overflow:visible;height:auto}
+  #stage{position:static;transform:none!important}
+  .slide{display:block!important;position:relative;page-break-after:always;width:1280px;height:720px}
+  .q i{visibility:visible}
+  .exq{display:none!important}
+  @page{size:1280px 720px;margin:0}
+}
+.dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+</style>
+</head>
+<body class="hideKo">
+<div id="stage"></div>
+<div id="ui"></div>
+<script>
+/* ---------- 슬라이드 내용 ---------- */
+const FT = `<div class="ft">PART 1_<b>Unit 02</b> 요지·주장 파악하기</div>`;
+const nm = n => `<span class="nm">${n}</span>&#8288;`;
+const b = (ans, cls="") => `<span class="q b ${cls}"><i>${ans}</i></span>`;
+const chip = ans => `<span class="q chip"><b>정답</b><i>${ans}</i></span>`;
+const ps = c => `<span class="ps">${c}</span>`;
+const W = (w, pos, m, cf) => `<li>${cf?"<em>cf.</em>":""}<b>${w}</b>${pos?ps(pos):""}${m}</li>`;
+const lines = k => `<div class="wl"></div>`.repeat(k);
+/* 끊어 읽기 해석 (해답지 Read Closely) — 해석 버튼(K)으로 보이기/숨기기 */
+const KO = {
+  R04:["네가 선택해 / 나는 따라갈게","이것이 생각이다 / 디토 소비의 바탕이 되는","‘디토’는 ‘나도 그래’를 의미한다","그래서 ‘디토 소비’는 의미한다 / 다른 사람들과 같은 것을 사는 것을 / 그들의 취향이나 스타일이 여러분과 비슷한","소셜 미디어 때문에 / 디토 소비는 빠르게 늘고 있다","예를 들어 / 많은 사람들이 스타나 인플루언서를 따라 한다 / 자신이 좋아하는 스타일인","그들은 종종 같은 것을 산다 / 옷, 음식, 혹은 기타 물건과 같은 / 이 사람처럼","그들은 생각한다 / 이것이 그들에게 좋다면 / 나에게도 분명 좋을 거야","이러한 소비는 / 쉽고 안전하게 느껴질 수 있다 / 하지만 문제를 일으킬 수 있다","사람들은 물건을 살 수도 있다 / 그들이 정말 필요하지 않은 / 그리고 돈을 낭비할 수도 있다","그들은 자신의 스타일을 잃을 수도 있다 / 그리고 불만족할 수도 있다 / 그들이 샀던 것에","결국 / 그들은 기회를 놓치게 될 수도 있다 / 자신만의 선택을 할"],
+  R05:["우리의 감정들은 중요하다 / 그들은 우리가 생존하도록 도와주기 때문에","두려움은 우리를 위험에서 멀리 떨어지게 한다","분노는 겁주어 쫓아 버릴 수 있다 / 우리의 적을","그리고 좋은 감정들은 우리를 도와준다 / 다른 사람들과 더 가까워지도록","이러한 감정들은 작동한다 / 우리 뇌 안에서 ‘프로그램’처럼","어떤 일이 일어났을 때 / 감정은 생겨난다 / 그리고 우리가 하는 행동을 조절한다","그것은 바꾼다 / 우리가 어떻게 주의를 기울이고 / 어떻게 움직이며 / 그리고 무엇을 기억하는지를","예를 들어 / 우리가 적을 만날 때 / 두려움은 우리를 만든다 / 위험에 더 집중하도록","그러면 우리는 선택할 수 있다 / 싸울지 혹은 도망칠지를","우리는 또한 기억한다 / 이러한 무서운 사건을 / 더 뚜렷하게 / 그래서 우리는 안전하게 지낼 수 있다 / 미래에","따라서 / 각 감정은 우리를 보호하는 데 도움을 준다","만약 감정들이 우리가 생존하는 데에 도움이 되지 않는다면 / 우리는 오늘날까지 그것들을 가지고 있지 않을 것이다"],
+  R06:["오늘날의 빠르게 돌아가는 생활 방식은 / 우리가 하나의 일을 두게 한다 / 다른 일 위에","많은 사람들은 믿는다 / 멀티태스킹이 시간을 절약한다고 / 하지만 그렇지 않다","매우 자주 / 멀티태스킹은 여러분을 느리게 할 뿐이다","여러분의 모든 집중력을 써라 / 여러분이 하고 있는 일에 / 지금","빨래를 하는 동안에는 / 빨래만 해라","들어라 / 물소리를 / 그것이 세탁기를 채울 때 / 그리고 옷을 느껴라 / 여러분의 손에 있는","통화를 하는 것이 / 여러분이 빨래를 하고 있는 동안 / 여러분에게 절약해 주지 않을 것이다 / 많은 시간을","같은 것이 적용된다 / 여러분의 모든 일에","한 가지 일에 집중해라 / 한 번에 / 그러면 여러분은 각각의 일을 더 잘 성취할 것이다 / 그리고 아마도 더 빨리"],
+  R07:["여러분은 친구들을 어떻게 격려하는가 / 바꾸려고 노력하고 있는 / 자신의 행동을","가정해 보라 / 여러분이 한 친구를 만난다고 / 다이어트 중인 / 그리고 몸무게가 많이 줄고 있는","분명히 / 여러분은 그녀에게 말하고 싶을 것이다 / 그녀가 멋져 보인다고","누구든 / 긍정적인 말을 듣는 / 기분이 좋아질 것이다 / 그리고 이런 피드백은 또한 매우 용기를 북돋워 줄 것이다","그러나 / 만약 여러분이 거기서 논의를 끝낸다면 / 유일한 피드백은 / 여러분의 친구가 받게 되는 / 결과에 관한 것이다","대신에 / 그 논의를 계속해라 / 과정에 관해 물음으로써","그녀에게 물어봐라 / 그녀가 무엇을 하고 있는지 / 그렇게 성공적이기 위해","그녀가 무엇을 먹고 있는가 // 그녀가 어디서 운동을 하고 있는가","","그 대화가 초점을 맞출 때 / 변화의 과정에 / 결과보다는 / 그것은 그녀에게 용기를 북돋워 준다 / 계속 변화를 만들어 나가도록"]};
+let CUR = "R04";
+const koHTML = t => t.replace(/ \/\/ /g,' <span class="sl">//</span> ').replace(/ \/ /g,' <span class="sl">/</span> ');
+const sen = (n, t, k=1, kx="") => `<div class="sen">${nm(n)}${t}</div><div class="wls">${lines(k)}<span class="ko">${koHTML(KO[CUR][n-1])}</span>${kx?`<span class="kx">${kx}</span>`:""}</div>`;
+
+function rdSide(n, opt={}){
+  return `<div class="side">
+    <span class="tagR">READING</span>
+    <div class="bigN">0${n}</div>
+    ${opt.gichul ? `<span class="gichul">고1 모의고사 기출 응용</span>` : ""}
+    <div class="hash"><h4>Add Your <span>Hashtags!</span></h4>
+      <div>#</div><div>#</div><div>#</div>
+      <div class="q chip" style="margin-left:0;border:0;height:auto;line-height:1.5;display:flex;flex-wrap:wrap"><b>예시</b><i style="font-size:15px">${opt.ex}</i></div>
+    </div></div>`;
+}
+function rcHead(){
+  return `<div class="rch"><div class="tab"><span>Read</span><span>Closely</span></div>
+    <div class="ins">의미 단위로 끊어 읽고(<span class="red">/</span>), <span class="wv red">주어</span>와&nbsp;<span class="bx red">동사</span>에 표시해 봅시다.</div></div>`;
+}
+const rcSlide = (sents, words, page) => `${rcHead()}
+  <div class="rc"><div class="ss">${sents}</div><div class="wds">${words?`<h5>Words</h5><ul>${words}</ul>`:""}</div></div>${FT}<div class="bp">${page}</div>`;
+
+const SS = [];
+const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+
+
+/* 정답과 해설 (해답지) */
+const HS = t => `<span class="lb">해석</span>${t}`;
+const OD = t => `<span class="lb o">오답풀이</span>${t}`;
+
+const KO2 = t => `<span class="ko">${t}</span>`;
+const EX = {
+ "R04-1": "취향이나 스타일이 비슷한 사람의 물건을 따라 사는 디토 소비는 쉽고 안전해 보이지만, 불필요한 소비로 돈을 낭비할 수 있고 자신의 스타일을 잃거나 자신이 산 것에 불만족하여 결국은 스스로 구매를 결정할 기회를 놓칠 수 있다는 내용이다.",
+ "R04-2": `다섯 번째 문장 Because of social media, ditto spending is growing fast.에서 소셜 미디어 때문에 디토 소비가 빠르게 늘고 있다고 했다.${KO2(HS("무엇이 디토 소비를 인기 있게 만드는가?<br>→ <u>소셜 미디어</u>가 그것을 인기 있게 만든다."))}`,
+ "R04-3": `(1) 디토 소비는 자신과 취향이 비슷한 스타나 인플루언서가 사는 물건을 따라서 구매하는 것을 말한다.${KO2(HS("(1) 디토 소비는 스타나 인플루언서로부터 물건을 사는 것을 의미한다.<br>(2) 다른 사람의 선택을 따라 하는 것은 쉽고 안전하게 느껴질 수 있지만, 그것은 문제를 일으킬 수 있다."))}`,
+ "R04-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c4">디토 소비</div><div class="c">&nbsp;</div></div>
+    <div class="r"><div class="h c2">의미</div><div class="c">여러분과 (1) <u>비슷한</u> 취향을 가진 다른 사람들이 사는 물건과 같은 것을 사는 것</div></div>
+    <div class="r"><div class="h c3">문제점</div><div class="c"><span class="dt"></span>돈을 (2) <u>낭비하는</u> 것<br><span class="dt"></span>자신만의 (3) <u>스타일</u>을 잃는 것<br>→ 스스로 (4) <u>선택</u>하지 못하는 것</div></div></div>`,
+ "R05-1": "감정이 우리의 생존과 안전을 위해 중요한 역할을 한다고 설명하고 있다.",
+ "R05-2": `(1) 분노는 적을 겁주어 쫓아 버릴 수 있다고 했으므로 anger(분노)가 적절하다.${KO2(HS("(1) 사람들이 <u>분노</u>를 보이면, 그것은 그들의 적을 두렵게 만들 수 있다.<br>(2) 좋은 감정들은 사람들이 <u>다른 사람들과 더 가까워지게</u> 도와준다."))}`,
+ "R05-3": `감정들이 우리 뇌 안에서 ‘프로그램’처럼 작동한다는 것은 어떤 일이 생기면 감정이 ‘프로그램’처럼 저절로 반응하여 우리의 행동을 조절한다는 것을 의미한다.${KO2(HS("우리가 어떤 문제에 직면했을 때, 감정은 <u>프로그램</u>처럼 시작된다. 그러면 그것들은 우리의 <u>주의력</u>, 움직임, 그리고 기억을 변화시키기 시작한다."))}`,
+ "R05-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c4">감정의 중요성</div><div class="c">&nbsp;</div></div>
+    <div class="r"><div class="h c1">감정</div><div class="c">두려움, (1) <u>분노</u>, 좋은 감정</div></div>
+    <div class="r"><div class="h c2">예시</div><div class="c">우리가 적을 볼 때 → 우리는 (2) <u>두려움</u>을 느낀다 → 위험에 집중한다 → (3) <u>싸우거나</u> 도망치기를 선택한다 → 무서운 일을 (4) <u>기억한다</u> → 미래에 위험으로부터 (5) <u>안전하게</u> 지낼 수 있다</div></div>
+    <div class="r"><div class="h c4">결론</div><div class="c">(6) <u>감정</u>은 우리를 (7) <u>생존하게</u> 돕기 때문에 우리와 함께 있다.</div></div></div>`,
+ "R06-1": "멀티태스킹은 일을 더 느리게 만들어 비효율적으로 만들기도 하기 때문에 한 번에 한 가지 일에 집중하는 것이 중요하다는 내용이므로, 필자가 주장하는 바로 가장 적절한 것은 ⑤이다.",
+ "R06-2": `많은 사람들이 멀티태스킹이 시간을 절약해 준다고 생각하지만, 오히려 종종 일의 속도를 늦추기도 한다고 했다.${KO2(HS("멀티태스킹은 시간을 <u>절약해 주는</u> 것 같지만, 진실은 종종 그 <u>반대</u>이다."))}`,
+ "R06-3": `(1) 빠른 생활 방식은 한 가지 일 위에 또 다른 일을 더해 여러 가지 일을 동시에 하도록 만든다.${KO2(HS("(1) 빠른 생활 방식은 우리가 일을 한 가지씩 하게 만든다.<br>(2) 빨래하는 동안 통화를 하는 것은 많은 시간을 절약하는 데 도움이 되지 않는다."))}`,
+ "R06-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c5">문제점</div><div class="c">사람들은 (1) <u>멀티태스킹</u>이 시간을 절약해 준다고 잘못 생각한다.</div></div>
+    <div class="r"><div class="h c4">조언</div><div class="c">지금 하고 있는 일에 당신의 (2) <u>모든</u> 집중을 쏟아라.</div></div>
+    <div class="r"><div class="h c2">빨래</div><div class="c">물소리를 (3) <u>듣고</u> 옷을 (4) <u>느껴라</u>.</div></div>
+    <div class="r"><div class="h c2">일</div><div class="c">더 나은 그리고 (6) <u>더 빠른</u> 결과를 얻기 위해 (5) <u>한 가지</u> 일에 집중하라.</div></div></div>`,
+ "R07-1": "행동을 바꾸려고 노력하는 친구를 격려할 때에는 결과에 대해서만 이야기하기보다는 변화의 과정에 초점을 맞춰 대화해야 한다는 내용이므로, 필자가 주장하는 바로 가장 적절한 것은 ⑤이다.",
+ "R07-2": `변화하려고 노력하는 친구와 변화의 과정에 대해 대화를 나누면 친구는 변화를 계속해 나갈 수 있는 격려를 받을 수 있다고 했다.${KO2(HS("<u>과정에 대해 질문함으로써 타인을 격려하는</u> 방법"))}`,
+ "R07-3": `${HS("(1) 결과에 대한 긍정적인 피드백은 큰 격려가 될 수 있다.<br>(2) 너는 친구에게 다이어트를 위해 무엇을 먹어야 하는지나 어떻게 운동해야 하는지에 대해 묻지 말아야 한다.")}`,
+ "R07-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c2">시작</div><div class="c">당신은 (1) <u>체중</u>을 줄이고 있는 친구를 만난다.</div></div>
+    <div class="r"><div class="h c4">결과</div><div class="c">그녀에게 (2) <u>멋져 보인다</u>고 말해라.</div></div>
+    <div class="r"><div class="h c1">과정</div><div class="c">그녀에게 성공하기 위해서 그녀가 하고 있는 것에 대해 (3) <u>질문해라</u>.</div></div>
+    <div class="r"><div class="h c3">정리</div><div class="c">(5) <u>결과</u>보다 (4) <u>과정</u>에 대해서 이야기하는 것은 그녀가 계속 변화하도록 격려한다.</div></div></div>`,
+ "POP-1": `${HS("")}${KO2("(1) 도시 생활은 바쁘고 <u>빠르게 진행된다</u>.<br>(2) 저는 목이 말라요. 유리잔에 물을 <u>채워 주세요</u>.<br>(3) 그 지시 사항은 <u>따라 하기</u>에 쉽고 단순하다.<br>(4) 그녀의 <u>격려하는</u> 말이 나에게 희망을 주었다.<br>(5) 슬픔은 모두가 느끼는 <u>감정</u>이다.")}`,
+ "POP-2": "(1) work out: 운동하다<br>(2) slow down: 속도를 줄이다<br>(3) pay attention: 주의를 기울이다, 집중하다<br>(4) on top of: ~ 위에, ~에 더하여",
+ "POP-3": `(1) 간접의문문은 평서문과 같은 「의문사 + 주어 + 동사」의 어순으로 써야 하므로 did he solve를 he solved로 고쳐야 한다.<br>(3) 「사역동사 make + 목적어 + 목적격 보어(동사원형)」의 형태가 되도록 thinking을 think로 고쳐야 한다.<br>(4) 마을의 집들이 돌로 지어진 것이므로 선행사 a village와 houses는 소유 관계이며, 따라서 which를 소유격 관계대명사 whose로 고쳐야 한다.<br>(5) ‘하루에 30분을 달리면 너는 더 건강해질 것이다’라는 뜻이 되는 것이 문맥상 자연스러우므로 「명령문, and ~」 형태로 써야 한다.${KO2(HS("(1) 나는 그가 어떻게 그 문제를 해결했는지 궁금하다.<br>(2) 나는 어머니가 유명한 요리사인 한 소녀를 만났다.<br>(3) 그녀의 연설은 우리를 미래에 대해 생각하게 했다.<br>(4) 우리는 집들이 돌로 지어진 마을을 방문했다.<br>(5) 하루에 30분 동안 달려라, 그러면 너는 더 건강해질 것이다."))}`,
+ "POP-4": "(1) 선생님과 강의는 소유 관계이므로 선행사 a math teacher 뒤에 「소유격 관계대명사 whose + 명사 + 동사」 순서로 쓴다.<br>(2) 남동생에게 표를 예약하도록 시킨 것이므로 「사역동사 have + 목적어 + 목적격 보어(동사원형)」 형태로 쓴다.<br>(3) ‘네가 그 셔츠를 어디서 샀는지’를 뜻하는 간접의문문이므로 「의문사 + 주어 + 동사」 형태로 쓴다.",
+ "POP-A": `문맥상 다른 사람의 소비를 따라 하다 보면 스스로 선택할 기회를 놓친다는 의미가 되어야 하므로 ⑤ gain(얻다)을 miss(놓치다)와 같은 낱말로 바꿔야 한다.${KO2(HS("READING 04 지문해석 참조"))}`,
+ "POP-B": `③ 사역동사 make 구문에서는 목적격 보어로 동사원형이 와야 하므로, to focus를 focus로 고쳐야 한다.${KO2(HS("READING 05 지문해석 참조"))}`
+};
+const exb = k => `<span class="q exq"><b>해설</b><span class="pan"><span class="pt">${k.split("-")[1]}번 해설</span>${EX[k]}</span></span>`;
+const gtip = (t, body, ex) => `<div class="tip"><span class="lb t">문법 TIP</span><b>${t}:</b> ${body}${ex.map(e=>`<div class="ex">${e}</div>`).join("")}</div>`;
+
+/* 표지 */
+add("U02","표지",`
+  <div class="main">
+    <div class="bk">Reading BITE GRADE 2</div>
+    <div class="un">Unit 02</div>
+    <h1>요지·주장<br>파악하기</h1>
+    <div class="rule"></div>
+    <div class="rd3"><span>READING 04</span><span>READING 05</span><span>READING 06</span><span>READING 07</span><span>Memory POP</span></div>
+  </div>
+  <div class="side">
+    <div class="pt">PART<b>01</b></div>
+    <h2>중심 내용<br>파악하기</h2>
+    <ol><li><span>Unit 01 주제 파악하기</span><span>12</span></li><li class="on"><span>Unit 02 요지·주장 파악하기</span><span>20</span></li><li><span>Unit 03 제목 추론하기</span><span>30</span></li><li><span>Unit 04 요약문 완성하기</span><span>38</span></li></ol>
+  </div>`, "cover");
+
+/* ===== READING 04 ===== */
+add("R04","본문",`<div class="rd">${rdSide(4,{ex:"#follow #ditto spending #buying same things"})}
+  <div class="main"><div class="psg">${nm(1)}“You choose, I’ll follow.” ${nm(2)}This is the idea behind ditto spending. ${nm(3)}“Ditto” means “me too.” ${nm(4)}So “ditto spending” means buying the same things as others whose taste or style is similar to yours. ${nm(5)}Because of social media, ditto spending is growing fast. ${nm(6)}For example, many people follow a star or influencer whose style they like. ${nm(7)}They often buy the same things—such as clothes, food, or other items—as this person. ${nm(8)}They think, “If it’s good for them, it must be good for me, too.” ${nm(9)}This kind of spending can feel easy and safe, but it can cause problems. ${nm(10)}People may buy things they don’t really need and waste money. ${nm(11)}They might lose their own style and feel unhappy with what they bought. ${nm(12)}In the end, they may miss the chance to make their own decisions.</div>
+  <div class="fn">*influencer: 인플루언서, 영향력을 행사하는 사람</div></div></div>${FT}<div class="bp">20</div>`);
+
+add("R04","문제 1-3",`<div class="qs" style="gap:24px">
+  <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 요지로 가장 적절한 것은? ${chip("④")} ${exb("R04-1")}
+      <div class="opts one"><div>① 유명인의 소셜 미디어는 팔로워들에게 큰 영향을 미친다.</div><div>② 소비 계획을 세우면 불필요한 소비를 막는 것을 도와준다.</div><div>③ 소셜 미디어에서 상품을 구매할 때는 후기를 참고하는 것이 중요하다.</div><div><span class="ok">④</span> 타인의 소비를 따라 하는 것은 스스로 구매를 결정하는 것을 어렵게 한다.</div><div>⑤ 자신과 취향이 비슷한 사람과 같은 물건을 사는 것은 쉽고 안전하게 느껴진다.</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">What makes ditto spending popular? ${exb("R04-2")}
+      <div class="ln">→ ${b("Social")} ${b("media")} makes it popular.</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R04-3")}
+      <div class="ln">(1) Ditto spending means buying things from a star or influencer. ${b("F","s")}</div>
+      <div class="ln">(2) While copying others’ choices can feel easy and safe, it may cause problems. ${b("T","s")}</div></div></div>
+  </div>${FT}<div class="bp">20</div>`);
+
+add("R04","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R04-4")}
+      <div class="tbl">
+        <div class="tth">Ditto Spending</div>
+        <div class="r"><div class="h c2">Meaning</div><div class="c">buying the same things as others who have <sup>(1)</sup>${b("similar")} tastes to yours</div></div>
+        <div class="r"><div class="h c3">Problems</div><div class="c"><span class="dt"></span><sup>(2)</sup>${b("wasting")} money<br><span class="dt"></span>losing your own <sup>(3)</sup>${b("style")}<br>→ not making your own <sup>(4)</sup>${b("decisions")}</div></div>
+      </div></div></div></div>${FT}<div class="bp">20</div>`);
+
+const W4 = [
+  W("choose","동","선택하다"),W("follow","동","따르다"),W("behind","전","~ 뒤에, ~의 이면에"),W("spending","명","소비"),W("mean","동","의미하다"),W("taste","명","취향"),W("similar","형","비슷한"),
+  W("for example","","예를 들어"),W("safe","형","안전한"),W("cause","동","일으키다"),W("need","동","필요로 하다"),W("waste","동","낭비하다"),
+  W("lose","동","잃다"),W("unhappy","형","불만족스러워하는"),W("in the end","","결국"),W("miss the chance","","기회를 놓치다"),W("make one’s own decisions","","스스로 결정하다")];
+
+add("R04","Read Closely 1",rcSlide(
+  sen(1,"“You choose, I’ll follow.”")+
+  sen(2,"This is the idea behind ditto spending.")+
+  sen(3,"“Ditto” means “me too.”")+
+  sen(4,`So “ditto spending” means buying the same things as others <span class="hl">whose</span> taste or style is similar to yours.`,2)+
+  gtip("소유격 관계대명사","소유격 관계대명사는 앞에 나온 명사(선행사)의 소유를 나타내요. 선행사가 사람이든 사물이든 모두 whose를 쓸 수 있어요.",["I know <u>a boy</u> <b>whose</b> father is a firefighter.","They live in <u>a house</u> <b>whose</b> garden is very beautiful."]),
+  W4.slice(0,7).join(""), 21));
+
+add("R04","Read Closely 2",rcSlide(
+  sen(5,"Because of social media, ditto spending is growing fast.")+
+  sen(6,`For example, many people follow a star or influencer <span class="hl">whose</span> style they like.`)+
+  sen(7,`They often buy the same things — <span class="hp">such as</span> clothes, food, or other items — as this person.`,2)+
+  `<div class="tip"><span class="lb p">독해 TIP</span><b>such as:</b> as 뒤에는 명사가 나열되며, ‘~와 같은, 예를 들면’이라는 의미를 나타내요. 앞에 나온 내용에 관해 구체적인 예시를 들어 설명할 때 써서 내용을 좀 더 쉽게 이해할 수 있게 해 줘요.</div>`,
+  W4.slice(7,12).join(""), 21));
+
+add("R04","Read Closely 3",rcSlide(
+  sen(8,"They think, “If it’s good for them, it must be good for me, too.”")+
+  sen(9,"This kind of spending can feel easy and safe, but it can cause problems.")+
+  sen(10,"People may buy things they don’t really need and waste money.")+
+  sen(11,"They might lose their own style and feel unhappy with what they bought.")+
+  sen(12,"In the end, they may miss the chance to make their own decisions."),
+  W4.slice(12).join(""), 21));
+
+/* ===== READING 05 ===== */
+CUR = "R05";
+add("R05","본문",`<div class="rd">${rdSide(5,{gichul:1,ex:"#emotions #fear #good feelings #survive"})}
+  <div class="main"><div class="psg">${nm(1)}Our emotions are important because they help us survive. ${nm(2)}Fear keeps us away from danger. ${nm(3)}Anger can scare away our enemies. ${nm(4)}And good feelings help us get closer to others. ${nm(5)}<u>These emotions work like “programs” in our brains.</u> ${nm(6)}When something happens, an emotion starts and controls what we do. ${nm(7)}It changes how we pay attention, how we move, and what we remember. ${nm(8)}For example, when we meet our enemies, fear makes us focus more on the danger. ${nm(9)}Then we can choose to fight or run away. ${nm(10)}We also remember this kind of scary event more clearly, so we can stay safe in the future. ${nm(11)}Thus, each emotion helps protect us. ${nm(12)}If emotions did not help us survive, we would not still have them today.</div></div></div>${FT}<div class="bp">22</div>`);
+
+add("R05","문제 1-2",`<div class="qs">
+  <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 요지로 가장 적절한 것은? ${chip("①")} ${exb("R05-1")}
+      <div class="opts one"><div><span class="ok">①</span> 감정은 인간이 살아남도록 도와준다.</div><div>② 인간의 감정은 점차 다양해지고 있다.</div><div>③ 과거의 경험이 현재의 감정에 영향을 미친다.</div><div>④ 두려움의 원인을 알면 두려움을 없앨 수 있다.</div><div>⑤ 부정적인 감정은 긍정적인 감정보다 더 오래 기억된다.</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">윗글의 내용과 일치하도록 괄호 안에서 알맞은 것을 고르시오. ${exb("R05-2")}
+      <div class="ln">(1) If people show [fear / anger], it can make their enemies afraid. ${chip("anger")}</div>
+      <div class="ln">(2) Good emotions help people [stay away from danger / get closer to others]. ${chip("get closer to others")}</div></div></div>
+  </div>${FT}<div class="bp">22</div>`);
+
+add("R05","문제 3-4",`<div class="qs tight" style="gap:18px">
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">밑줄 친 <u>These emotions work like “programs” in our brains.</u>가 의미하는 바가 무엇인지 빈칸에 알맞은 말을 윗글에서 찾아 쓰시오. ${exb("R05-3")}
+      <div class="bxq">When we face a problem, emotions start like ${b("programs")}. Then they begin to change our ${b("attention")}, movement, and memory.</div></div></div>
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R05-4")}
+      <div class="tbl">
+        <div class="tth">Importance of Emotions</div>
+        <div class="r"><div class="h c1">Emotions</div><div class="c">fear, <sup>(1)</sup>${b("anger")}, good feelings</div></div>
+        <div class="r"><div class="h c2">Example</div><div class="c">when we see our enemies → we feel <sup>(2)</sup>${b("fear")} → focus on danger<br>→ choose to <sup>(3)</sup>${b("fight")} or run away → <sup>(4)</sup>${b("remember")} the scary event<br>→ can stay <sup>(5)</sup>${b("safe")} from danger in the future</div></div>
+        <div class="r"><div class="h c4">Conclusion</div><div class="c"><sup>(6)</sup>${b("Emotions")} stay with us because they help us <sup>(7)</sup>${b("survive")}.</div></div>
+      </div></div></div></div>${FT}<div class="bp">22</div>`);
+
+const W5 = [
+  W("emotion","명","감정"),W("important","형","중요한"),W("survive","동","생존하다"),W("keep A away from B","","A를 B로부터 멀리하게 하다"),W("danger","명","위험"),W("scare ~ away","","겁주어 ~을 물리치다"),W("get closer to","","~에 더 가까워지다"),
+  W("work","동","작동하다"),W("control","동","조절하다, 통제하다"),W("pay attention","","주의를 기울이다"),W("remember","동","기억하다"),W("focus on","","~에 집중하다"),W("choose","동","선택하다"),
+  W("fight","동","싸우다"),W("run away","","도망가다"),W("clearly","부","뚜렷하게"),W("protect","동","보호하다")];
+
+add("R05","Read Closely 1",rcSlide(
+  sen(1,`Our emotions are important because they <span class="hl">help us survive</span>.`)+
+  gtip("(준)사역동사 + 목적어 + 목적격 보어","make, let, have와 같이 ‘~가 …하게 하다’라는 의미를 가진 동사들을 사역동사라고 하는데, help가 이와 비슷한 의미(~가 …하는 것을 돕다)로 쓰일 때 ‘준사역동사’라고 불러요. help의 목적격 보어 자리에는 동사원형 또는 to부정사를 쓸 수 있으며, 사역동사는 목적격 보어로 동사원형을 써요.",["My phone <b>helps me (to) wake up</b> in the morning.","The movie <b>made me cry</b>."])+
+  sen(2,"Fear keeps us away from danger.")+
+  sen(3,"Anger can scare away our enemies.")+
+  sen(4,`And good feelings <span class="hl">help us get</span> closer to others.`),
+  W5.slice(0,7).join(""), 23));
+
+add("R05","Read Closely 2",rcSlide(
+  sen(5,"These emotions work like “programs” in our brains.")+
+  sen(6,"When something happens, an emotion starts and controls what we do.")+
+  sen(7,"It changes how we pay attention, how we move, and what we remember.")+
+  sen(8,`For example, when we meet our enemies, fear <span class="hl">makes us focus</span> more on the danger.`,2)+
+  sen(9,"Then we can choose to fight or run away."),
+  W5.slice(7,13).join(""), 23));
+
+add("R05","Read Closely 3",rcSlide(
+  sen(10,"We also remember this kind of scary event more clearly, so we can stay safe in the future.",2)+
+  sen(11,"Thus, each emotion helps protect us.")+
+  sen(12,`If emotions did not <span class="hl">help us survive</span>, we would not still have them today.`),
+  W5.slice(13).join(""), 23));
+
+/* ===== READING 06 ===== */
+CUR = "R06";
+add("R06","본문",`<div class="rd">${rdSide(6,{gichul:1,ex:"#multitasking #whole focus #focus on one task"})}
+  <div class="main"><div class="psg">${nm(1)}Today’s fast-paced lifestyle makes us put one thing on top of another. ${nm(2)}Many people believe that multitasking saves time, but it doesn’t. ${nm(3)}Very often, multitasking only slows you down. ${nm(4)}Give your whole focus to what you’re doing at the moment. ${nm(5)}While doing the laundry, just do the laundry. ${nm(6)}Listen to the sound of the water as it fills the washing machine and feel the clothes in your hand. ${nm(7)}Talking on the phone while you are doing the laundry will not save you a lot of time. ${nm(8)}The same applies to all your work. ${nm(9)}Focus on one task at a time, and you’ll accomplish each task better, and probably faster.</div></div></div>${FT}<div class="bp">24</div>`);
+
+add("R06","문제 1-3",`<div class="qs" style="gap:24px">
+  <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글에서 필자가 주장하는 바로 가장 적절한 것은? ${chip("⑤")} ${exb("R06-1")}
+      <div class="opts one"><div>① 업무 중에는 휴대 전화 사용을 자제하라.</div><div>② 틈틈이 비는 시간을 생산적으로 활용하라.</div><div>③ 회사 일로 인해 집안일을 소홀히 하지 말라.</div><div>④ 자신이 하는 일에 대해 확고한 신념을 가져라.</div><div><span class="ok">⑤</span> 무슨 일이든 한 번에 한 가지 일에만 집중하라.</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">윗글의 내용과 일치하도록 괄호 안에서 알맞은 것을 고르시오. ${exb("R06-2")}
+      <div class="ln">Multitasking seems to [save / waste] time, but the truth is often the [same / opposite]. ${chip("save, opposite")}</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R06-3")}
+      <div class="ln">(1) A fast lifestyle makes us do things one by one. ${b("F","s")}</div>
+      <div class="ln">(2) Talking on the phone during laundry doesn’t help save a lot of time. ${b("T","s")}</div></div></div>
+  </div>${FT}<div class="bp">24</div>`);
+
+add("R06","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R06-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c5">Problem</div><div class="c">People mistakenly believe that <sup>(1)</sup>${b("multitasking")} saves time.</div></div>
+        <div class="r"><div class="h c4">Advice</div><div class="c">Put your <sup>(2)</sup>${b("whole")} focus on what you’re doing now.</div></div>
+        <div class="r"><div class="h c2">Laundry</div><div class="c"><sup>(3)</sup>${b("Listen")} to the water and <sup>(4)</sup>${b("feel")} the clothes.</div></div>
+        <div class="r"><div class="h c2">Work</div><div class="c">Focus on <sup>(5)</sup>${b("one")} task to get better and <sup>(6)</sup>${b("faster")} results.</div></div>
+      </div></div></div></div>${FT}<div class="bp">24</div>`);
+
+const W6 = [
+  W("fast-paced","형","빨리 진행되는"),W("lifestyle","명","생활 방식"),W("on top of","","~의 위에, ~에 더하여"),W("multitasking","명","멀티태스킹"),W("multitask","동","한꺼번에 여러 가지 일을 처리하다",1),W("slow ~ down","","~의 속도를 늦추다, 느리게 하다"),W("whole","형","전부의, 모든"),W("focus","명","집중"),W("at the moment","","지금"),W("do the laundry","","빨래하다"),W("laundry","명","빨래",1),
+  W("fill","동","채우다"),W("empty","동","비우다",1),W("washing machine","","세탁기"),W("apply to","","~에 적용되다"),W("task","명","일, 과업"),W("at a time","","한 번에"),W("accomplish","동","성취하다"),W("achieve","동","성취하다",1),W("probably","부","아마도")];
+
+add("R06","Read Closely 1",rcSlide(
+  sen(1,"Today’s fast-paced lifestyle makes us put one thing on top of another.")+
+  sen(2,"Many people believe that multitasking saves time, but it doesn’t.")+
+  sen(3,"Very often, multitasking only slows you down.")+
+  sen(4,"Give your whole focus to what you’re doing at the moment.")+
+  sen(5,"While doing the laundry, just do the laundry."),
+  W6.slice(0,11).join(""), 25));
+
+add("R06","Read Closely 2",rcSlide(
+  sen(6,"Listen to the sound of the water as it fills the washing machine and feel the clothes in your hand.",2)+
+  sen(7,"Talking on the phone while you are doing the laundry will not save you a lot of time.",2)+
+  sen(8,"The same applies to all your work."),
+  W6.slice(11,16).join(""), 25));
+
+add("R06","Read Closely 3",rcSlide(
+  sen(9,`<span class="hl">Focus on one task at a time, and</span> you’ll accomplish each task better, and probably faster.`,2)+
+  gtip("명령문, and …","‘~해라, 그러면 …할 것이다’라는 뜻으로, 앞 문장의 명령을 따랐을 때 나타나는 결과가 뒤 문장에서 이어져요.",["<b>Press the button, and</b> the door will open.","<b>Trust yourself, and</b> you’ll achieve your goals."]),
+  W6.slice(16).join(""), 25));
+
+add("R06","Story BITE",`<div class="sb"><div class="sbh"><span>Story <b>BITE</b></span>집중하기 어렵다면, ‘포모도로 기법’을?</div>
+  <p>‘포모도로 기법(The Pomodoro Technique)’은 이탈리아의 경영 컨설턴트 ‘프란체스코 치릴로(Francesco Cirillo)’가 제안한 시간 관리법으로, 그가 대학 시절 토마토(pomodoro) 모양의 요리용 타이머를 활용해 공부한 데서 붙여진 이름이라고 해요. 방법은 간단해요. 타이머를 맞추고 ‘25분 집중 + 5분 휴식’을 1세트로 하여 4회 반복한 후 15~30분간 쉬면 돼요. 이러한 패턴을 여러 번 반복하세요. 이렇게 하면 긴 시간을 집중해야 하는 부담이 없고, 작업과 휴식을 반복하면서 뇌의 피로를 풀 수 있으며, 적절한 시간의 압박을 통해 집중력이 올라가 일의 효율을 높일 수 있다고 해요.</p></div>${FT}<div class="bp">25</div>`);
+
+/* ===== READING 07 ===== */
+CUR = "R07";
+add("R07","본문",`<div class="rd">${rdSide(7,{gichul:1,ex:"#encourage your friend #process of change"})}
+  <div class="main"><div class="psg">${nm(1)}How do you encourage your friends who are trying to change their behavior? ${nm(2)}Suppose you see a friend who has been working on a diet and losing a lot of weight. ${nm(3)}Definitely, you would want to tell her that she looks great. ${nm(4)}Anyone who hears positive comments will feel good, and this feedback will also be very encouraging. ${nm(5)}However, if you end the discussion there, the only feedback your friend is getting is about the outcome. ${nm(6)}Instead, continue the discussion by asking about the process. ${nm(7)}Ask her what she is doing to be so successful. ${nm(8)}What is she eating? ${nm(9)}Where is she working out? ${nm(10)}When the conversation focuses on the process of change rather than the outcome, it encourages her to keep making the change.</div></div></div>${FT}<div class="bp">26</div>`);
+
+add("R07","문제 1-3",`<div class="qs" style="gap:24px">
+  <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글에서 필자가 주장하는 바로 가장 적절한 것은? ${chip("⑤")} ${exb("R07-1")}
+      <div class="opts one"><div>① 조언할 때는 상대방의 감정을 고려해야 한다.</div><div>② 지속적 변화를 위해서는 결과에 집중해야 한다.</div><div>③ 토론 중에는 지나치게 공격적인 질문을 삼가야 한다.</div><div>④ 다이어트에 성공하려면 구체적인 계획을 세워야 한다.</div><div><span class="ok">⑤</span> 행동을 바꾸려는 사람과는 과정에 초점을 두어 대화해야 한다.</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">주어진 말을 바르게 배열하여 윗글의 주제를 완성하시오. ${exb("R07-2")}
+      <div class="ln">(by asking / others / about processes / encourage)</div>
+      <div class="ln">→ how to ${b("encourage others by asking about processes","w")}</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R07-3")}
+      <div class="ln">(1) Positive feedback about outcomes can be very encouraging. ${b("T","s")}</div>
+      <div class="ln">(2) You shouldn’t ask your friend about what to eat or how to exercise for a diet. ${b("F","s")}</div></div></div>
+  </div>${FT}<div class="bp">26</div>`);
+
+add("R07","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R07-4")}
+      <div class="flow">
+        <div class="fw c2">You meet a friend who is losing <sup>(1)</sup>${b("weight")}.</div>
+        <div class="f2"><div><div class="fh c4">Outcome</div><div class="fc">Tell her that she <sup>(2)</sup>${b("looks great","m")}.</div></div>
+          <div><div class="fh c1">Process</div><div class="fc"><sup>(3)</sup>${b("Ask")} her what she is doing to be successful.</div></div></div>
+        <div class="fw c3">Talking about the <sup>(4)</sup>${b("process")} rather than the <sup>(5)</sup>${b("outcome")} encourages her to keep changing.</div>
+      </div></div></div></div>${FT}<div class="bp">26</div>`);
+
+const W7 = [
+  W("encourage","동","격려하다, 용기를 북돋워 주다"),W("discourage","동","낙담시키다, 용기를 잃게 하다",1),W("behavior","명","행동"),W("suppose","동","가정하다"),W("diet","명","다이어트, 식단"),W("lose weight","","체중이 줄다"),W("definitely","부","분명히"),W("positive","형","긍정적인"),W("comment","명","언급, 말"),
+  W("feedback","명","피드백, 반응"),W("encouraging","형","격려하는, 용기를 북돋워 주는"),W("discussion","명","논의, 토론"),W("outcome","명","결과"),W("result","명","결과",1),W("instead","부","대신에"),W("continue","동","계속하다"),W("process","명","과정"),
+  W("successful","형","성공적인"),W("success","명","성공",1),W("work out","","운동하다"),W("conversation","명","대화")];
+
+add("R07","Read Closely 1",rcSlide(
+  sen(1,"How do you encourage your friends who are trying to change their behavior?")+
+  sen(2,"Suppose you see a friend who has been working on a diet and losing a lot of weight.",2)+
+  sen(3,"Definitely, you would want to tell her that she looks great.")+
+  sen(4,"Anyone who hears positive comments will feel good, and this feedback will also be very encouraging.",2),
+  W7.slice(0,9).join(""), 27));
+
+add("R07","Read Closely 2",rcSlide(
+  sen(5,"However, if you end the discussion there, the only feedback your friend is getting is about the outcome.")+
+  sen(6,"Instead, continue the discussion by asking about the process.")+
+  sen(7,`Ask her <span class="hl">what she is doing</span> to be so successful.`)+
+  gtip("간접의문문","의문문이 다른 문장의 일부가 되어 명사절 역할을 하는 것으로 ‘의문사 + 주어 + 동사’의 어순으로 써요.",["He asked me <b>where I worked</b>.","Do you know <b>how this machine works</b>?"]),
+  W7.slice(9,17).join(""), 27));
+
+add("R07","Read Closely 3",rcSlide(
+  sen(8,`What is she eating? <span class="nm in">9</span>Where is she working out?`)+
+  sen(10,"When the conversation focuses on the process of change rather than the outcome, it encourages her to keep making the change.",2),
+  W7.slice(17).join(""), 27));
+
+/* ===== Memory POP ===== */
+const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+add("POP","1",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">1</span>괄호 안에서 문맥상 적절한 단어를 고르시오. ${exb("POP-1")}</h4><ol>
+    <li>(1) City life is busy and [slow-paced / fast-paced]. ${chip("fast-paced")}</li>
+    <li>(2) I’m thirsty. Please [fill / empty] my glass with water. ${chip("fill")}</li>
+    <li>(3) The instructions are easy and simple to [follow / lead]. ${chip("follow")}</li>
+    <li>(4) Her [discouraging / encouraging] words gave me hope. ${chip("encouraging")}</li>
+    <li>(5) Sadness is a(n) [discussion / emotion] that everyone feels. ${chip("emotion")}</li></ol></div>
+  </div>${FT}<div class="bp">28</div>`);
+add("POP","2",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">2</span>우리말과 의미가 같도록 빈칸에 알맞은 표현을 <span class="bk1">보기</span>에서 골라 쓰시오. ${exb("POP-2")}</h4>
+    <div class="bogi"><span>pay attention</span><span>work out</span><span>slow down</span><span>on top of</span></div><ol>
+    <li><span class="ko">(1) 나는 건강을 유지하기 위해 체육관에서 운동한다.</span><span class="en">→ I ${b("work out","m")} at the gym to stay healthy.</span></li>
+    <li><span class="ko">(2) 운전자들은 스쿨존에서 속도를 줄여야 한다.</span><span class="en">→ Drivers have to ${b("slow down","m")} in the school zone.</span></li>
+    <li><span class="ko">(3) 너는 다른 사람들이 말할 때 집중해야 한다.</span><span class="en">→ You should ${b("pay attention","m")} when others are talking.</span></li>
+    <li><span class="ko">(4) 그는 숙제에 더해 발표까지 준비해야 했다.</span><span class="en">→ ${b("On top of","m")} his homework, he had to prepare a presentation.</span></li></ol></div>
+  </div>${FT}<div class="bp">28</div>`);
+
+add("POP","3",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">3</span>다음 문장이 어법에 맞으면 ○표, 그렇지 <u>않으면</u> 틀린 부분을 바르게 고치시오. ${exb("POP-3")}</h4><ol>
+    <li>(1) I wonder how did he solve the problem. ${chip("did he solve → he solved")}</li>
+    <li>(2) I met a girl whose mother is a famous chef. ${chip("○")}</li>
+    <li>(3) Her speech made us thinking about the future. ${chip("thinking → think")}</li>
+    <li>(4) We visited a village which houses are built of stone. ${chip("which → whose")}</li>
+    <li>(5) Run for thirty minutes a day, or you will be healthier. ${chip("or → and")}</li></ol></div>
+  </div>${FT}<div class="bp">28</div>`);
+add("POP","4",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">4</span>우리말과 의미가 같도록 주어진 말을 바르게 배열하시오. ${exb("POP-4")}</h4><ol>
+    <li><span class="ko">(1) 그는 강의가 매우 인기 있는 수학 선생님이다. (popular / class / is / whose / very)</span><span class="en">→ He is a math teacher ${b("whose class is very popular","m")}.</span></li>
+    <li><span class="ko">(2) Ted는 그의 남동생에게 기차표를 예약하게 했다. (brother / book / his / had)</span><span class="en">→ Ted ${b("had his brother book","m")} the train tickets.</span></li>
+    <li><span class="ko">(3) 네가 그 셔츠를 어디서 샀는지 내게 말해줄 수 있니? (me / that shirt / bought / you / tell / where)</span><span class="en">→ Can you ${b("tell me where you bought that shirt","m")}?</span></li></ol></div>
+  </div>${FT}<div class="bp">29</div>`);
+
+add("POP","A",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">A</span>다음 글의 밑줄 친 부분 중, 문맥상 낱말의 쓰임이 적절하지 <u>않은</u> 것은? ${chip("⑤")} ${exb("POP-A")}</h4>
+  <p>“You choose, I’ll follow.” This is the idea behind ditto spending. “Ditto” means “me too.” So “ditto spending” means buying the same things as others whose taste or style is ① <u>similar</u> to yours. Because of social media, ditto spending is ② <u>growing</u> fast. For example, many people follow a star or influencer whose style they like. They often buy the same things—such as clothes, food, or other items—as this person. They think, “If it’s good for them, it must be good for me, too.” This kind of spending can feel ③ <u>easy</u> and safe, but it can cause problems. People may buy things they don’t really need and waste money. They might ④ <u>lose</u> their own style and feel unhappy with what they bought. In the end, they may <span class="ok">⑤</span> <u>gain</u> the chance to make their own decisions.</p></div>
+  ${FT}<div class="bp">29</div>`);
+
+add("POP","B",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">B</span>다음 글의 밑줄 친 부분 중, 어법상 <u>틀린</u> 것은? ${chip("③")} ${exb("POP-B")}</h4>
+  <p>Our emotions are important because they help us survive. Fear keeps us away from danger. Anger can scare away our enemies. And good feelings help us ① <u>get</u> closer to others. These emotions work like “programs” in our brains. When something happens, an emotion starts and controls ② <u>what</u> we do. It changes how we pay attention, how we move, and what we remember. For example, when we meet our enemies, fear makes us <span class="ok">③</span> <u>to focus</u> more on the danger. Then we can choose to fight or run away. We also remember this kind of scary event more clearly, so we can stay ④ <u>safe</u> in the future. Thus, each emotion helps protect us. If emotions did not help us survive, we would not still have ⑤ <u>them</u> today.</p></div>
+  ${FT}<div class="bp">29</div>`);
+
+
+/* ---------- 화면 ---------- */
+const stage = document.getElementById("stage");
+let slides = [];
+const slideHTML = x => x.raw ? x.raw : `<section class="slide ${x.cls||""}">${x.html}<div class="pg"></div></section>`;
+function render(){
+  stage.innerHTML = SS.map(slideHTML).join("");
+  slides = [...stage.querySelectorAll(".slide")];
+  slides.forEach((s,i)=>{ const p=s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
+}
+/* 본문: 한 줄에 한 문장씩 나누고, 슬라이드에 들어가는 가장 큰 글씨로 맞춤 */
+function splitPsg(){
+  stage.querySelectorAll(".psg:not(.one)").forEach(p=>{
+    const rows = []; let row = null;
+    [...p.childNodes].forEach(nd=>{
+      if(nd.nodeType===1 && nd.classList.contains("nm")){ row = document.createElement("div"); row.className = "ps1"; rows.push(row); }
+      if(row){ if(nd.nodeType===3) nd.textContent = nd.textContent.replace(/^⁠/,""); row.appendChild(nd); }
+    });
+    rows.forEach(r=>{ r.lastChild.nodeType===3 && (r.lastChild.textContent = r.lastChild.textContent.replace(/\s+$/,"")); });
+    p.replaceChildren(...rows); p.classList.add("one");
+  });
+}
+function fitPsg(){
+  slides.forEach(sl=>{
+    const p = sl.querySelector(".psg.one"); if(!p) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const lim = 664;
+    for(let f=25; f>=17; f-=.5){
+      p.style.fontSize = f+"px";
+      if(p.offsetTop + p.offsetHeight <= lim) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitRc(){
+  slides.forEach(sl=>{
+    const ss = sl.querySelector(".rc .ss"); if(!ss) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const top = sl.getBoundingClientRect().top, sc = sl.getBoundingClientRect().height/720;
+    for(let f=28; f>=22; f-=.5){
+      ss.querySelectorAll(".sen").forEach(e=>e.style.fontSize = f+"px");
+      const last = ss.lastElementChild.getBoundingClientRect().bottom;
+      if((last-top)/sc <= 668) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+/* 해설 창: 위쪽 문제는 아래에, 아래쪽 문제는 위에 띄움 */
+function placeEx(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const t = sl.getBoundingClientRect(), sc = t.height/720;
+    sl.querySelectorAll(".exq").forEach(q=>{ q.classList.toggle("lo", (q.getBoundingClientRect().top - t.top)/sc < 330); });
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitKo(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    sl.querySelectorAll(".wls").forEach(w=>{
+      const ko = w.querySelector(".ko"); let n = w.querySelectorAll(".wl").length;
+      while(ko.offsetHeight > n*34 + 2 && n < 4){ ko.insertAdjacentHTML("beforebegin",'<div class="wl"></div>'); n++; }
+    });
+    if(!was) sl.classList.remove("on");
+  });
+}
+stage.addEventListener("click", e=>{ const q = e.target.closest(".q"); if(!q) return; q.classList.toggle("open");
+  if(q.classList.contains("exq") && q.classList.contains("open")) q.closest(".slide").querySelectorAll(".exq.open").forEach(o=>{ if(o!==q) o.click(); }); });
+render();
+
+let cur = 0;
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+}
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+}
+function tg(c){ document.body.classList.toggle(c); }
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+addEventListener("resize", fit);
+addEventListener("keydown", e=>{
+  const k = e.key;
+  if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
+  else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home") go(0);
+  else if(k==="End") go(slides.length-1);
+  else if(k==="f"||k==="F") fs();
+});
+fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+splitPsg(); fitPsg(); fitKo(); fitRc(); placeEx(); document.fonts.ready.then(()=>{ fitPsg(); fitKo(); fitRc(); placeEx(); });
+</script>
+<script src="https://s2ionn.github.io/class-tools/board.js"></script>
+<script>
+/* 아래 막대에 정답 버튼: 이 장의 정답을 한꺼번에 보이기/숨기기 (A) */
+(function addAns(){
+  const ui = document.getElementById("ui"), ko = document.getElementById("koBtn");
+  if(!ko) return setTimeout(addAns, 100);
+  ko.insertAdjacentHTML("beforebegin", `<button id="ansBtn" title="정답 보이기/숨기기 (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg><span>정답</span></button>`);
+  const btn = document.getElementById("ansBtn");
+  const qs = () => slides[cur] ? [...slides[cur].querySelectorAll(".q:not(.exq)")] : [];
+  function sync(){ const q = qs(); btn.style.display = q.length ? "" : "none"; btn.classList.toggle("on", q.length>0 && q.every(x=>x.classList.contains("open"))); }
+  function toggle(){ const q = qs(), all = q.length && q.every(x=>x.classList.contains("open")); q.forEach(x=>{ if(x.classList.contains("open")===all) x.click(); }); sync(); }
+  btn.onclick = toggle;
+  addEventListener("keydown", e=>{ if((e.key==="a"||e.key==="A") && !e.ctrlKey && !e.metaKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) toggle(); });
+  setInterval(sync, 300); sync();
+})();
+</script>
+</body>
+</html>
