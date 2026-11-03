@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리딩바이트2 Unit 03 제목 추론하기</title>
+<style>
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:100 500;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:600 900;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{
+  --ink:#2f3448; --sub:#7d8199; --line:#e3e1ea; --paper:#FFFDF6; --bg:#2a2d3d;
+  --navy:#6f7296; --brown:#6f7296; --yel:#E2D4E0; --yel2:#efe7f0; --red:#c05a7a;
+  --green:#7C7E9D; --teal:#8a8fb0; --tealbg:#e4e6ef; --purple:#4C5372; --purplebg:#ece4ee;
+  --dot:#6f7296; --pop:#f1ecf3; --cream:#f0eef5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;word-break:keep-all}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{display:none;position:absolute;inset:0;background:var(--paper);overflow:hidden}
+.slide.on{display:block}
+.ft{position:absolute;left:28px;bottom:14px;font-size:13px;color:#8f93aa}
+.ft b{color:#3e4560;font-weight:700}
+.pg{position:absolute;left:250px;bottom:14px;font-size:13px;color:#8f93aa;font-variant-numeric:tabular-nums}
+.bp{position:absolute;right:28px;top:20px;font:700 20px Hyemin,sans-serif;color:#3e4560}
+
+/* 표지 */
+.cover{background:#FFFDF6}
+.cover .side{position:absolute;right:0;top:0;bottom:0;width:430px;background:#7C7E9D;color:#fff;padding:64px 56px}
+.cover .side .pt{font:400 26px Title,sans-serif;color:#E2D4E0;letter-spacing:.04em}
+.cover .side .pt b{font-weight:400;font-size:64px;display:block;line-height:1;margin-top:6px}
+.cover .side h2{font:400 44px/1.25 Title,sans-serif;margin-top:28px}
+.cover .side ol{list-style:none;position:absolute;left:56px;right:56px;bottom:120px;border-top:1.5px solid rgba(255,255,255,.45)}
+.cover .side li{display:flex;justify-content:space-between;font:700 19px/1 Hyemin,sans-serif;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.25)}
+.cover .side li.on{color:#E2D4E0}
+.cover .main{position:absolute;left:96px;top:0;bottom:0;width:640px;display:flex;flex-direction:column;justify-content:center}
+.cover .bk{font:700 20px Hyemin,sans-serif;color:#8f93aa;letter-spacing:.02em}
+.cover .un{font:400 34px Title,sans-serif;color:#949AB1;margin-top:46px}
+.cover h1{font:400 92px/1.1 Title,sans-serif;color:#4C5372;margin-top:6px}
+.cover .rule{width:72px;height:6px;background:#E2D4E0;border-radius:3px;margin:30px 0 26px}
+.cover .rd3{display:flex;gap:10px}
+.cover .rd3 span{font:700 18px Hyemin,sans-serif;color:#4C5372;background:#E2D4E0;border-radius:999px;padding:7px 18px}
+
+/* PART 소개 */
+.intro{background:#f3eef4;padding:56px 90px}
+.intro .q3{display:grid;gap:26px;max-width:880px}
+.intro h3{display:inline-block;font:900 25px Hyemin,sans-serif;color:#fff;background:var(--navy);border:0;border-radius:999px;padding:4px 26px;margin-bottom:10px}
+.intro p,.intro li{font-size:21px;line-height:1.6;color:var(--ink)}
+.intro ul{list-style:none;display:grid;gap:4px}
+.intro li{padding-left:30px;position:relative}
+.intro li::before{content:"";position:absolute;left:4px;top:10px;width:13px;height:8px;border-left:3px solid var(--red);border-bottom:3px solid var(--red);transform:rotate(-45deg)}
+.intro .types{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:center;margin:6px 0 0 30px;max-width:520px}
+.intro .types b{font-size:21px;color:var(--ink)}
+.intro .types s{border-bottom:2px dotted #b9bdd0;text-decoration:none;height:0}
+.intro .types span{font:700 15px Hyemin,sans-serif;color:#fff;background:var(--brown);padding:3px 18px 3px 12px;clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%)}
+.intro .types span em{color:var(--yel);font-style:normal}
+
+/* 본문(READING) */
+.rd{display:grid;grid-template-columns:240px 1fr;height:100%}
+.rd .side{background:var(--cream);border-right:1px solid var(--line);padding:34px 22px 0 34px;position:relative}
+.tagR{font:400 20px Title,sans-serif;color:var(--navy);background:var(--yel);border-radius:999px;padding:3px 14px;display:inline-block}
+.bigN{font:900 120px/1 Title,sans-serif;color:var(--navy);margin-top:6px}
+.bigN span{color:#fff;-webkit-text-stroke:0}
+.gichul{display:inline-block;margin-top:14px;font:700 14px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:4px 12px}
+.hash{margin-top:34px}
+.hash h4{font:900 16px Hyemin,sans-serif;color:var(--navy)}
+.hash h4 span{background:var(--yel2);padding:0 3px}
+.hash div{border-bottom:2px dashed #949AB1;height:44px;line-height:52px;font-size:17px;color:#8f93aa}
+.hash p{font:400 14px Hyemin,sans-serif;color:#6a6f8e;margin-top:8px;line-height:1.5}
+.hash .q{margin-top:12px}
+.rd .main{padding:30px 50px 40px 40px}
+.psg{font-size:24px;line-height:2;color:var(--ink);text-align:justify}
+.nm{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--dot);color:#fff;font:700 11px Hyemin,sans-serif;align-items:center;justify-content:center;vertical-align:11px;margin:0 3px 0 6px}
+.nm:first-child{margin-left:0}
+.psg.one{text-align:left;display:grid;gap:0}
+.psg.one .ps1{position:relative;padding-left:34px;line-height:1.5;padding:4px 0 5px 36px;border-bottom:1px solid #ebe8f0}
+.psg.one .ps1:last-child{border-bottom:0}
+.psg.one .ps1 .nm{position:absolute;left:0;top:calc(4px + .38em);margin:0;width:22px;height:22px;font-size:12px;vertical-align:0}
+.rd{position:relative}
+.fn{position:absolute;left:34px;bottom:48px;text-align:left!important;font-size:15px;color:#5a6080;margin-top:6px}
+
+/* 문제 */
+.qs{padding:40px 70px 40px 70px;display:grid;gap:30px;align-content:start}
+.qi{display:grid;grid-template-columns:56px 1fr;column-gap:10px}
+.qi .no{font:900 40px/1 Hyemin,sans-serif;color:var(--navy);text-align:center}
+.qi .bdg{display:block;margin:6px auto 0;width:40px;font:700 13px/1.2 Hyemin,sans-serif;color:#fff;text-align:center;padding:5px 2px;border-radius:6px 6px 14px 14px}
+.bdg.g{background:var(--green)}.bdg.r{background:var(--red)}
+.qi .tag2{display:block;font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:2px 8px;width:max-content;margin:0 auto 4px}
+.qi .tx{font-size:23px;line-height:1.55;padding-top:4px}
+.qi .tx u{text-underline-offset:4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:4px 40px;margin-top:10px;font-size:22px;font-family:Hyemin,sans-serif}
+.opts.one{grid-template-columns:1fr}
+.opts.en{font-family:Hyemin,sans-serif;font-size:23px}
+.ln{margin-top:10px;font-size:23px}
+.wd{text-align:right;font-size:22px;margin-top:4px}
+
+/* 정답 가리기 */
+.q{cursor:pointer}
+.q i{font-style:normal;visibility:hidden;color:#e0262f;font-weight:700}
+.q.open i{visibility:visible}
+.b{display:inline-block;min-width:110px;border-bottom:1.5px solid var(--navy);text-align:center;padding:0 6px;line-height:1.25}
+.b.w{min-width:520px}.b.m{min-width:260px}.b.s{min-width:70px}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-left:14px;vertical-align:2px}
+.chip b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--navy);border-radius:5px;padding:2px 8px}
+.chip.open b{background:#e0262f}
+.chip i{font-size:20px}
+.ok{display:inline-flex;width:1.2em;height:1.2em;align-items:center;justify-content:center;border-radius:50%;vertical-align:-.12em;margin:0 .04em;text-indent:0}
+.slide:has(.chip.open) .ok{color:#e0262f;font-weight:900;box-shadow:0 0 0 2.5px #e0262f;background:#fff0f0}
+@media print{.ok{color:#e0262f;box-shadow:0 0 0 2.5px #e0262f}}
+
+/* 구조 이해 표 */
+.tbl{display:grid;gap:8px;margin-top:12px}
+.tbl .r{display:grid;grid-template-columns:200px 1fr;border:1px solid var(--line);background:#fff;border-radius:6px;overflow:hidden}
+.tbl .h{display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;padding:8px;line-height:1.3}
+.tbl .c{padding:12px 20px;font-size:22px;line-height:1.8}
+.c1{background:#f0e8ef;color:#4C5372}.c2{background:#e8e9f1;color:#4C5372}.c3{background:#eadcea;color:#6a5a78}.c4{background:#dfe2ec;color:#4C5372}.c5{background:#eadcea;color:#6a5a78}
+.tbl sup{font-size:12px;margin-right:1px}
+.tbl .b{min-width:96px}
+.tbl .ar{display:block;text-align:center;line-height:.6;font-size:18px}
+
+
+/* 번호별 해설 */
+.exq{display:inline-flex;margin-left:8px;vertical-align:2px}
+.exq>b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:5px;padding:2px 8px}
+.exq.open>b{background:var(--red)}
+.exq .pan{display:none;position:fixed;right:36px;top:92px;width:620px;max-height:560px;overflow:auto;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:12px 20px 14px;z-index:3;font:700 19px/1.6 Hyemin,sans-serif;color:var(--ink);text-align:left;text-indent:0;white-space:normal}
+.exq.lo .pan{top:auto;bottom:56px}
+.exq.open .pan{display:block}
+.pan .pt{display:block;font:700 16px Hyemin,sans-serif;color:var(--red);margin-bottom:4px}
+.pan .lb{display:inline-block;font:700 14px/1.5 Hyemin,sans-serif;color:#fff;background:var(--purple);border-radius:4px;padding:0 7px;margin-right:6px;vertical-align:1px}
+.pan .lb.o{background:var(--teal)}
+.pan .ko{display:block;color:#5a6080;margin-top:4px}
+.pan u{text-decoration:underline dotted var(--red);text-underline-offset:4px;text-decoration-thickness:2px}
+.pan .tbl{margin-top:6px;gap:5px}
+.pan .tbl .r{grid-template-columns:120px 1fr}
+.pan .tbl .h{font-size:16px;padding:6px}
+.pan .tbl .c{font-size:17px;line-height:1.6;padding:6px 12px}
+
+
+/* Unit 02 추가 */
+.qs.tight .tbl .c{font-size:20.5px;line-height:1.6;padding:7px 18px}
+.qs.tight .tbl{gap:6px}
+.cover .rd3{flex-wrap:wrap;max-width:600px}
+.cover .rd3 span{white-space:nowrap}
+.tbl .tth{text-align:center;font-size:21px;padding:8px;border-radius:6px;background:#dfe2ec;color:#4C5372;font-weight:700}
+.bxq{margin-top:12px;border:1.5px solid var(--line);border-radius:12px;padding:10px 20px;font-size:23px;line-height:1.8;background:#fff}
+.flow{display:grid;gap:8px;margin-top:12px}
+.flow .fw{text-align:center;border-radius:10px;padding:10px 16px;font-size:22px;line-height:1.7}
+.flow .f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.flow .fh{text-align:center;border-radius:10px 10px 0 0;padding:6px;font-size:21px}
+.flow .fc{border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:10px 14px;font-size:22px;line-height:1.7;background:#fff;text-align:center}
+.sen .nm.in{position:static;display:inline-flex;vertical-align:.35em;margin:0 6px 0 12px}
+.bk1{display:inline-block;font-size:15px;color:#fff;background:#7C7E9D;border-radius:5px;padding:0 8px;vertical-align:2px}
+.bogi{margin:12px 0 0 46px;border:1.5px dashed #b9bdd0;border-radius:12px;padding:8px 20px;display:flex;justify-content:space-around;font-size:22px}
+.sb{position:absolute;left:90px;right:90px;top:80px;border-left:4px solid #7C7E9D;padding:6px 0 6px 32px}
+.sbh{display:flex;align-items:center;gap:18px;font:700 26px Hyemin,sans-serif;color:var(--ink);margin-bottom:22px}
+.sbh span{font:400 26px Title,sans-serif;color:#fff;background:#7C7E9D;border-radius:14px 14px 0 0;padding:6px 22px 4px}
+.sbh span b{font-weight:400;color:#E2D4E0}
+.sb p{font-size:23px;line-height:1.95;text-align:justify}
+
+.mt{display:grid;grid-template-columns:1fr 260px;gap:30px;align-items:start}
+.mtr{display:grid;gap:14px;margin-top:8px}
+.mtr span{border:1.5px solid #e2d4e0;border-radius:10px;padding:10px 16px;font-size:22px;text-align:center;background:#fff}
+.flow .fc{text-align:left}
+/* Read Closely */
+.rch{position:absolute;left:0;top:24px;right:40px;height:88px}
+.rch .tab{position:absolute;left:0;top:0;z-index:2;width:262px;height:88px;background:#4C5372;border-radius:0 44px 44px 0;box-shadow:6px 0 0 var(--paper);padding:10px 0 0 48px;font:400 30px/1 Title,sans-serif;color:#fff}
+.rch .tab span{display:block;color:#E2D4E0}
+.rch .tab span+span{color:#fff;margin-top:3px;font-size:34px}
+.rch .ins{position:absolute;left:200px;right:0;top:16px;z-index:1;height:56px;background:#ece6f0;color:#3e4560;border-radius:28px;font:700 20px Hyemin,sans-serif;display:flex;align-items:center;justify-content:flex-end;padding-right:30px;gap:2px}
+.wv{text-decoration:underline wavy var(--red);text-underline-offset:5px;text-decoration-thickness:1.5px}
+.bx{border:1.5px solid var(--red);border-radius:7px;padding:0 4px}
+.red{color:var(--red)}
+.rc{position:absolute;left:0;right:0;top:128px;bottom:56px;display:grid;grid-template-columns:1fr 250px;column-gap:30px;padding:0 40px 0 76px}
+.rc .ss{display:flex;flex-direction:column;gap:2px}
+.sen{font:700 28px/1.45 Hyemin,sans-serif;color:var(--ink);position:relative;padding-left:4px}
+.sen .nm{position:absolute;left:-32px;top:.32em;margin:0;width:24px;height:24px;font-size:13px;background:#7C7E9D}
+.wl{height:34px;border-bottom:1.5px dashed #d8d3e3}
+.wls{position:relative}
+.wls .ko,.wls .kx{position:absolute;left:4px;right:0;top:4px;font:700 18px/34px Hyemin,sans-serif;color:var(--red)}
+.wls .ko .sl{color:#b9bdd0;margin:0 .15em}
+.wls .kx{display:none}
+.hideKo .wls .ko{visibility:hidden}
+.hideKo .wls .kx{display:block}
+.hl{background:var(--tealbg);padding:0 2px}
+.hp{background:var(--purplebg);padding:0 2px}
+.tip{font:500 16px/1.6 Hyemin,sans-serif;color:#3e4560;margin:8px 0 6px;padding:9px 16px;background:#f3eef4;border:1px solid #e2d4e0;border-radius:12px}
+.tip .lb{display:inline-block;font:700 15px Hyemin,sans-serif;color:#fff;border-radius:999px;padding:0 10px;margin-right:8px}
+.tip .lb.p{background:#4C5372}.tip .lb.t{background:#7C7E9D}
+.tip .ex{padding-left:18px;position:relative}
+.tip .ex::before{content:"";position:absolute;left:5px;top:11px;width:5px;height:5px;border-radius:50%;background:#6a6f8e}
+.tip u{text-underline-offset:4px;text-decoration-color:#8f93aa}
+.wds{background:#f3eef4;border-radius:16px;padding:14px 16px 12px;align-self:start;max-height:100%;overflow:hidden}
+.wds:empty{display:none}
+.wds h5{display:block;font:400 20px Title,sans-serif;color:#4C5372;padding-bottom:8px;margin-bottom:6px;border-bottom:2px solid #E2D4E0}
+.wds ul{list-style:none;display:grid;gap:0}
+.wds li{font-size:16.5px;line-height:1.35;color:#5a6080;padding:4px 0;border-bottom:1px dashed #e2d4e0}
+.wds li:last-child{border-bottom:0}
+.wds li b{color:#2f3448;font-weight:700;margin-right:4px}
+.wds li em{font-style:italic;color:#2f3448;margin-right:3px}
+.ps{display:inline-flex;width:17px;height:17px;border:0;background:#949AB1;color:#fff!important;border-radius:50%;font-size:10.5px;align-items:center;justify-content:center;vertical-align:1px;margin-right:3px;color:#5a6080}
+
+/* Memory POP */
+.mph{position:absolute;left:0;top:30px;height:62px;width:420px;background:var(--navy);border-radius:0 14px 14px 0;font:400 38px/62px Title,sans-serif;color:#fff;padding-left:100px}
+.mph span{color:var(--yel)}
+.mph .pop{position:absolute;right:-56px;top:-14px;width:84px;height:62px;border:3px solid var(--navy);border-radius:50%;background:#fff;color:var(--navy);font-size:22px;line-height:56px;text-align:center}
+.mp{position:absolute;left:0;right:0;top:122px;bottom:40px;padding:0 90px;display:grid;gap:26px;align-content:start}
+.mq h4{display:flex;gap:14px;font:700 23px Hyemin,sans-serif;align-items:baseline}
+.mq h4 .no{font:900 32px/1 Title,sans-serif;color:var(--red)}
+.mq ol{list-style:none;padding-left:46px;display:grid;gap:12px;margin-top:14px}
+.mq li{font-size:23px;line-height:1.55}
+.mq li .ko{display:block}
+.mq li .en{display:block;padding-left:28px}
+.mq u{text-underline-offset:4px}
+.pinkbg{position:absolute;inset:0;background:var(--pop)}
+.su{position:absolute;right:120px;top:26px;background:var(--navy);color:#fff;border-radius:12px;padding:6px 18px;font:400 22px/1.15 Title,sans-serif;text-align:center}
+.su span{color:var(--yel);display:block}
+.ab{position:absolute;left:90px;right:90px;top:96px;display:grid;gap:12px}
+.ab h4{display:flex;gap:14px;align-items:center;font:700 22px Hyemin,sans-serif}
+.ab h4 .c{display:inline-flex;width:44px;height:44px;border-radius:50%;background:var(--teal);color:#fff;font:900 26px Hyemin,sans-serif;align-items:center;justify-content:center}
+.ab p{font-size:22px;line-height:1.95;text-indent:1em;text-align:justify}
+.ab u{text-underline-offset:5px}
+
+@media print{
+  html,body{background:#fff;overflow:visible;height:auto}
+  #stage{position:static;transform:none!important}
+  .slide{display:block!important;position:relative;page-break-after:always;width:1280px;height:720px}
+  .q i{visibility:visible}
+  .exq{display:none!important}
+  @page{size:1280px 720px;margin:0}
+}
+.dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+</style>
+</head>
+<body class="hideKo">
+<div id="stage"></div>
+<div id="ui"></div>
+<script>
+/* ---------- 슬라이드 내용 ---------- */
+const FT = `<div class="ft">PART 1_<b>Unit 03</b> 제목 추론하기</div>`;
+const nm = n => `<span class="nm">${n}</span>&#8288;`;
+const b = (ans, cls="") => `<span class="q b ${cls}"><i>${ans}</i></span>`;
+const chip = ans => `<span class="q chip"><b>정답</b><i>${ans}</i></span>`;
+const ps = c => `<span class="ps">${c}</span>`;
+const W = (w, pos, m, cf) => `<li>${cf?"<em>cf.</em>":""}<b>${w}</b>${pos?ps(pos):""}${m}</li>`;
+const lines = k => `<div class="wl"></div>`.repeat(k);
+/* 끊어 읽기 해석 (해답지 Read Closely) — 해석 버튼(K)으로 보이기/숨기기 */
+const KO = {
+  R08:["세계 곳곳의 사람들은 / 독특한 전통을 가지고 있다 / 재물을 불러오는 / 새해에","예를 들어 / 미국의 남부 지역에서는 / 사람들이 특별한 요리를 먹는다 / 호핑 존이라는 이름의","이 요리는 만들어진다 / 콩과 다른 채소들로 / 동전과 달러 지폐처럼 생긴","사람들은 이 음식을 즐겨 먹는다 / 많은 돈을 얻기 위해 / 다가오는 해에","또 다른 예는 첫 발디딤이다 / 스코틀랜드의 새해 전통인","스코틀랜드 사람들은 믿는다 / 첫 번째 사람이 / 자정 이후에 집에 들어오는 / 행운과 재물을 불러올 것이라고 / 새해에","처음에 발을 들이는 사람은 키가 크고 잘생긴 남자여야 한다 / 검은색 머리카락을 가진","그는 들고 있어야 한다 / 상징적인 선물을 / 석탄, 소금, 그리고 케이크라는","그것들은 따뜻함, 재물, 그리고 음식을 상징한다 / 각각"],
+  R09:["Brian / 내가 너에게 한 남자에 대해 말해 줄게 / 내가 절대 잊지 못할","내 친구 Mark는 소방서에서 일하고 있었어 / 세계무역센터 근처에 있는","그의 동료 한 명이 / 2001년 9월 11일에 근무할 예정이었어 / 하지만 그의 아내가 병원에 가야 했지 / 아기를 낳기 위해","그래서 Mark가 그 대신 근무했어 // 너는 아니 / 그날 무슨 일이 있었는지","911 테러요 / 내가 대답했다","Mark는 최초의 사람들 중 하나였어 / 세계무역센터 안으로 뛰어든 / 아빠는 잠시 말을 멈추었다","몇몇 사람들이 / 건물 밖으로 뛰어나오던 / 말했지 / 소방대원 한 명이 있어요 / 저 위에","그가 우리를 이곳에서 빠져나오게 해 주었어요 // 그를 도와주세요","하지만 / 너무 늦었어 // 그는 결코 밖으로 나오지 못했지","그는 말이 없었다 / 잠시 동안 // 잘 들어라 Brian // Mark는 진정한 영웅이었어","바로 나였어 / 나의 (근무) 일정을 바꾼 것은 / 그리고 네가 그 아기였단다 / 그날 태어난","우리는 여기 있는 거란다 / 그 덕분에"],
+  R10:["고래는 거대한 탄소 저장고이다","고래 한 마리가 죽으면 / 그것은 바다 밑바닥으로 가라앉는다 / 약 30톤의 이산화탄소를 지닌 채 / 그것의 몸 안에","이 탄소는 깊이 머무른다 / 바닷속에 / 오랫동안","나무 한 그루는 흡수한다 / 약 22킬로그램의 이산화탄소만을 / 1년에 / 그래서 고래 한 마리는 수천 그루의 나무와 같다","고래는 또한 바다를 돕는다 / 또 다른 방식으로","그들의 배설물은 먹이가 된다 / 작은 식물을 위한 / 식물성 플랑크톤이라고 불리는","이 작은 식물들은 또한 탄소를 제거한다 / 공기 중에서","그것이 과학자들이 고래를 부르는 이유이다 / ‘지구의 수호자’라고","2019년에 / 몇몇 전문가들은 말했다 / 한 마리의 고래는 가치가 있다 / 2백만 달러가 넘는 / 왜냐하면 그것은 자연에 매우 많은 도움이 되기 때문이다","그러나 많은 고래들이 과거에 사냥당했다 / 그리고 그들의 수가 줄어들었다","계획이 필요하다 / 고래를 보호하기 위해서","그들은 중요한 열쇠가 될 수 있다 / 기후 변화를 늦추는 데에"]};
+let CUR = "R08";
+const koHTML = t => t.replace(/ \/\/ /g,' <span class="sl">//</span> ').replace(/ \/ /g,' <span class="sl">/</span> ');
+const sen = (n, t, k=1, kx="") => `<div class="sen">${nm(n)}${t}</div><div class="wls">${lines(k)}<span class="ko">${koHTML(KO[CUR][n-1])}</span>${kx?`<span class="kx">${kx}</span>`:""}</div>`;
+
+function rdSide(n, opt={}){
+  return `<div class="side">
+    <span class="tagR">READING</span>
+    <div class="bigN">${String(n).padStart(2,"0")}</div>
+    ${opt.gichul ? `<span class="gichul">고1 모의고사 기출 응용</span>` : ""}
+    <div class="hash"><h4>Add Your <span>Hashtags!</span></h4>
+      <div>#</div><div>#</div><div>#</div>
+      <div class="q chip" style="margin-left:0;border:0;height:auto;line-height:1.5;display:flex;flex-wrap:wrap"><b>예시</b><i style="font-size:15px">${opt.ex}</i></div>
+    </div></div>`;
+}
+function rcHead(){
+  return `<div class="rch"><div class="tab"><span>Read</span><span>Closely</span></div>
+    <div class="ins">의미 단위로 끊어 읽고(<span class="red">/</span>), <span class="wv red">주어</span>와&nbsp;<span class="bx red">동사</span>에 표시해 봅시다.</div></div>`;
+}
+const rcSlide = (sents, words, page) => `${rcHead()}
+  <div class="rc"><div class="ss">${sents}</div><div class="wds">${words?`<h5>Words</h5><ul>${words}</ul>`:""}</div></div>${FT}<div class="bp">${page}</div>`;
+
+const SS = [];
+const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+
+
+/* 정답과 해설 (해답지) */
+const HS = t => `<span class="lb">해석</span>${t}`;
+const OD = t => `<span class="lb o">오답풀이</span>${t}`;
+
+const KO2 = t => `<span class="ko">${t}</span>`;
+const EX = {
+ "R08-1": `새해에 재물을 불러온다고 전해지는 미국 남부와 스코틀랜드의 전통을 소개하는 내용이므로, 글의 제목으로 가장 적절한 것은 ② ‘부를 위한 새해의 전통’이다.${KO2(HS("① 1년 안에 부자가 되는 방법 ③ 행운을 가져다주는 음식들 ④ 첫 발디딤: 스코틀랜드의 전통 ⑤ 새해를 축하하는 가장 좋은 방법"))}`,
+ "R08-2": `(1) 미국 남부 지역에서는 돈처럼 생긴 채소들로 만들어진 호핑 존이라는 요리를 먹으며 부를 기원하므로 money(돈)가 적절하다.<br>(2) 스코틀랜드에서는 새해 자정 이후에 처음 집안에 발을 디디는 사람이 새해에 복을 불러올 것이라고 했으므로 enter(들어가다)가 적절하다.${KO2(HS("(1) 미국 남부 지역에서, 사람들은 많은 돈을 기원하기 위해 호핑 존을 먹는다.<br>(2) 스코틀랜드 전통에서, 첫 발을 디디는 사람은 새해에 집에 들어오는 첫 번째 사람이다."))}`,
+ "R08-3": `스코틀랜드의 새해 전통에서는 ‘첫 발을 디디는 사람’이 집에 들어올 때, 따뜻함의 상징인 석탄, 재물을 상징하는 소금, 그리고 음식을 의미하는 케이크를 들고 있어야 한다.${KO2(HS("(1) 석탄 → 따뜻함 (2) 소금 → 재물 (3) 케이크 → 음식"))}`,
+ "R08-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c4">주제</div><div class="c">(1) <u>새해</u>를 위해</div></div>
+    <div class="r"><div class="h c1">미국의 남부 지역</div><div class="c">사람들은 (4) <u>돈</u>처럼 생긴 (3) <u>콩</u>과 다른 채소들로 만든 (2) <u>요리</u>, 호핑 존을 먹는다.</div></div>
+    <div class="r"><div class="h c2">스코틀랜드</div><div class="c">첫 발을 디디는 사람은 (7) <u>상징적인</u> 선물을 들고, (6) <u>검은</u> 머리카락을 가진 키가 크고 잘생긴 (5) <u>남자</u>여야 한다.</div></div></div>`,
+ "R09-1": `소방대원인 Mark는 911 테러 당시 필자의 아버지와 근무 시간을 바꿔 주어서 필자가 무사히 태어나는 데 도움을 주었지만, 본인은 건물 안의 사람들을 구하다가 죽게 되었다는 내용이므로 글의 제목으로 ④ ‘내 가족의 영웅 이야기’가 가장 적절하다.${KO2(OD("① 나의 영웅, 나의 아빠 ② 소방대원들이 하는 일 ③ 9월 11일의 비극 ⑤ 소방대원으로 일하는 것의 어려움"))}`,
+ "R09-2": "(a) 본래 2001년 9월 11일에 근무하기로 되어 있었던 Mark의 친구는 Brian의 아버지이다.<br>(b) his wife는 Brian의 어머니를 가리키므로 2001년 9월 11일에 출생 예정이었던 그들의 아기는 Brian이다.",
+ "R09-3": `(1) Mark는 세계무역센터 근처의 소방서에서 일했고, 911 테러가 일어났을 때 세계무역센터에 가서 구조 작업을 했다.<br>(2) 건물 밖으로 뛰쳐나온 사람들이 한 소방관이 건물 안에 있다고 말했다.${KO2(HS("(1) Mark는 세계무역센터에서 일했다.<br>(2) 2001년 9월 11일에 아무도 건물 밖으로 뛰쳐나오지 않았다."))}`,
+ "R09-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c4">Mark</div><div class="c"><span class="dt"></span>그는 Brian의 아버지와 (1) <u>소방서</u>에서 일했다.<br><span class="dt"></span>2001년 9월 11일, 그는 Brian의 어머니가 (3) <u>아기</u>를 출산할 예정이어서 Brian 아버지의 (2) <u>근무</u>를 대신했다.<br><span class="dt"></span>9/11 (4) <u>테러</u>에서 그는 사람들을 구하다가 목숨을 잃었다.<br><span class="dt"></span>Brian의 아버지는 Mark를 진정한 (5) <u>영웅</u>이라고 부른다.</div></div></div>`,
+ "R10-1": `고래는 많은 양의 탄소를 저장해서 기후 변화와 환경을 지키는 데 중요한 역할을 하므로 보호해야 한다는 내용의 글이므로, 글의 제목으로 가장 적절한 것은 ① ‘고래를 구하는 것은 지구를 구하는 것을 의미한다’이다.${KO2(OD("② 기후 변화가 어떻게 고래의 서식지를 해치는가 ③ 왜 고래가 바다에서 사라지고 있을까? ④ 고래 사냥 산업의 진실 ⑤ 고래가 너무 많으면 어떤 일이 생길까?"))}`,
+ "R10-2": `(2) 고래의 배설물이 공기 중의 탄소를 제거하는 식물성 플랑크톤의 먹이가 되므로 고래를 ‘지구의 수호자’라고 부른다.${KO2(HS("(1) 한 마리의 고래는 수천 그루의 나무만큼 많은 탄소를 제거할 수 있다.<br>(2) 식물성 플랑크톤은 공기 중의 탄소를 제거하기 때문에 ‘지구의 수호자’로 불린다."))}`,
+ "R10-3": `2019년 몇몇 전문가들은 한 마리의 고래는 자연에 2백만 달러가 넘는 가치가 있다고 말했다.${KO2(HS("Q: 한 마리의 고래는 자연에 얼마만큼의 가치가 있는가?<br>→ 한 마리의 고래는 자연에 <u>2백만 달러</u>가 넘는 가치가 있다."))}`,
+ "R10-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c1">고래의 역할</div><div class="c"><span class="dt"></span>고래는 많은 (1) <u>탄소</u>를 저장할 수 있다.<br><span class="dt"></span>고래의 (2) <u>배설물</u>은 식물성 플랑크톤이 자라는 데 도움을 주고, 그들은 탄소를 흡수한다.</div></div>
+    <div class="r"><div class="h c5">문제점</div><div class="c">많은 고래들은 (3) <u>사냥당해서</u> 그들의 수는 줄어들었다.</div></div>
+    <div class="r"><div class="h c2">해결책</div><div class="c">우리는 고래를 (4) <u>보호하기</u> 위한 계획이 필요하다.</div></div>
+    <div class="r"><div class="h c4">핵심 메시지</div><div class="c">고래는 (5) <u>기후 변화</u>를 늦추는 데 중요하다.</div></div></div>`,
+ "POP-1": `${HS("")}${KO2("(1) 야생 동물들은 살아남기 위해 <u>사냥할</u> 필요가 있다.<br>(2) 그 컵과 그 접시는 <u>각각</u> 5달러와 3달러이다.<br>(3) 그는 아동 도서관을 짓는 데 그의 <u>재산</u>을 썼다.<br>(4) 그 드레스의 <u>독특한</u> 무늬가 그것을 특별하게 만들었다.<br>(5) 그 작은 보트는 매우 가벼워서 <u>가라앉지</u> 않을 것이다.")}`,
+ "POP-2": `(1) be worth: ~의 가치가 있다<br>(2) give birth to: ~을 낳다<br>(3) be made with: ~로 만들어지다<br>(4) be scheduled to: ~하도록 예정되어 있다${KO2(HS("(1) 이 오래된 그림은 수백만 달러의 <u>가치가 있을</u> 수 있다.<br>(2) 그 고양이는 새끼 고양이들을 <u>낳을</u> 것이다.<br>(3) 그 주스는 신선한 복숭아로 <u>만들어졌다</u>고 한다.<br>(4) 그 회의는 오후 3시에 시작<u>할 예정이다</u>."))}`,
+ "POP-3": `(1) Peter broke the window.의 주어 Peter를 강조하는 「It was ~ that …」 강조 구문이 되어야 하므로 It이 적절하다.<br>(2) I want to read this book.의 목적어 this book을 강조하는 「It is ~ that …」 강조 구문이 되어야 하므로 that이 적절하다.<br>(3) 케이팝이 전 세계 팬들로부터 사랑받는 것이므로 「be동사 + 과거분사 + by 행위자」의 수동태가 되어야 한다. 따라서 is loved가 적절하다.<br>(4) ‘기다리고 있을 것이다’라는 의미의 조동사의 진행시제 「조동사 + be + 현재분사」 형태가 되어야 한다. 따라서 will be waiting이 적절하다.<br>(5) 창문이 청소되는 것이므로 수동태 「be동사 + 과거분사」 형태인 are cleaned가 적절하다.${KO2(HS("(1) 창문을 깬 것은 바로 Peter이다.<br>(2) 이것이 내가 읽고 싶은 바로 그 책이다.<br>(3) K-pop은 전 세계적으로 팬들에게 사랑받는다.<br>(4) 우리는 역에서 너를 기다리고 있을 것이다.<br>(5) 창문들은 매일 아침 청소된다."))}`,
+ "POP-4": "(1) ‘~하고 있을지도 모른다’는 의미가 되도록 조동사의 진행시제 「조동사(might) + be + 현재분사」 형태로 쓴다. play를 현재분사 playing으로 바꿔 써야 한다.<br>(2) ‘~에 의해 쓰였다’는 수동태의 의미가 되도록 「be동사 + 과거분사 + by 행위자」 형태로 쓴다. write를 과거분사 written으로 바꿔 써야 한다.<br>(3) 목적어 Jenny를 강조하여 「It was + 강조 대상(Jenny) + that + 주어 + 동사」 형태로 쓴다. 과거시제이므로 be동사를 was로 쓴다.",
+ "POP-A": `많은 고래가 과거에 사냥되어서 그 수가 줄어들었다는 내용으로 이어지는 것이 문맥상 자연스럽다. 따라서 ④ increased(늘었다)를 decreased(줄어들었다)와 같은 낱말로 바꿔야 한다.${KO2(HS("READING 10 지문해석 참조"))}`,
+ "POP-B": `⑤ the baby를 선행사로 하는 주격 관계대명사가 되어야 하므로 whom을 who로 고쳐야 한다.${KO2(HS("READING 09 지문해석 참조"))}`
+};
+const exb = k => `<span class="q exq"><b>해설</b><span class="pan"><span class="pt">${k.split("-")[1]}번 해설</span>${EX[k]}</span></span>`;
+const gtip = (t, body, ex) => `<div class="tip"><span class="lb t">문법 TIP</span><b>${t}:</b> ${body}${ex.map(e=>`<div class="ex">${e}</div>`).join("")}</div>`;
+
+/* 표지 */
+add("U03","표지",`
+  <div class="main">
+    <div class="bk">Reading BITE GRADE 2</div>
+    <div class="un">Unit 03</div>
+    <h1>제목<br>추론하기</h1>
+    <div class="rule"></div>
+    <div class="rd3"><span>READING 08</span><span>READING 09</span><span>READING 10</span><span>Memory POP</span></div>
+  </div>
+  <div class="side">
+    <div class="pt">PART<b>01</b></div>
+    <h2>중심 내용<br>파악하기</h2>
+    <ol><li><span>Unit 01 주제 파악하기</span><span>12</span></li><li><span>Unit 02 요지·주장 파악하기</span><span>20</span></li><li class="on"><span>Unit 03 제목 추론하기</span><span>30</span></li><li><span>Unit 04 요약문 완성하기</span><span>38</span></li></ol>
+  </div>`, "cover");
+
+/* ===== READING 08 ===== */
+add("R08","본문",`<div class="rd">${rdSide(8,{ex:"#unique traditions #bring wealth #the New Year"})}
+  <div class="main"><div class="psg">${nm(1)}People all over the world have unique traditions to bring wealth in the New Year. ${nm(2)}For example, in the southern United States, people eat a special dish called Hoppin’ John. ${nm(3)}This dish is made with peas and other vegetables that look like coins and dollar bills. ${nm(4)}People enjoy this dish to get lots of money in the coming year. ${nm(5)}Another example is First Footing, the Scottish New Year’s tradition. ${nm(6)}Scots believe that the first person to enter the house after midnight will bring good luck and wealth in the New Year. ${nm(7)}The first-footer should be a tall, handsome male with dark hair. ${nm(8)}He should be carrying symbolic gifts of coal, salt, and cake. ${nm(9)}They represent warmth, wealth, and food respectively.</div></div></div>${FT}<div class="bp">30</div>`);
+
+add("R08","문제 1-3",`<div class="qs" style="gap:22px">
+  <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 제목으로 가장 적절한 것은? ${chip("②")} ${exb("R08-1")}
+      <div class="opts one en"><div>① How to Get Rich in a Year</div><div><span class="ok">②</span> New Year’s Traditions for Wealth</div><div>③ Some Foods That Bring Good Luck</div><div>④ First Footing: The Scottish Tradition</div><div>⑤ The Best Way to Celebrate the New Year</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">윗글의 내용과 일치하도록 괄호 안에서 알맞은 것을 고르시오. ${exb("R08-2")}
+      <div class="ln">(1) In the southern United States, people eat Hoppin’ John to wish for lots of [food / money]. ${chip("money")}</div>
+      <div class="ln">(2) In Scottish tradition, a first-footer is the first person to [enter / leave] a house in the new year. ${chip("enter")}</div></div></div>
+  </div>${FT}<div class="bp">30</div>`);
+
+add("R08","문제 3-4",`<div class="qs" style="gap:22px">
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">first-footer가 가지고 오는 선물과 각 선물이 의미하는 것을 윗글에서 찾아 쓰시오. ${exb("R08-3")}
+      <div class="ln">(1) ${b("coal")} → ${b("warmth")} &nbsp;&nbsp; (2) ${b("salt")} → ${b("wealth")} &nbsp;&nbsp; (3) ${b("cake")} → ${b("food")}</div></div></div>
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R08-4")}
+      <div class="flow">
+        <div class="fw c4">For the <sup>(1)</sup>${b("New Year","m")}</div>
+        <div class="f2"><div><div class="fh c1">In the southern United States</div><div class="fc">People eat Hoppin’ John, a <sup>(2)</sup>${b("dish")} made with <sup>(3)</sup>${b("peas")} and other vegetables that look like <sup>(4)</sup>${b("money")}.</div></div>
+          <div><div class="fh c2">In Scotland</div><div class="fc">The first-footer should be a tall, handsome <sup>(5)</sup>${b("male")} with <sup>(6)</sup>${b("dark")} hair, carrying <sup>(7)</sup>${b("symbolic")} gifts.</div></div></div>
+      </div></div></div></div>${FT}<div class="bp">30</div>`);
+
+const W8 = [
+  W("all over the world","","세계 도처에"),W("unique","형","독특한"),W("tradition","명","전통"),W("traditional","형","전통적인",1),W("bring","동","가지고 오다"),W("wealth","명","재물, 부(富)"),W("wealthy","형","부유한",1),W("example","명","예시"),W("southern","형","남쪽의"),W("be made with","","~로 만들어지다"),W("pea","명","완두콩"),W("look like","","~처럼 보이다"),W("coin","명","동전"),W("bill","명","지폐"),W("coming","형","다가오는"),
+  W("Scottish","형","스코틀랜드의"),W("Scot","명","스코틀랜드 사람"),W("enter","동","들어가다"),W("midnight","명","자정"),W("good luck","","행운"),W("handsome","형","잘생긴"),W("male","명","남자, 남성"),W("female","명","여자, 여성",1),W("carry","동","들고 있다"),W("symbolic","형","상징적인"),W("symbolize","동","상징하다",1),W("coal","명","석탄"),W("represent","동","나타내다, 상징하다"),W("warmth","명","따뜻함"),W("warm","형","따뜻한",1),W("respectively","부","각각")];
+
+add("R08","Read Closely 1",rcSlide(
+  sen(1,"People all over the world have unique traditions to bring wealth in the New Year.")+
+  sen(2,"For example, in the southern United States, people eat a special dish called Hoppin’ John.",2)+
+  sen(3,"This dish is made with peas and other vegetables that look like coins and dollar bills.",2)+
+  sen(4,"People enjoy this dish to get lots of money in the coming year."),
+  W8.slice(0,12).join(""), 31));
+
+add("R08","Read Closely 2",rcSlide(
+  sen(5,"Another example is First Footing, the Scottish New Year’s tradition.")+
+  sen(6,"Scots believe that the first person to enter the house after midnight will bring good luck and wealth in the New Year.",2)+
+  sen(7,"The first-footer should be a tall, handsome male with dark hair."),
+  W8.slice(12,23).join(""), 31));
+
+add("R08","Read Closely 3",rcSlide(
+  sen(8,`He <span class="hl">should be carrying</span> symbolic gifts of coal, salt, and cake.`)+
+  gtip("조동사를 포함하는 진행시제","‘조동사 + be + 현재분사(-ing)’의 형태로 진행형에 조동사의 뜻을 더해 해석해요.",["Please be quiet. My mother <b>may be sleeping</b>.","Tom isn’t home. He <b>must be studying</b> in the library."])+
+  sen(9,"They represent warmth, wealth, and food respectively."),
+  W8.slice(23).join(""), 31));
+
+add("R08","Story BITE",`<div class="sb"><div class="sbh"><span>Story <b>BITE</b></span>세계 각국의 독특한 새해 맞이</div>
+  <p>문화는 달라도 새해의 행운을 기원하는 마음은 모두 같을 거예요. 스페인에서는 새해 전날 자정을 알리는 12번의 종소리에 맞춰 입 안 가득 12개의 포도 알을 먹으면서 행운을 빌어요. 독일에서는 12월 31일에 ‘납 붓기’를 행하는 전통이 있는데, 국자에 납 조각을 녹인 후 찬물을 부어 반지(결혼), 돼지(재물)와 같이 굳은 모양에 따라 새해의 운세를 점친다고 해요. 브라질에서는 새해 첫날 흰 옷을 입는데, 분홍색(사랑), 흰색(평화), 노란색(재물) 등을 뜻하는 다채로운 색깔의 속옷까지 갖춰 입기도 한다고 해요.</p></div>${FT}<div class="bp">31</div>`);
+
+/* ===== READING 09 ===== */
+CUR = "R09";
+add("R09","본문",`<div class="rd">${rdSide(9,{ex:"#a fireman #the September 11 attacks #a real hero"})}
+  <div class="main"><div class="psg">${nm(1)}“Brian, I’ll tell you about a man I’ll never forget. ${nm(2)}My friend, Mark, was working at a fire station near the World Trade Center. ${nm(3)}(a) <u>A buddy</u> of his was scheduled to work on September 11, 2001, but his wife had to go to the hospital to give birth to (b) <u>their baby</u>. ${nm(4)}So Mark took his shift. Do you know what happened that day?” ${nm(5)}“The September 11 attacks,” I answered. ${nm(6)}“Mark was one of the first to run into the World Trade Center,” Dad paused. ${nm(7)}“Some people running out of the building said, ‘There’s a fireman up there. ${nm(8)}He got us out of here. Help him!’ ${nm(9)}But, it was too late. He never came out.” ${nm(10)}He was silent for a moment. “Listen, Brian. Mark was a real hero. ${nm(11)}It was I that changed my schedule, and you were the baby who was born that day. ${nm(12)}We are here thanks to him.”</div></div></div>${FT}<div class="bp">32</div>`);
+
+add("R09","문제 1-3",`<div class="qs" style="gap:24px">
+  <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 제목으로 가장 적절한 것은? ${chip("④")} ${exb("R09-1")}
+      <div class="opts en"><div>① My Hero, My Dad</div><div>② What Firefighters Do</div><div>③ The Tragedy on September 11</div><div><span class="ok">④</span> The Story of My Family’s Hero</div><div>⑤ Difficulties in Working as a Firefighter</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">밑줄 친 (a), (b)가 가리키는 것을 각각 윗글에서 찾아 쓰시오. ${exb("R09-2")}
+      <div class="ln">(a) a buddy → ${b("Dad")} &nbsp;&nbsp;&nbsp;&nbsp; (b) their baby → ${b("Brian")}</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R09-3")}
+      <div class="ln">(1) Mark worked at the World Trade Center. ${b("F","s")}</div>
+      <div class="ln">(2) No one ran out of the building on September 11, 2001. ${b("F","s")}</div></div></div>
+  </div>${FT}<div class="bp">32</div>`);
+
+add("R09","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">Mark에 대해 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R09-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c4">Mark</div><div class="c"><span class="dt"></span>He worked at a <sup>(1)</sup>${b("fire station","m")} with Brian’s dad.<br><span class="dt"></span>On September 11, 2001, he took Brian’s dad’s <sup>(2)</sup>${b("shift")} because Brian’s mom was going to have a <sup>(3)</sup>${b("baby")}.<br><span class="dt"></span>During the 9/11 <sup>(4)</sup>${b("attacks")}, he died while saving people.<br><span class="dt"></span>Brian’s dad calls Mark a real <sup>(5)</sup>${b("hero")}.</div></div>
+      </div></div></div></div>${FT}<div class="bp">32</div>`);
+
+const W9 = [
+  W("forget","동","잊다"),W("remember","동","기억하다",1),W("fire station","","소방서"),W("trade","명","무역, 거래"),W("buddy","명","친구, 동료"),W("be scheduled to","","~하기로 예정되어 있다"),W("give birth to","","~을 낳다"),W("shift","명","교대 근무 (시간)"),W("attack","명","공격 동 공격하다"),
+  W("pause","동","잠시 멈추다"),W("fireman","명","소방대원"),W("firefighter","명","소방대원",1),W("silent","형","침묵하는"),W("silence","명","침묵, 고요",1),
+  W("for a moment","","잠시 동안"),W("real","형","진짜의"),W("hero","명","영웅"),W("schedule","명","일정"),W("thanks to","","~ 덕분에")];
+
+add("R09","Read Closely 1",rcSlide(
+  sen(1,"“Brian, I’ll tell you about a man I’ll never forget.")+
+  sen(2,"My friend, Mark, was working at a fire station near the World Trade Center.")+
+  sen(3,"A buddy of his was scheduled to work on September 11, 2001, but his wife had to go to the hospital to give birth to their baby.",2)+
+  sen(4,"So Mark took his shift. Do you know what happened that day?”")+
+  sen(5,"“The September 11 attacks,” I answered."),
+  W9.slice(0,9).join(""), 33));
+
+add("R09","Read Closely 2",rcSlide(
+  sen(6,"“Mark was one of the first to run into the World Trade Center,” Dad paused.")+
+  sen(7,"“Some people running out of the building said, ‘There’s a fireman up there.")+
+  sen(8,"He got us out of here. Help him!’")+
+  sen(9,"But, it was too late. He never came out.”")+
+  sen(10,"He was silent for a moment. “Listen, Brian. Mark was a real hero."),
+  W9.slice(9,14).join(""), 33));
+
+add("R09","Read Closely 3",rcSlide(
+  sen(11,`<span class="hl">It was I that changed my schedule</span>, and you were the baby who was born that day.`,2)+
+  gtip("It is[was] ~ that … 강조 구문","It is[was]와 that 사이에 강조할 부분을 넣어 ‘…한 것은 바로 ~이다[였다]’라는 의미를 나타내요. 주어, 목적어, 부사어를 강조할 수 있어요.",["<b>It is</b> Mike <b>that[who]</b> is my best friend. (주어 강조)","<b>It was</b> my bag <b>that</b> I left on the train. (목적어 강조)"])+
+  sen(12,"We are here thanks to him.”"),
+  W9.slice(14).join(""), 33));
+
+/* ===== READING 10 ===== */
+CUR = "R10";
+add("R10","본문",`<div class="rd">${rdSide(10,{gichul:1,ex:"#whales #carbon tanks #Earth’s protectors"})}
+  <div class="main"><div class="psg">${nm(1)}Whales are huge carbon tanks. ${nm(2)}When a whale dies, it sinks to the bottom of the ocean with about 30 tons of carbon dioxide inside its body. ${nm(3)}This carbon stays deep in the ocean for a long time. ${nm(4)}One tree takes in only about 22 kilograms of carbon dioxide each year, so one whale is equal to thousands of trees. ${nm(5)}Whales also help the ocean in another way. ${nm(6)}Their waste becomes food for tiny plants called phytoplankton. ${nm(7)}These tiny plants also remove carbon from the air. ${nm(8)}That’s why scientists call whales “Earth’s protectors.” ${nm(9)}In 2019, some experts said, “Every whale is worth more than two million dollars because it helps nature so much. ${nm(10)}But many whales were hunted in the past, and their number decreased.” ${nm(11)}A plan is needed to protect whales. ${nm(12)}They can be a key to slowing down climate change.</div>
+  <div class="fn">*carbon dioxide: 이산화탄소 **phytoplankton: 식물성 플랑크톤</div></div></div>${FT}<div class="bp">34</div>`);
+
+add("R10","문제 1-3",`<div class="qs" style="gap:22px">
+  <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 제목으로 가장 적절한 것은? ${chip("①")} ${exb("R10-1")}
+      <div class="opts one en"><div><span class="ok">①</span> Saving Whales Means Saving the Earth</div><div>② How Climate Change Hurts Whales’ Homes</div><div>③ Why Are Whales Disappearing in the Ocean?</div><div>④ The Truth About the Whale Hunting Industry</div><div>⑤ What Happens If There Are Too Many Whales?</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R10-2")}
+      <div class="ln">(1) One whale can take away as much carbon as thousands of trees. ${b("T","s")}</div>
+      <div class="ln">(2) Phytoplankton are called “Earth’s Protectors” because they remove carbon from the air. ${b("F","s")}</div></div></div>
+  </div>${FT}<div class="bp">34</div>`);
+
+add("R10","문제 3-4",`<div class="qs tight" style="gap:18px">
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">How much is a whale worth to nature? ${exb("R10-3")}
+      <div class="ln">→ Each whale is worth more than ${b("two million dollars","m")} to nature.</div></div></div>
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R10-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c1">Role of Whales</div><div class="c"><span class="dt"></span>Whales can hold a lot of <sup>(1)</sup>${b("carbon")}.<br><span class="dt"></span>Whale <sup>(2)</sup>${b("waste")} helps phytoplankton grow, and they take in carbon.</div></div>
+        <div class="r"><div class="h c5">Problem</div><div class="c">Many whales were <sup>(3)</sup>${b("hunted")}, so their number went down.</div></div>
+        <div class="r"><div class="h c2">Solution</div><div class="c">We need a plan to <sup>(4)</sup>${b("protect")} whales.</div></div>
+        <div class="r"><div class="h c4">Key Message</div><div class="c">Whales are important for slowing down <sup>(5)</sup>${b("climate change","m")}.</div></div>
+      </div></div></div></div>${FT}<div class="bp">34</div>`);
+
+const W10 = [
+  W("whale","명","고래"),W("huge","형","거대한"),W("carbon","명","탄소"),W("sink","동","가라앉다"),W("bottom","명","바닥, 밑부분"),W("ocean","명","대양, 바다"),W("take in","","~을 흡수하다"),W("be equal to","","~와 같다"),
+  W("in another way","","다른 방식으로"),W("waste","명","배설물, 쓰레기"),W("tiny","형","아주 작은"),W("plant","명","식물"),W("remove","동","제거하다"),W("protector","명","보호자"),W("expert","명","전문가"),W("be worth","","~의 가치가 있다"),W("million","명","백만"),
+  W("nature","명","자연"),W("hunt","동","사냥하다"),W("decrease","동","감소하다"),W("protect","동","보호하다"),W("slow down","","~의 속도를 늦추다"),W("climate change","","기후 변화")];
+
+add("R10","Read Closely 1",rcSlide(
+  sen(1,"Whales are huge carbon tanks.")+
+  sen(2,"When a whale dies, it sinks to the bottom of the ocean with about 30 tons of carbon dioxide inside its body.")+
+  sen(3,"This carbon stays deep in the ocean for a long time.")+
+  sen(4,"One tree takes in only about 22 kilograms of carbon dioxide each year, so one whale is equal to thousands of trees.")+
+  sen(5,"Whales also help the ocean in another way.")+
+  sen(6,"Their waste becomes food for tiny plants called phytoplankton."),
+  W10.slice(0,8).join(""), 35));
+
+add("R10","Read Closely 2",rcSlide(
+  sen(7,"These tiny plants also remove carbon from the air.")+
+  sen(8,"That’s why scientists call whales “Earth’s protectors.”")+
+  sen(9,`In 2019, some experts said, “Every whale <span class="hp">is worth more than two million dollars</span> because it helps nature so much.`)+
+  `<div class="tip"><span class="lb p">독해 TIP</span><b>be worth+가치:</b> ‘~의(할) 가치가 있다’는 뜻으로, be worth 뒤에는 돈·시간·노력 등을 나타내는 (동)명사가 와요. 또한 ‘a try(시도)’, ‘a visit(방문)’처럼 무언가를 할 만한 이유도 올 수 있어요.</div>`,
+  W10.slice(8,17).join(""), 35));
+
+add("R10","Read Closely 3",rcSlide(
+  sen(10,`But many whales <span class="hl">were hunted</span> in the past, and their number decreased.”`)+
+  gtip("수동태","‘be동사+과거분사(+by 행위자)’의 형태로 ‘~되다, ~당하다’라는 의미를 나타내요. 능동태 문장의 목적어가 수동태 문장의 주어가 되어 동작을 받거나 당하는 상황을 나타낼 때 사용해요. 주로 동작의 결과나 상태를 강조하기 위해 써요.",["This tree <b>was planted by</b> my grandfather.","Each room <b>is cleaned</b> every day in this hotel."])+
+  sen(11,`A plan <span class="hl">is needed</span> to protect whales.`)+
+  sen(12,"They can be a key to slowing down climate change."),
+  W10.slice(17).join(""), 35));
+
+/* ===== Memory POP ===== */
+const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+add("POP","1",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">1</span>빈칸에 알맞은 단어를 <span class="bk1">보기</span>에서 골라 쓰시오. ${exb("POP-1")}</h4>
+    <div class="bogi"><span>respectively</span><span>hunt</span><span>sink</span><span>wealth</span><span>unique</span></div><ol>
+    <li>(1) Wild animals need to ${b("hunt")} to survive.</li>
+    <li>(2) The cup and the plate cost $5 and $3, ${b("respectively","m")}.</li>
+    <li>(3) He used his ${b("wealth")} to build children’s libraries.</li>
+    <li>(4) The ${b("unique")} pattern of the dress made it special.</li>
+    <li>(5) The small boat won’t ${b("sink")} because it is very light.</li></ol></div>
+  </div>${FT}<div class="bp">36</div>`);
+add("POP","2",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">2</span>문맥에 맞게 빈칸에 들어갈 표현을 연결하시오. ${exb("POP-2")}</h4>
+    <div class="mt"><ol>
+      <li>(1) This old painting could ______ millions of dollars. ${chip("③")}</li>
+      <li>(2) The cat is going to ______ kittens. ${chip("④")}</li>
+      <li>(3) The juice is said to ______ fresh peaches. ${chip("②")}</li>
+      <li>(4) The meeting will ______ start at 3 p.m. ${chip("①")}</li></ol>
+      <div class="mtr"><span>① be scheduled to</span><span>② be made with</span><span>③ be worth</span><span>④ give birth to</span></div></div></div>
+  </div>${FT}<div class="bp">36</div>`);
+
+add("POP","3",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">3</span>괄호 안에서 어법상 적절한 것을 고르시오. ${exb("POP-3")}</h4><ol>
+    <li>(1) [He / It] was Peter that broke the window. ${chip("It")}</li>
+    <li>(2) It is this book [that / whose] I want to read. ${chip("that")}</li>
+    <li>(3) K-pop [loves / is loved] by fans all over the world. ${chip("is loved")}</li>
+    <li>(4) We [will waiting / will be waiting] for you at the station. ${chip("will be waiting")}</li>
+    <li>(5) The windows [are cleaned / are cleaning] every morning. ${chip("are cleaned")}</li></ol></div>
+  </div>${FT}<div class="bp">36</div>`);
+add("POP","4",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">4</span>우리말과 의미가 같도록 주어진 말을 바르게 배열하시오. (필요시 형태를 변형할 것) ${exb("POP-4")}</h4><ol>
+    <li><span class="ko">(1) 그들은 지금 축구를 하고 있을지도 모른다. (play / might / be / soccer)</span><span class="en">→ They ${b("might be playing soccer","m")} now.</span></li>
+    <li><span class="ko">(2) 이 노래는 유명한 작곡가에 의해 쓰였다. (was / famous / write / composer / a / by)</span><span class="en">→ This song ${b("was written by a famous composer","m")}.</span></li>
+    <li><span class="ko">(3) 방과 후에 내가 만난 사람은 Jenny였다. (after / met / it / I / that / Jenny / be / school)</span><span class="en">→ ${b("It was Jenny that I met after school.","w")}</span></li></ol></div>
+  </div>${FT}<div class="bp">37</div>`);
+
+add("POP","A",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">A</span>다음 글의 밑줄 친 부분 중, 문맥상 낱말의 쓰임이 적절하지 <u>않은</u> 것은? ${chip("④")} ${exb("POP-A")}</h4>
+  <p>Whales are huge carbon tanks. When a whale dies, it sinks to the bottom of the ocean with about 30 tons of carbon dioxide inside its body. This carbon stays ① <u>deep</u> in the ocean for a long time. One tree takes in only about 22 kilograms of carbon dioxide each year, so one whale is equal to thousands of trees. Whales also ② <u>help</u> the ocean in another way. Their waste becomes food for tiny plants called phytoplankton. These tiny plants also ③ <u>remove</u> carbon from the air. That’s why scientists call whales “Earth’s protectors.” In 2019, some experts said, “Every whale is worth more than two million dollars because it helps nature so much. But many whales were hunted in the past, and their number <span class="ok">④</span> <u>increased</u>.” A plan is needed to ⑤ <u>protect</u> whales. They can be a key to slowing down climate change.</p></div>
+  ${FT}<div class="bp">37</div>`);
+
+add("POP","B",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">B</span>다음 글의 밑줄 친 부분 중, 어법상 <u>틀린</u> 것은? ${chip("⑤")} ${exb("POP-B")}</h4>
+  <p>“Brian, I’ll tell you about a man I’ll never forget. My friend, Mark, was working at a fire station near the World Trade Center. A buddy of his ① <u>was</u> scheduled to work on September 11, 2001, but his wife had to go to the hospital to give birth to their baby. So Mark took his shift. Do you know ② <u>what</u> happened that day?” “The September 11 attacks,” I answered. “Mark was one of the first ③ <u>to run</u> into the World Trade Center,” Dad paused. “Some people running out of the building said, ‘④ <u>There’s</u> a fireman up there. He got us out of here. Help him!’ But, it was too late. He never came out.” He was silent for a moment. “Listen, Brian. Mark was a real hero. It was I that changed my schedule, and you were the baby <span class="ok">⑤</span> <u>whom</u> was born that day. We are here thanks to him.”</p></div>
+  ${FT}<div class="bp">37</div>`);
+
+
+/* ---------- 화면 ---------- */
+const stage = document.getElementById("stage");
+let slides = [];
+const slideHTML = x => x.raw ? x.raw : `<section class="slide ${x.cls||""}">${x.html}<div class="pg"></div></section>`;
+function render(){
+  stage.innerHTML = SS.map(slideHTML).join("");
+  slides = [...stage.querySelectorAll(".slide")];
+  slides.forEach((s,i)=>{ const p=s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
+}
+/* 본문: 한 줄에 한 문장씩 나누고, 슬라이드에 들어가는 가장 큰 글씨로 맞춤 */
+function splitPsg(){
+  stage.querySelectorAll(".psg:not(.one)").forEach(p=>{
+    const rows = []; let row = null;
+    [...p.childNodes].forEach(nd=>{
+      if(nd.nodeType===1 && nd.classList.contains("nm")){ row = document.createElement("div"); row.className = "ps1"; rows.push(row); }
+      if(row){ if(nd.nodeType===3) nd.textContent = nd.textContent.replace(/^⁠/,""); row.appendChild(nd); }
+    });
+    rows.forEach(r=>{ r.lastChild.nodeType===3 && (r.lastChild.textContent = r.lastChild.textContent.replace(/\s+$/,"")); });
+    p.replaceChildren(...rows); p.classList.add("one");
+  });
+}
+function fitPsg(){
+  slides.forEach(sl=>{
+    const p = sl.querySelector(".psg.one"); if(!p) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const lim = 664;
+    for(let f=25; f>=17; f-=.5){
+      p.style.fontSize = f+"px";
+      if(p.offsetTop + p.offsetHeight <= lim) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitRc(){
+  slides.forEach(sl=>{
+    const ss = sl.querySelector(".rc .ss"); if(!ss) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const top = sl.getBoundingClientRect().top, sc = sl.getBoundingClientRect().height/720;
+    for(let f=28; f>=22; f-=.5){
+      ss.querySelectorAll(".sen").forEach(e=>e.style.fontSize = f+"px");
+      const last = ss.lastElementChild.getBoundingClientRect().bottom;
+      if((last-top)/sc <= 668) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+/* 해설 창: 위쪽 문제는 아래에, 아래쪽 문제는 위에 띄움 */
+function placeEx(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const t = sl.getBoundingClientRect(), sc = t.height/720;
+    sl.querySelectorAll(".exq").forEach(q=>{ q.classList.toggle("lo", (q.getBoundingClientRect().top - t.top)/sc < 330); });
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitKo(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    sl.querySelectorAll(".wls").forEach(w=>{
+      const ko = w.querySelector(".ko"); let n = w.querySelectorAll(".wl").length;
+      while(ko.offsetHeight > n*34 + 2 && n < 4){ ko.insertAdjacentHTML("beforebegin",'<div class="wl"></div>'); n++; }
+    });
+    if(!was) sl.classList.remove("on");
+  });
+}
+stage.addEventListener("click", e=>{ const q = e.target.closest(".q"); if(!q) return; q.classList.toggle("open");
+  if(q.classList.contains("exq") && q.classList.contains("open")) q.closest(".slide").querySelectorAll(".exq.open").forEach(o=>{ if(o!==q) o.click(); }); });
+render();
+
+let cur = 0;
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+}
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+}
+function tg(c){ document.body.classList.toggle(c); }
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+addEventListener("resize", fit);
+addEventListener("keydown", e=>{
+  const k = e.key;
+  if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
+  else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home") go(0);
+  else if(k==="End") go(slides.length-1);
+  else if(k==="f"||k==="F") fs();
+});
+fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+splitPsg(); fitPsg(); fitKo(); fitRc(); placeEx(); document.fonts.ready.then(()=>{ fitPsg(); fitKo(); fitRc(); placeEx(); });
+</script>
+<script src="https://s2ionn.github.io/class-tools/board.js"></script>
+<script>
+/* 아래 막대에 정답 버튼: 이 장의 정답을 한꺼번에 보이기/숨기기 (A) */
+(function addAns(){
+  const ui = document.getElementById("ui"), ko = document.getElementById("koBtn");
+  if(!ko) return setTimeout(addAns, 100);
+  ko.insertAdjacentHTML("beforebegin", `<button id="ansBtn" title="정답 보이기/숨기기 (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg><span>정답</span></button>`);
+  const btn = document.getElementById("ansBtn");
+  const qs = () => slides[cur] ? [...slides[cur].querySelectorAll(".q:not(.exq)")] : [];
+  function sync(){ const q = qs(); btn.style.display = q.length ? "" : "none"; btn.classList.toggle("on", q.length>0 && q.every(x=>x.classList.contains("open"))); }
+  function toggle(){ const q = qs(), all = q.length && q.every(x=>x.classList.contains("open")); q.forEach(x=>{ if(x.classList.contains("open")===all) x.click(); }); sync(); }
+  btn.onclick = toggle;
+  addEventListener("keydown", e=>{ if((e.key==="a"||e.key==="A") && !e.ctrlKey && !e.metaKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) toggle(); });
+  setInterval(sync, 300); sync();
+})();
+</script>
+</body>
+</html>
