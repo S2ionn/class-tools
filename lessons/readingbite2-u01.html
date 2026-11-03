@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리딩바이트2 Unit 01 주제 파악하기</title>
+<style>
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:100 500;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Hyemin";font-weight:600 900;font-display:swap;src:local("IM혜민 Bold"),local("IM_Hyemin-Bold"),url("https://s2ionn.github.io/class-tools/fonts/IM_Hyemin-Bold.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{
+  --ink:#2f3448; --sub:#7d8199; --line:#e3e1ea; --paper:#FFFDF6; --bg:#2a2d3d;
+  --navy:#6f7296; --brown:#6f7296; --yel:#E2D4E0; --yel2:#efe7f0; --red:#c05a7a;
+  --green:#7C7E9D; --teal:#8a8fb0; --tealbg:#e4e6ef; --purple:#4C5372; --purplebg:#ece4ee;
+  --dot:#6f7296; --pop:#f1ecf3; --cream:#f0eef5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;word-break:keep-all}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{display:none;position:absolute;inset:0;background:var(--paper);overflow:hidden}
+.slide.on{display:block}
+.ft{position:absolute;left:28px;bottom:14px;font-size:13px;color:#8f93aa}
+.ft b{color:#3e4560;font-weight:700}
+.pg{position:absolute;left:250px;bottom:14px;font-size:13px;color:#8f93aa;font-variant-numeric:tabular-nums}
+.bp{position:absolute;right:28px;top:20px;font:700 20px Hyemin,sans-serif;color:#3e4560}
+
+/* 표지 */
+.cover{background:#FFFDF6}
+.cover .side{position:absolute;right:0;top:0;bottom:0;width:430px;background:#7C7E9D;color:#fff;padding:64px 56px}
+.cover .side .pt{font:400 26px Title,sans-serif;color:#E2D4E0;letter-spacing:.04em}
+.cover .side .pt b{font-weight:400;font-size:64px;display:block;line-height:1;margin-top:6px}
+.cover .side h2{font:400 44px/1.25 Title,sans-serif;margin-top:28px}
+.cover .side ol{list-style:none;position:absolute;left:56px;right:56px;bottom:120px;border-top:1.5px solid rgba(255,255,255,.45)}
+.cover .side li{display:flex;justify-content:space-between;font:700 19px/1 Hyemin,sans-serif;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.25)}
+.cover .side li.on{color:#E2D4E0}
+.cover .main{position:absolute;left:96px;top:0;bottom:0;width:640px;display:flex;flex-direction:column;justify-content:center}
+.cover .bk{font:700 20px Hyemin,sans-serif;color:#8f93aa;letter-spacing:.02em}
+.cover .un{font:400 34px Title,sans-serif;color:#949AB1;margin-top:46px}
+.cover h1{font:400 92px/1.1 Title,sans-serif;color:#4C5372;margin-top:6px}
+.cover .rule{width:72px;height:6px;background:#E2D4E0;border-radius:3px;margin:30px 0 26px}
+.cover .rd3{display:flex;gap:10px}
+.cover .rd3 span{font:700 18px Hyemin,sans-serif;color:#4C5372;background:#E2D4E0;border-radius:999px;padding:7px 18px}
+
+/* PART 소개 */
+.intro{background:#f3eef4;padding:56px 90px}
+.intro .q3{display:grid;gap:26px;max-width:880px}
+.intro h3{display:inline-block;font:900 25px Hyemin,sans-serif;color:#fff;background:var(--navy);border:0;border-radius:999px;padding:4px 26px;margin-bottom:10px}
+.intro p,.intro li{font-size:21px;line-height:1.6;color:var(--ink)}
+.intro ul{list-style:none;display:grid;gap:4px}
+.intro li{padding-left:30px;position:relative}
+.intro li::before{content:"";position:absolute;left:4px;top:10px;width:13px;height:8px;border-left:3px solid var(--red);border-bottom:3px solid var(--red);transform:rotate(-45deg)}
+.intro .types{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:center;margin:6px 0 0 30px;max-width:520px}
+.intro .types b{font-size:21px;color:var(--ink)}
+.intro .types s{border-bottom:2px dotted #b9bdd0;text-decoration:none;height:0}
+.intro .types span{font:700 15px Hyemin,sans-serif;color:#fff;background:var(--brown);padding:3px 18px 3px 12px;clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%)}
+.intro .types span em{color:var(--yel);font-style:normal}
+
+/* 본문(READING) */
+.rd{display:grid;grid-template-columns:240px 1fr;height:100%}
+.rd .side{background:var(--cream);border-right:1px solid var(--line);padding:34px 22px 0 34px;position:relative}
+.tagR{font:400 20px Title,sans-serif;color:var(--navy);background:var(--yel);border-radius:999px;padding:3px 14px;display:inline-block}
+.bigN{font:900 120px/1 Title,sans-serif;color:var(--navy);margin-top:6px}
+.bigN span{color:#fff;-webkit-text-stroke:0}
+.gichul{display:inline-block;margin-top:14px;font:700 14px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:4px 12px}
+.hash{margin-top:34px}
+.hash h4{font:900 16px Hyemin,sans-serif;color:var(--navy)}
+.hash h4 span{background:var(--yel2);padding:0 3px}
+.hash div{border-bottom:2px dashed #949AB1;height:44px;line-height:52px;font-size:17px;color:#8f93aa}
+.hash p{font:400 14px Hyemin,sans-serif;color:#6a6f8e;margin-top:8px;line-height:1.5}
+.hash .q{margin-top:12px}
+.rd .main{padding:30px 50px 40px 40px}
+.psg{font-size:24px;line-height:2;color:var(--ink);text-align:justify}
+.nm{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--dot);color:#fff;font:700 11px Hyemin,sans-serif;align-items:center;justify-content:center;vertical-align:11px;margin:0 3px 0 6px}
+.nm:first-child{margin-left:0}
+.psg.one{text-align:left;display:grid;gap:0}
+.psg.one .ps1{position:relative;padding-left:34px;line-height:1.5;padding:4px 0 5px 36px;border-bottom:1px solid #ebe8f0}
+.psg.one .ps1:last-child{border-bottom:0}
+.psg.one .ps1 .nm{position:absolute;left:0;top:calc(4px + .38em);margin:0;width:22px;height:22px;font-size:12px;vertical-align:0}
+.rd{position:relative}
+.fn{position:absolute;left:34px;bottom:48px;text-align:left!important;font-size:15px;color:#5a6080;margin-top:6px}
+
+/* 문제 */
+.qs{padding:40px 70px 40px 70px;display:grid;gap:30px;align-content:start}
+.qi{display:grid;grid-template-columns:56px 1fr;column-gap:10px}
+.qi .no{font:900 40px/1 Hyemin,sans-serif;color:var(--navy);text-align:center}
+.qi .bdg{display:block;margin:6px auto 0;width:40px;font:700 13px/1.2 Hyemin,sans-serif;color:#fff;text-align:center;padding:5px 2px;border-radius:6px 6px 14px 14px}
+.bdg.g{background:var(--green)}.bdg.r{background:var(--red)}
+.qi .tag2{display:block;font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:999px;padding:2px 8px;width:max-content;margin:0 auto 4px}
+.qi .tx{font-size:23px;line-height:1.55;padding-top:4px}
+.qi .tx u{text-underline-offset:4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:4px 40px;margin-top:10px;font-size:22px;font-family:Hyemin,sans-serif}
+.opts.one{grid-template-columns:1fr}
+.opts.en{font-family:Hyemin,sans-serif;font-size:23px}
+.ln{margin-top:10px;font-size:23px}
+.wd{text-align:right;font-size:22px;margin-top:4px}
+
+/* 정답 가리기 */
+.q{cursor:pointer}
+.q i{font-style:normal;visibility:hidden;color:#e0262f;font-weight:700}
+.q.open i{visibility:visible}
+.b{display:inline-block;min-width:110px;border-bottom:1.5px solid var(--navy);text-align:center;padding:0 6px;line-height:1.25}
+.b.w{min-width:520px}.b.m{min-width:260px}.b.s{min-width:70px}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-left:14px;vertical-align:2px}
+.chip b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--navy);border-radius:5px;padding:2px 8px}
+.chip.open b{background:#e0262f}
+.chip i{font-size:20px}
+.ok{display:inline-flex;width:1.2em;height:1.2em;align-items:center;justify-content:center;border-radius:50%;vertical-align:-.12em;margin:0 .04em;text-indent:0}
+.slide:has(.chip.open) .ok{color:#e0262f;font-weight:900;box-shadow:0 0 0 2.5px #e0262f;background:#fff0f0}
+@media print{.ok{color:#e0262f;box-shadow:0 0 0 2.5px #e0262f}}
+
+/* 구조 이해 표 */
+.tbl{display:grid;gap:8px;margin-top:12px}
+.tbl .r{display:grid;grid-template-columns:200px 1fr;border:1px solid var(--line);background:#fff;border-radius:6px;overflow:hidden}
+.tbl .h{display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;padding:8px;line-height:1.3}
+.tbl .c{padding:12px 20px;font-size:22px;line-height:1.8}
+.c1{background:#f0e8ef;color:#4C5372}.c2{background:#e8e9f1;color:#4C5372}.c3{background:#eadcea;color:#6a5a78}.c4{background:#dfe2ec;color:#4C5372}.c5{background:#eadcea;color:#6a5a78}
+.tbl sup{font-size:12px;margin-right:1px}
+.tbl .b{min-width:96px}
+.tbl .ar{display:block;text-align:center;line-height:.6;font-size:18px}
+
+
+/* 번호별 해설 */
+.exq{display:inline-flex;margin-left:8px;vertical-align:2px}
+.exq>b{font:700 13px Hyemin,sans-serif;color:#fff;background:var(--teal);border-radius:5px;padding:2px 8px}
+.exq.open>b{background:var(--red)}
+.exq .pan{display:none;position:fixed;right:36px;top:92px;width:620px;max-height:560px;overflow:auto;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:12px 20px 14px;z-index:3;font:700 19px/1.6 Hyemin,sans-serif;color:var(--ink);text-align:left;text-indent:0;white-space:normal}
+.exq.lo .pan{top:auto;bottom:56px}
+.exq.open .pan{display:block}
+.pan .pt{display:block;font:700 16px Hyemin,sans-serif;color:var(--red);margin-bottom:4px}
+.pan .lb{display:inline-block;font:700 14px/1.5 Hyemin,sans-serif;color:#fff;background:var(--purple);border-radius:4px;padding:0 7px;margin-right:6px;vertical-align:1px}
+.pan .lb.o{background:var(--teal)}
+.pan .ko{display:block;color:#5a6080;margin-top:4px}
+.pan u{text-decoration:underline dotted var(--red);text-underline-offset:4px;text-decoration-thickness:2px}
+.pan .tbl{margin-top:6px;gap:5px}
+.pan .tbl .r{grid-template-columns:120px 1fr}
+.pan .tbl .h{font-size:16px;padding:6px}
+.pan .tbl .c{font-size:17px;line-height:1.6;padding:6px 12px}
+
+/* Read Closely */
+.rch{position:absolute;left:0;top:24px;right:40px;height:88px}
+.rch .tab{position:absolute;left:0;top:0;z-index:2;width:262px;height:88px;background:#4C5372;border-radius:0 44px 44px 0;box-shadow:6px 0 0 var(--paper);padding:10px 0 0 48px;font:400 30px/1 Title,sans-serif;color:#fff}
+.rch .tab span{display:block;color:#E2D4E0}
+.rch .tab span+span{color:#fff;margin-top:3px;font-size:34px}
+.rch .ins{position:absolute;left:200px;right:0;top:16px;z-index:1;height:56px;background:#ece6f0;color:#3e4560;border-radius:28px;font:700 20px Hyemin,sans-serif;display:flex;align-items:center;justify-content:flex-end;padding-right:30px;gap:2px}
+.wv{text-decoration:underline wavy var(--red);text-underline-offset:5px;text-decoration-thickness:1.5px}
+.bx{border:1.5px solid var(--red);border-radius:7px;padding:0 4px}
+.red{color:var(--red)}
+.rc{position:absolute;left:0;right:0;top:128px;bottom:56px;display:grid;grid-template-columns:1fr 250px;column-gap:30px;padding:0 40px 0 76px}
+.rc .ss{display:flex;flex-direction:column;gap:2px}
+.sen{font:700 28px/1.45 Hyemin,sans-serif;color:var(--ink);position:relative;padding-left:4px}
+.sen .nm{position:absolute;left:-32px;top:.32em;margin:0;width:24px;height:24px;font-size:13px;background:#7C7E9D}
+.wl{height:34px;border-bottom:1.5px dashed #d8d3e3}
+.wls{position:relative}
+.wls .ko,.wls .kx{position:absolute;left:4px;right:0;top:4px;font:700 18px/34px Hyemin,sans-serif;color:var(--red)}
+.wls .ko .sl{color:#b9bdd0;margin:0 .15em}
+.wls .kx{display:none}
+.hideKo .wls .ko{visibility:hidden}
+.hideKo .wls .kx{display:block}
+.hl{background:var(--tealbg);padding:0 2px}
+.hp{background:var(--purplebg);padding:0 2px}
+.tip{font:500 16px/1.6 Hyemin,sans-serif;color:#3e4560;margin:8px 0 6px;padding:9px 16px;background:#f3eef4;border:1px solid #e2d4e0;border-radius:12px}
+.tip .lb{display:inline-block;font:700 15px Hyemin,sans-serif;color:#fff;border-radius:999px;padding:0 10px;margin-right:8px}
+.tip .lb.p{background:#4C5372}.tip .lb.t{background:#7C7E9D}
+.tip .ex{padding-left:18px;position:relative}
+.tip .ex::before{content:"";position:absolute;left:5px;top:11px;width:5px;height:5px;border-radius:50%;background:#6a6f8e}
+.tip u{text-underline-offset:4px;text-decoration-color:#8f93aa}
+.wds{background:#f3eef4;border-radius:16px;padding:14px 16px 12px;align-self:start;max-height:100%;overflow:hidden}
+.wds:empty{display:none}
+.wds h5{display:block;font:400 20px Title,sans-serif;color:#4C5372;padding-bottom:8px;margin-bottom:6px;border-bottom:2px solid #E2D4E0}
+.wds ul{list-style:none;display:grid;gap:0}
+.wds li{font-size:16.5px;line-height:1.35;color:#5a6080;padding:4px 0;border-bottom:1px dashed #e2d4e0}
+.wds li:last-child{border-bottom:0}
+.wds li b{color:#2f3448;font-weight:700;margin-right:4px}
+.wds li em{font-style:italic;color:#2f3448;margin-right:3px}
+.ps{display:inline-flex;width:17px;height:17px;border:0;background:#949AB1;color:#fff!important;border-radius:50%;font-size:10.5px;align-items:center;justify-content:center;vertical-align:1px;margin-right:3px;color:#5a6080}
+
+/* Memory POP */
+.mph{position:absolute;left:0;top:30px;height:62px;width:420px;background:var(--navy);border-radius:0 14px 14px 0;font:400 38px/62px Title,sans-serif;color:#fff;padding-left:100px}
+.mph span{color:var(--yel)}
+.mph .pop{position:absolute;right:-56px;top:-14px;width:84px;height:62px;border:3px solid var(--navy);border-radius:50%;background:#fff;color:var(--navy);font-size:22px;line-height:56px;text-align:center}
+.mp{position:absolute;left:0;right:0;top:122px;bottom:40px;padding:0 90px;display:grid;gap:26px;align-content:start}
+.mq h4{display:flex;gap:14px;font:700 23px Hyemin,sans-serif;align-items:baseline}
+.mq h4 .no{font:900 32px/1 Title,sans-serif;color:var(--red)}
+.mq ol{list-style:none;padding-left:46px;display:grid;gap:12px;margin-top:14px}
+.mq li{font-size:23px;line-height:1.55}
+.mq li .ko{display:block}
+.mq li .en{display:block;padding-left:28px}
+.mq u{text-underline-offset:4px}
+.pinkbg{position:absolute;inset:0;background:var(--pop)}
+.su{position:absolute;right:120px;top:26px;background:var(--navy);color:#fff;border-radius:12px;padding:6px 18px;font:400 22px/1.15 Title,sans-serif;text-align:center}
+.su span{color:var(--yel);display:block}
+.ab{position:absolute;left:90px;right:90px;top:96px;display:grid;gap:12px}
+.ab h4{display:flex;gap:14px;align-items:center;font:700 22px Hyemin,sans-serif}
+.ab h4 .c{display:inline-flex;width:44px;height:44px;border-radius:50%;background:var(--teal);color:#fff;font:900 26px Hyemin,sans-serif;align-items:center;justify-content:center}
+.ab p{font-size:22px;line-height:1.95;text-indent:1em;text-align:justify}
+.ab u{text-underline-offset:5px}
+
+@media print{
+  html,body{background:#fff;overflow:visible;height:auto}
+  #stage{position:static;transform:none!important}
+  .slide{display:block!important;position:relative;page-break-after:always;width:1280px;height:720px}
+  .q i{visibility:visible}
+  .exq{display:none!important}
+  @page{size:1280px 720px;margin:0}
+}
+.dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+</style>
+</head>
+<body class="hideKo">
+<div id="stage"></div>
+<div id="ui"></div>
+<script>
+/* ---------- 슬라이드 내용 ---------- */
+const FT = `<div class="ft">PART 1_<b>Unit 01</b> 주제 파악하기</div>`;
+const nm = n => `<span class="nm">${n}</span>&#8288;`;
+const b = (ans, cls="") => `<span class="q b ${cls}"><i>${ans}</i></span>`;
+const chip = ans => `<span class="q chip"><b>정답</b><i>${ans}</i></span>`;
+const ps = c => `<span class="ps">${c}</span>`;
+const W = (w, pos, m, cf) => `<li>${cf?"<em>cf.</em>":""}<b>${w}</b>${pos?ps(pos):""}${m}</li>`;
+const lines = k => `<div class="wl"></div>`.repeat(k);
+/* 끊어 읽기 해석 (해답지 Read Closely) — 해석 버튼(K)으로 보이기/숨기기 */
+const KO = {
+  R01:["우리는 생각하곤 했다 / 우리의 뇌가 변할 수 없다고","하지만 이제 과학자들은 안다 / 그것들은 그럴 수 있다는 것을","Richard Davidson이라는 과학자는 말한다 / 우리의 뇌는 만들어진다고 / 같은 생각을 몇 번이고 반복함으로써","그는 설명한다 / 행복해지는 것은 ~와 같다 / 첼로를 연주하는 것을 배우는 것 // 만약 우리가 연습한다면 / 우리는 더 나아질 수 있다","다시 말해 / 우리는 우리의 뇌를 훈련할 수 있다 / 더 감사하고 더 편안하고 또는 더 용감하게 느끼도록","우리가 반복할 때 / 같은 생각과 행동을 / 우리의 뇌세포는 함께 작용한다","이러한 뇌세포가 계속함에 따라 / 함께 작용하는 것을 / 그들의 연결은 더 강해진다","시간이 지나면서 / 이러한 강한 연결들은 우리에게 도움을 준다 / 새로운 습관을 형성하고 / 우리의 뇌를 변화시키도록","이 생각은 뒷받침된다 / 또 다른 과학자인 Donald Hebb에 의해","그는 말한다 / 함께 작용하는 뇌세포는 / 함께 연결된다","이것은 좋은 소식이다","우리가 계속 긍정적인 생각을 한다면 / 우리의 뇌는 더 행복해질 수 있다"],
+  R02:["여러분은 알고 있는가 / 얼마나 큰지 / 바닷속 물고기들이","한 새로운 보고서가 말한다 / 물고기들이 이전보다 더 작다고 / 지구 온난화 때문에","그 조사에 따르면 / 대부분의 물고기들이 훨씬 더 작아질 것이다 / 2050년경에는 / 바닷물이 점점 더 따뜻해지고 있어서","가장 큰 변화는 보일 것이다 / 열대 지방에서","과학자들은 말한다 / 물고기들이 충분히 자라지 못한다고 / 산소가 더 적기 때문에 / 더 따뜻한 물에는","그들은 또한 말한다 / 많은 물고기들이 이동할 거라고 / 더 시원한 물로 / 열대 지방 바깥의","William Cheung 교수가 말했다 / 우리는 발견했다 / 물고기들이 훨씬 더 작다는 것을 / 요즘","그것은 일어났다 / 짧은 기간 동안","그것은 매우 놀랍다","알려져 있다 / 물고기들이 반응한다고 / 기후 변화에","따라서 / 매우 중요하다 / 온실가스를 줄이는 것이 / 그리고 지구 온난화를 제어하는 것이"],
+  R03:["스마트폰은 꼭 필요한 도구이다 / 사람들에게 / 요즘","나는 종종 내 스마트폰을 가지고 간다 / 화장실에 / 한 14세 학생이 말했다","나는 또한 그것을 사용한다 / 잠자기 직전에 / 그리고 깨어난 직후에","나는 살 수 없다 / 내 스마트폰 없이","이런 상황과 관련해서 / 정부는 학생들에게 권장한다 / 이해하도록 / 자신의 스마트폰 중독 정도를 / 자가 진단을 통해","의사들은 경고한다 / 스마트폰 중독의 위험성에 대해 / 십 대의","그것은 부정적인 영향을 끼친다 / 학생들의 뇌에","그들이 스마트폰에 중독되면 / 학생들은 어려워한다 / 판단을 내리는 것을 / 또는 그들의 감정을 조절하는 것을","게다가 / 그들은 끊임없이 자신의 전화기를 확인해서 / 공부를 하는 동안에도 / 그들은 집중할 수가 없다 / 그들의 공부에"]};
+let CUR = "R01";
+const koHTML = t => t.replace(/ \/\/ /g,' <span class="sl">//</span> ').replace(/ \/ /g,' <span class="sl">/</span> ');
+const sen = (n, t, k=1, kx="") => `<div class="sen">${nm(n)}${t}</div><div class="wls">${lines(k)}<span class="ko">${koHTML(KO[CUR][n-1])}</span>${kx?`<span class="kx">${kx}</span>`:""}</div>`;
+
+function rdSide(n, opt={}){
+  return `<div class="side">
+    <span class="tagR">READING</span>
+    <div class="bigN">0${n}</div>
+    ${opt.gichul ? `<span class="gichul">고1 모의고사 기출 응용</span>` : ""}
+    <div class="hash"><h4>Add Your <span>Hashtags!</span></h4>
+      <div>#</div><div>#</div><div>#</div>
+      ${opt.note ? `<p>핵심어구를 찾아 나만의 해시태그를 만들어 보세요.</p>` : ""}
+      <div class="q chip" style="margin-left:0;border:0;height:auto;line-height:1.5;display:flex;flex-wrap:wrap"><b>예시</b><i style="font-size:15px">${opt.ex}</i></div>
+    </div></div>`;
+}
+function rcHead(){
+  return `<div class="rch"><div class="tab"><span>Read</span><span>Closely</span></div>
+    <div class="ins">의미 단위로 끊어 읽고(<span class="red">/</span>), <span class="wv red">주어</span>와&nbsp;<span class="bx red">동사</span>에 표시해 봅시다.</div></div>`;
+}
+const rcSlide = (sents, words, page) => `${rcHead()}
+  <div class="rc"><div class="ss">${sents}</div><div class="wds">${words?`<h5>Words</h5><ul>${words}</ul>`:""}</div></div>${FT}<div class="bp">${page}</div>`;
+
+const SS = [];
+const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+
+
+/* 정답과 해설 (해답지) */
+const HS = t => `<span class="lb">해석</span>${t}`;
+const OD = t => `<span class="lb o">오답풀이</span>${t}`;
+
+const KO2 = t => `<span class="ko">${t}</span>`;
+const EX = {
+ "R01-1": "긍정적인 생각과 행동을 반복하면 우리의 뇌가 더 행복하게 변할 수 있다는 내용이므로 이 글의 주제로 ① ‘행복을 위한 뇌 훈련 방법’이 적절하다.",
+ "R01-2": `행복해지는 것을 첼로를 배우는 것에 비유하며 첼로를 연습하면 더 훌륭하게 연주할 수 있듯이, 우리의 뇌도 연습하면 더 행복해질 수 있다고 했다.${KO2(HS("Richard Davidson은 ‘행복해지는 것’을 무엇에 비유하고 있는가?<br>→ 그는 그것(행복해지는 것)을 <u>첼로를 연주하는 법을 배우는 것</u>에 비유했다."))}`,
+ "R01-3": `(2) Richard Davidson과 Donald Hebb은 모두 뇌세포들이 함께 작용하면 서로 연결된다는 비슷한 생각을 가지고 있다.${KO2(HS("(1) 같은 생각을 계속해서 하는 것은 뇌세포들이 연결되도록 도와준다.<br>(2) Richard Davidson과 Donald Hebb은 뇌에 관해 비슷한 생각을 가지고 있다."))}`,
+ "R01-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c1">과거의 믿음</div><div class="c">사람들은 (1) <u>뇌</u>가 변할 수 없다고 생각했다.</div></div>
+    <div class="r"><div class="h c2">새로운 발견</div><div class="c">과학자들은 이제 뇌가 (2) <u>변할</u> 수 있다는 것을 안다.</div></div>
+    <div class="r"><div class="h c3">뇌가 작동하는<br>방식</div><div class="c">같은 생각과 행동을 (3) <u>반복해라</u>.<br>→ 뇌세포들이 함께 작용하고, 그들의 (4) <u>연결</u>은 더 강해진다.<br>→ 이것은 우리의 뇌가 새로운 습관을 형성하도록 돕는다.</div></div>
+    <div class="r"><div class="h c4">좋은 소식</div><div class="c">(6) <u>긍정적인</u> 생각을 반복함으로써 우리의 뇌는 (5) <u>더 행복해질</u> 수 있다.</div></div></div>`,
+ "R02-1": `두 번째 문장 A new report says that fish are smaller than before due to global warming.이 주제문으로, 물고기가 예전보다 더 작아지는 이유는 지구 온난화 때문이라는 내용이다. 따라서 이 글의 주제로 ③ ‘물고기가 더 작아지고 있는 이유’가 가장 적절하다.${KO2(OD("① 바다의 산소 부족 ② 열대어의 특징 ④ 지구 온난화에 미치는 온실가스의 영향 ⑤ 큰 물고기와 작은 물고기의 맛의 차이"))}`,
+ "R02-2": `(2) 대부분의 물고기들이 2050년경에는 훨씬 더 작아질 것이라고 했다.${KO2(HS("(1) 더 따뜻한 물은 물고기가 충분히 자라는 것을 막는다.<br>(2) 물고기 크기의 변화는 2050년까지 멈출 것으로 예상된다."))}`,
+ "R02-3": `William Cheung 교수는 요즘 물고기들이 훨씬 더 작아진 것을 발견했는데 그것이 짧은 시간 동안 일어나서 매우 놀랍다고 말했다.${KO2(HS("과학자들은 왜 놀라는가?<br>→ 그들은 물고기가 <u>짧은 시간 안에 훨씬 더 작아져서</u> 놀란다."))}`,
+ "R02-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c5">문제점</div><div class="c">물고기가 지구 온난화로 점점 (1) <u>더 작아</u>지고 있다.</div></div>
+    <div class="r"><div class="h c2">원인과 결과</div><div class="c">바닷물이 점점 (2) <u>더 따뜻해</u>진다. → 따뜻한 물에는 (3) <u>산소</u>가 더 적다. → 물고기가 잘 (4) <u>자라지</u> 못한다. → 물고기는 (5) <u>열대</u> 지방을 떠나 더 시원한 물로 갈 것이다.</div></div>
+    <div class="r"><div class="h c4">교훈</div><div class="c">온실가스를 (6) <u>줄이고</u> 지구 온난화를 제어하라.</div></div></div>`,
+ "R03-1": "십 대들의 스마트폰 중독과 그것의 부정적인 영향에 관한 글이다.",
+ "R03-2": `정부는 학생들이 자가 진단을 통해 자신의 스마트폰 중독 정도를 이해하도록 권장한다고 했다.${KO2(HS("정부는 학생들이 무엇을 하도록 권장하는가?<br>→ 정부는 학생들이 <u>자가 진단을 통해 자신의 스마트폰 중독 정도를 이해하도록</u> 권장한다."))}`,
+ "R03-3": `의사들은 십 대의 스마트폰 중독의 위험성에 대해 경고하면서 그것이 학생들의 뇌에 부정적인 영향을 끼친다고 했다.${KO2(HS("스마트폰 중독은 학생들의 <u>뇌</u>에 해로울 수 있다."))}`,
+ "R03-4": `${HS("")}<div class="tbl">
+    <div class="r"><div class="h c4">원인</div><div class="c">십 대들이 스마트폰에 (1) <u>중독된다</u>.</div></div>
+    <div class="r"><div class="h c1">결과</div><div class="c"><span class="dt"></span>그들은 (2) <u>판단</u>을 내리는 것을 어려워한다.<br><span class="dt"></span>그들은 자신의 감정을 쉽게 (3) <u>조절할</u> 수 없다.<br><span class="dt"></span>그들은 자신의 (4) <u>공부</u>에 집중할 수 없다.</div></div></div>`,
+ "POP-1": `${HS("")}${KO2("(1) 따뜻한 목욕은 너를 <u>편안하게</u> 느끼게 할 수 있다.<br>(2) 중요한 <u>결정</u>을 내리는 것은 어렵다.<br>(3) 고래는 <u>바다</u>에 사는 커다란 동물들이다.<br>(4) 정크 푸드는 건강에 <u>부정적인</u> 영향을 줄 수 있다.<br>(5) 우리는 사용하는 플라스틱의 양을 <u>줄여야</u> 한다.")}`,
+ "POP-2": "(1) due to: ~ 때문에<br>(2) focus on: ~에 집중하다<br>(3) according to: ~에 따르면<br>(4) have an effect on: ~에 영향을 미치다",
+ "POP-3": `(2) 진목적어 to ride the roller coaster를 대신하는 가목적어 it이 적절하다.<br>(3) 선행사가 The man이므로 주격 관계대명사 who가 적절하다.<br>(4) 진주어 to wash your hands before eating을 대신하는 가주어 It이 적절하다.<br>(5) 「가주어 it-진주어(to부정사구)」 구문이므로 to make가 적절하다.${KO2(HS("(1) 지금 나오는 노래는 내가 가장 좋아하는 노래이다.<br>(2) 우리는 롤러코스터를 타는 것이 매우 신이 났다.<br>(3) 어제 너에게 전화한 사람은 내 삼촌이다.<br>(4) 먹기 전에 너의 손을 씻는 것은 필수이다.<br>(5) 무언가를 배울 때 실수하는 것은 자연스럽다."))}`,
+ "POP-4": "(1) 동사 뒤에 「가목적어 it + 목적격 보어(형용사) + 진목적어(to부정사구)」 형태로 쓴다.<br>(2) 선행사가 단수명사 The house이므로 주격 관계대명사 that, 3인칭 단수동사 stands를 쓰고, 문장의 동사는 3인칭 단수동사 has로 써야 한다.<br>(3) 「가주어 It + be동사 + 주격 보어(형용사) + 진주어(to부정사구)」 형태로 쓰고, 의문문이므로 be동사 is를 문장 앞으로 보낸다. 목적어 자리에는 ‘~하는 방법’을 뜻하는 「how to + 동사원형」을 쓴다.<br>(4) 「가주어 It + be동사 + 주격 보어(형용사) + 진주어(that절)」 형태로 쓴다. that절의 내용이 현재진행형이므로 ~ is telling the truth로 써야 한다.",
+ "POP-A": `③을 포함한 문장의 앞뒤로 반복되는 생각과 행동을 하면 뇌세포들이 함께 활동한다는 내용과 시간이 지나면 ‘이러한 강한 연결들(these strong connections)’이 우리의 습관과 뇌를 바꾼다는 내용이 나오므로 문맥상 weaker(더 약한)를 stronger(더 강한)와 같은 낱말로 바꿔야 한다.${KO2(HS("READING 01 지문해석 참조"))}`,
+ "POP-B": `⑤ 접속사 and를 사이에 두고 to reduce와 병렬 구조로 연결되어 있으므로 controlling을 (to) control로 고쳐야 한다.${KO2(HS("READING 02 지문해석 참조"))}`
+};
+const exb = k => `<span class="q exq"><b>해설</b><span class="pan"><span class="pt">${k.split("-")[1]}번 해설</span>${EX[k]}</span></span>`;
+
+/* 표지 */
+add("U01","표지",`
+  <div class="main">
+    <div class="bk">Reading BITE GRADE 2</div>
+    <div class="un">Unit 01</div>
+    <h1>주제 파악하기</h1>
+    <div class="rule"></div>
+    <div class="rd3"><span>READING 01</span><span>READING 02</span><span>READING 03</span><span>Memory POP</span></div>
+  </div>
+  <div class="side">
+    <div class="pt">PART<b>01</b></div>
+    <h2>중심 내용<br>파악하기</h2>
+    <ol><li class="on"><span>Unit 01 주제 파악하기</span><span>12</span></li><li><span>Unit 02 요지·주장 파악하기</span><span>20</span></li><li><span>Unit 03 제목 추론하기</span><span>30</span></li><li><span>Unit 04 요약문 완성하기</span><span>38</span></li></ol>
+  </div>`, "cover");
+
+/* PART 1 소개 */
+add("U01","PART 1",`<div class="q3">
+  <div><h3>중심 내용이란 뭔가요?</h3>
+    <ul><li>글에서 가장 중요하게 다루는 생각이나 주제로, 필자가 말하고자 하는 핵심을 말해요.</li></ul></div>
+  <div><h3>어떻게 문제를 해결하나요?</h3>
+    <ul><li>글을 읽으면서 핵심어구를 찾아 해시태그(#)를 표시해 보세요. 해시태그로 표시한 어구들이 중심 내용에 담겨 있어야 해요.</li>
+    <li>중심 내용과 이를 뒷받침하는 예시나 부연 설명을 구분하면서 주제문을 찾아보세요. 주제문은 보통 글의 시작이나 끝에 있는 경우가 많아요.</li></ul></div>
+  <div><h3>수능에 어떻게 나오나요?</h3>
+    <ul><li>다음 네 가지 유형으로 출제돼요.</li></ul>
+    <div class="types">
+      <b>주제 파악하기</b><s></s><span>Unit <em>01</em></span>
+      <b>요지·주장 파악하기</b><s></s><span>Unit <em>02</em></span>
+      <b>제목 추론하기</b><s></s><span>Unit <em>03</em></span>
+      <b>요약문 완성하기</b><s></s><span>Unit <em>04</em></span>
+    </div></div></div>`, "intro");
+
+/* ===== READING 01 ===== */
+add("R01","본문",`<div class="rd">${rdSide(1,{gichul:1,note:1,ex:"#brain #being happy #positive thoughts"})}
+  <div class="main"><div class="psg">${nm(1)}We used to think that our brains could not change. ${nm(2)}But now scientists know that they can. ${nm(3)}A scientist named Richard Davidson says that our brains are shaped by repeating the same thoughts again and again. ${nm(4)}He explains, “Being happy is like learning to play the cello. If we practice, we can get better.” ${nm(5)}In other words, we can train our brains to feel more thankful, relaxed, or brave. ${nm(6)}When we repeat the same thoughts and actions, our brain cells work together. ${nm(7)}As these brain cells continue to work together, their connections get stronger. ${nm(8)}Over time, these strong connections help us form new habits and change our brains. ${nm(9)}This idea is supported by another scientist, Donald Hebb. ${nm(10)}He says, “Brain cells that work together connect together.” ${nm(11)}This is good news. ${nm(12)}If we keep thinking positive thoughts, our brains can become happier.</div>
+  <div class="fn">*cell: 세포</div></div></div>${FT}<div class="bp">12</div>`);
+
+add("R01","문제 1-3",`<div class="qs">
+  <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 주제로 가장 적절한 것은? ${chip("①")} ${exb("R01-1")}
+      <div class="opts"><div><span class="ok">①</span> 행복을 위한 뇌 훈련 방법</div><div>② 악기를 배울 때 연습의 중요성</div><div>③ 몸의 움직임을 향상시키는 뇌의 역할</div><div>④ 뇌세포의 작용을 연구하는 것의 어려움</div><div>⑤ 휴식이 기억력 향상에 도움이 되는 이유</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">What did Richard Davidson compare “being happy” to? ${exb("R01-2")}
+      <div class="ln">→ He compared it to ${b("learning to play the cello","w")}.</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R01-3")}
+      <div class="ln">(1) Thinking the same thoughts again and again helps brain cells connect. ${b("T","s")}</div>
+      <div class="ln">(2) Richard Davidson and Donald Hebb have similar ideas about brains. ${b("T","s")}</div></div></div>
+  </div>${FT}<div class="bp">12</div>`);
+
+add("R01","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R01-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c1">Old Belief</div><div class="c">People thought that the <sup>(1)</sup>${b("brain")} could not change.</div></div>
+        <div class="r"><div class="h c2">New Discovery</div><div class="c">Scientists now know that the brain can <sup>(2)</sup>${b("change")}.</div></div>
+        <div class="r"><div class="h c3">How the Brain<br>Works</div><div class="c"><sup>(3)</sup>${b("Repeat")} the same thoughts and actions.<br>→ Brain cells work together, and their <sup>(4)</sup>${b("connections")} become stronger.<br>→ This helps our brain form new habits.</div></div>
+        <div class="r"><div class="h c4">Good News</div><div class="c">Our brains can be <sup>(5)</sup>${b("happier")} by repeating <sup>(6)</sup>${b("positive")} thoughts.</div></div>
+      </div></div></div></div>${FT}<div class="bp">12</div>`);
+
+const W1 = [
+  W("used to","","~하곤 했다"),W("brain","명","뇌"),W("shape","동","형성하다"),W("repeat","동","반복하다"),W("explain","동","설명하다"),W("practice","동","연습하다"),W("get better","","더 나아지다, 향상되다"),
+  W("in other words","","다시 말해서"),W("train","동","훈련하다"),W("thankful","형","감사하는"),W("relaxed","형","편안한, 느긋한"),W("brave","형","용감한"),W("continue","동","계속하다"),W("connect","동","연결하다"),W("connection","명","연결",1),
+  W("over time","","오랜 시간에 걸쳐"),W("form","동","형성하다"),W("habit","명","습관"),W("support","동","지지하다"),W("positive","형","긍정적인"),W("negative","형","부정적인",1)];
+
+add("R01","Read Closely 1",rcSlide(
+  sen(1,`<span class="wv">We</span> <span class="bx">used to think</span><span class="red">/</span>that our brains could not change.`,1,"우리는 생각하곤 했다 /")+
+  sen(2,"But now scientists know that they can.")+
+  sen(3,"A scientist named Richard Davidson says that our brains are shaped by repeating the same thoughts again and again.",2)+
+  sen(4,"He explains, “Being happy is like learning to play the cello. If we practice, we can get better.”",2),
+  W1.slice(0,9).join(""), 13));
+
+add("R01","Read Closely 2",rcSlide(
+  sen(5,`<span class="hp">In other words</span>, we can train our brains to feel more thankful, relaxed, or brave.`)+
+  `<div class="tip"><span class="lb p">독해 TIP</span><b>in other words:</b> ‘다시 말해서’라는 뜻으로 앞에서 나온 내용을 다른 방식으로 설명하거나 명확하게 표현하기 위해 사용해요. 즉, in other words를 사이에 두고 앞뒤 문장은 같은 의미라고 볼 수 있어요.</div>`+
+  sen(6,"When we repeat the same thoughts and actions, our brain cells work together.")+
+  sen(7,"As these brain cells continue to work together, their connections get stronger.")+
+  sen(8,"Over time, these strong connections help us form new habits and change our brains.")+
+  sen(9,"This idea is supported by another scientist, Donald Hebb."),
+  W1.slice(9,16).join(""), 13));
+
+add("R01","Read Closely 3",rcSlide(
+  sen(10,`He says, “Brain cells <span class="hl">that</span> work together connect together.”`)+
+  `<div class="tip"><span class="lb t">문법 TIP</span><b>주격 관계대명사:</b> 앞에 나온 명사인 선행사를 대신해 절에서 주어 역할을 하며, 뒤에는 동사가 이어져요. 선행사가 사물이나 동물일 때 주격 관계대명사 that/which를 쓰고, 사람일 때는 who/that를 써요.
+    <div class="ex">Mom made <u>a strawberry cake</u> <b>that[which]</b> tastes delicious.</div>
+    <div class="ex"><u>The boy</u> <b>who[that]</b> lives next door is very kind.</div></div>`+
+  sen(11,"This is good news.")+
+  sen(12,"If we keep thinking positive thoughts, our brains can become happier."),
+  W1.slice(16).join(""), 13));
+
+/* ===== READING 02 ===== */
+add("R02","본문",`<div class="rd">${rdSide(2,{ex:"#fish are smaller #global warming"})}
+  <div class="main"><div class="psg">${nm(1)}Do you know how big the fish in the ocean are? ${nm(2)}A new report says that fish are smaller than before due to global warming. ${nm(3)}According to the research, most fish will become even smaller by the year 2050 because the ocean is getting warmer. ${nm(4)}The biggest changes will be seen in tropical areas. ${nm(5)}The scientists say that the fish cannot grow enough because there is less oxygen in warmer water. ${nm(6)}They also say that many fish will move to cooler water outside the tropics. ${nm(7)}Professor William Cheung said, “We found that the fish are much smaller these days. ${nm(8)}It occurred over a short period of time. ${nm(9)}It is very surprising. ${nm(10)}It is known that fish respond to climate change. ${nm(11)}Thus, it is very important to reduce greenhouse gases and control global warming.”</div></div></div>${FT}<div class="bp">14</div>`);
+
+add("R02","문제 1-3",`<div class="qs" style="gap:24px">
+  <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 주제로 가장 적절한 것은? ${chip("③")} ${exb("R02-1")}
+      <div class="opts one en"><div>① lack of oxygen in the ocean</div><div>② characteristics of tropical fish</div><div><span class="ok">③</span> the reason why fish are getting smaller</div><div>④ the effect of greenhouse gases on global warming</div><div>⑤ the difference of taste between big fish and small ones</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">윗글의 내용과 일치하면 T, 그렇지 <u>않으면</u> F를 쓰시오. ${exb("R02-2")}
+      <div class="ln">(1) Warmer water stops fish from growing enough. ${b("T","s")}</div>
+      <div class="ln">(2) Changes in fish size are expected to stop by 2050. ${b("F","s")}</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">Why are the scientists surprised? ${exb("R02-3")}
+      <div class="ln">→ They are surprised because the fish ${b("became much smaller in a short time","w")}.</div>
+      <div class="wd">(in / short / smaller / a / became / time / much)</div></div></div>
+  </div>${FT}<div class="bp">14</div>`);
+
+add("R02","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R02-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c5">Problem</div><div class="c">Fish are getting <sup>(1)</sup>${b("smaller")} because of global warming.</div></div>
+        <div class="r"><div class="h c2">Cause<br>&amp;<br>Effect</div><div class="c">The ocean is getting <sup>(2)</sup>${b("warmer")}. → There is less <sup>(3)</sup>${b("oxygen")} in warm water. → Fish cannot <sup>(4)</sup>${b("grow")} well. → Fish will leave <sup>(5)</sup>${b("tropical")} areas and go to cooler water.</div></div>
+        <span class="ar">↓</span>
+        <div class="r"><div class="h c4">Message</div><div class="c"><sup>(6)</sup>${b("Reduce")} greenhouse gases and control global warming.</div></div>
+      </div></div></div></div>${FT}<div class="bp">14</div>`);
+
+const W2 = [
+  W("ocean","명","바다, 해양"),W("due to","","~ 때문에"),W("because of","","~ 때문에",1),W("global warming","","지구 온난화"),W("according to","","~에 따르면"),W("research","명","조사, 연구"),W("tropical","형","열대의"),
+  W("oxygen","명","산소"),W("tropics","명","열대 지방"),W("professor","명","교수"),W("these days","","요즘"),W("occur","동","발생하다"),W("happen","동","일어나다",1),W("period","명","기간"),
+  W("respond","동","반응을 보이다"),W("response","명","반응",1),W("climate","명","기후"),W("weather","명","날씨",1),W("reduce","동","줄이다"),`<li><em>cf.</em><b>decrease</b>${ps("동")}줄이다<br><b style="margin-left:22px">increase</b>${ps("동")}늘리다</li>`,W("greenhouse gas","","온실가스"),W("control","동","제어하다")];
+
+CUR = "R02";
+add("R02","Read Closely 1",rcSlide(
+  sen(1,"Do you know how big the fish in the ocean are?")+
+  sen(2,"A new report says that fish are smaller than before due to global warming.")+
+  sen(3,"According to the research, most fish will become even smaller by the year 2050 because the ocean is getting warmer.",2)+
+  sen(4,"The biggest changes will be seen in tropical areas.")+
+  sen(5,"The scientists say that the fish cannot grow enough because there is less oxygen in warmer water.",2),
+  W2.slice(0,8).join(""), 15));
+
+add("R02","Read Closely 2",rcSlide(
+  sen(6,"They also say that many fish will move to cooler water outside the tropics.")+
+  sen(7,"Professor William Cheung said, “We found that the fish are much smaller these days.",2)+
+  sen(8,"It occurred over a short period of time.")+
+  sen(9,"It is very surprising."),
+  W2.slice(8,15).join(""), 15));
+
+add("R02","Read Closely 3",rcSlide(
+  sen(10,`<span class="hl">It</span> is known <span class="hl">that fish respond to climate change</span>.`)+
+  `<div class="tip"><span class="lb t">문법 TIP</span><b>가주어 it-진주어:</b> to부정사(구) 또는 that이 이끄는 명사절이 주어로 쓰이면 대개 문장의 맨 뒤로 보내고 주어 자리에 it을 써요. 이때 it을 가주어, to부정사(구)와 that절을 진주어라고 해요.
+    <div class="ex"><b>It</b> is surprising <b>that he remembered my name.</b></div>
+    <div class="ex"><b>It</b> is important <b>to drink enough water.</b></div></div>`+
+  sen(11,`Thus, <span class="hl">it</span> is very important <span class="hl">to reduce greenhouse gases and control global warming</span>.”`,2),
+  W2.slice(15).join(""), 15));
+
+/* ===== READING 03 ===== */
+add("R03","본문",`<div class="rd">${rdSide(3,{ex:"#smartphone addiction #negative effects on the brains"})}
+  <div class="main"><div class="psg">${nm(1)}Smartphones are the must-have devices for people these days. ${nm(2)}“I often bring my smartphone to the bathroom,” said a 14-year-old student. ${nm(3)}“I also use it just before I go to bed and right after I wake up. ${nm(4)}I just can’t live without my smartphone.” ${nm(5)}Regarding this situation, the government encourages students to understand their levels of smartphone addiction through a self-test. ${nm(6)}Doctors warn about the danger of smartphone addiction in teens. ${nm(7)}It has negative effects on the brains of students. ${nm(8)}When they are addicted to smartphones, students find it difficult to make a decision or control their feelings. ${nm(9)}Besides, as they constantly check their phones while they are studying, they can’t focus on their studies.</div></div></div>${FT}<div class="bp">16</div>`);
+
+add("R03","문제 1-3",`<div class="qs" style="gap:26px">
+  <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
+    <div class="tx">윗글의 주제로 가장 적절한 것은? ${chip("⑤")} ${exb("R03-1")}
+      <div class="opts one"><div>① 스마트폰 사용 예절</div><div>② 스마트폰의 유용한 기능</div><div>③ 십 대의 스마트폰 사용 습관</div><div>④ 스마트폰 앱을 활용한 학습법</div><div><span class="ok">⑤</span> 십 대의 스마트폰 중독의 문제점</div></div></div></div>
+  <div class="qi"><div class="no">2</div>
+    <div class="tx">What does the government encourage students to do? ${exb("R03-2")}
+      <div class="ln">→ It encourages them ${b("to understand their levels of smartphone addiction through a self-test","w")}.</div></div></div>
+  <div class="qi"><div class="no">3</div>
+    <div class="tx">윗글의 내용과 일치하도록 빈칸에 알맞은 단어를 윗글에서 찾아 쓰시오. ${exb("R03-3")}
+      <div class="ln">Smartphone addiction can be harmful to the ${b("brains")} of students.</div></div></div>
+  </div>${FT}<div class="bp">16</div>`);
+
+add("R03","문제 4",`<div class="qs">
+  <div class="qi"><div><div class="no">4</div><span class="bdg r">구조<br>이해</span></div>
+    <div class="tx">윗글의 내용을 다음과 같이 정리할 때, 빈칸에 알맞은 말을 쓰시오. ${exb("R03-4")}
+      <div class="tbl">
+        <div class="r"><div class="h c4">Cause</div><div class="c">Teens are <sup>(1)</sup>${b("addicted")} to smartphones.</div></div>
+        <span class="ar">↓</span>
+        <div class="r"><div class="h c1">Effect</div><div class="c"><span class="dt"></span>They find it difficult to make <sup>(2)</sup>${b("decisions")}.<br><span class="dt"></span>They can’t <sup>(3)</sup>${b("control")} their feelings easily.<br><span class="dt"></span>They can’t pay attention to their <sup>(4)</sup>${b("studies")}.</div></div>
+      </div></div></div></div>${FT}<div class="bp">16</div>`);
+
+const W3 = [
+  W("must-have","형","꼭 필요한"),W("device","명","도구, 장치"),W("without","전","~ 없이"),W("regarding","전","~에 관하여"),W("situation","명","상황"),W("government","명","정부"),W("encourage","동","권장[격려]하다"),W("level","명","정도, 수준"),W("addiction","명","중독"),W("addicted","형","중독된",1),W("self-test","","자가 진단"),W("warn","동","경고하다"),W("danger","명","위험"),
+  W("negative","형","부정적인"),W("positive","형","긍정적인",1),W("have an effect on","","~에 영향을 미치다"),W("effect","명","영향",1),W("brain","명","뇌"),W("make a decision","","결정하다"),W("decision","명","판단, 결정",1),W("control","동","조절하다"),W("besides","부","게다가"),W("constantly","부","끊임없이"),W("constant","형","끊임없는",1),W("focus on","","~에 집중하다")];
+
+CUR = "R03";
+add("R03","Read Closely 1",rcSlide(
+  sen(1,"Smartphones are the must-have devices for people these days.")+
+  sen(2,"“I often bring my smartphone to the bathroom,” said a 14-year-old student.",2)+
+  sen(3,"“I also use it just before I go to bed and right after I wake up.")+
+  sen(4,"I just can’t live without my smartphone.”")+
+  sen(5,"Regarding this situation, the government encourages students to understand their levels of smartphone addiction through a self-test.",2)+
+  sen(6,"Doctors warn about the danger of smartphone addiction in teens."),
+  W3.slice(0,13).join(""), 17));
+
+add("R03","Read Closely 2",rcSlide(
+  sen(7,"It has negative effects on the brains of students.")+
+  sen(8,`When they are addicted to smartphones, students find <span class="hl">it</span> difficult <span class="hl">to make a decision or control their feelings</span>.`,2)+
+  `<div class="tip"><span class="lb t">문법 TIP</span><b>가목적어 it-to부정사(구):</b> ‘동사 + 목적어 + 목적격 보어(형용사)’ 구문에서 목적어 자리에 to부정사(구)가 오면 그 자리에 가목적어 it을 쓰고 to부정사(구)는 뒤로 보내요.
+    <div class="ex">Tony finds <b>it</b> difficult <b>to understand the book.</b></div>
+    <div class="ex">The Internet makes <b>it</b> easy <b>to find information.</b></div></div>`+
+  sen(9,"Besides, as they constantly check their phones while they are studying, they can’t focus on their studies.",2),
+  W3.slice(13).join(""), 17));
+
+/* ===== Memory POP ===== */
+const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+add("POP","1",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">1</span>괄호 안에서 문맥상 적절한 단어를 고르시오. ${exb("POP-1")}</h4><ol>
+    <li>(1) A warm bath can make you feel [nervous / relaxed]. ${chip("relaxed")}</li>
+    <li>(2) It’s hard to make important [addictions / decisions]. ${chip("decisions")}</li>
+    <li>(3) Whales are large animals that live in the [ocean / desert]. ${chip("ocean")}</li>
+    <li>(4) Junk food can have a [negative / positive] impact on health. ${chip("negative")}</li>
+    <li>(5) We should [increase / reduce] the amount of plastic we use. ${chip("reduce")}</li></ol></div>
+  </div>${FT}<div class="bp">18</div>`);
+add("POP","2",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">2</span>우리말과 의미가 같도록 빈칸에 알맞은 표현을 쓰시오. ${exb("POP-2")}</h4><ol>
+    <li><span class="ko">(1) 비행기는 악천후 때문에 지연되었다.</span><span class="en">→ The flight was delayed ${b("due")} ${b("to")} bad weather.</span></li>
+    <li><span class="ko">(2) 우리는 고객 서비스 개선에 집중해야 한다.</span><span class="en">→ We need to ${b("focus")} ${b("on")} improving customer service.</span></li>
+    <li><span class="ko">(3) 보고서에 따르면, AI 사용자의 수가 늘고 있다.</span><span class="en">→ ${b("According")} ${b("to")} the report, the number of AI users is increasing.</span></li>
+    <li><span class="ko">(4) 수면의 질은 정신 건강에 영향을 미칠 수 있다.</span><span class="en">→ Sleep quality can ${b("have")} ${b("an")} ${b("effect")} ${b("on")} mental health.</span></li></ol></div>
+  </div>${FT}<div class="bp">18</div>`);
+
+add("POP","3",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">3</span>다음 밑줄 친 부분이 어법에 맞으면 ○표, 그렇지 <u>않으면</u> 바르게 고치시오. ${exb("POP-3")}</h4><ol>
+    <li>(1) The song <u>that</u> is playing now is my favorite. ${chip("○")}</li>
+    <li>(2) We found <u>that</u> exciting to ride the roller coaster. ${chip("it")}</li>
+    <li>(3) The man <u>which</u> called you yesterday is my uncle. ${chip("who")}</li>
+    <li>(4) <u>That</u> is necessary to wash your hands before eating. ${chip("It")}</li>
+    <li>(5) It is natural <u>makes</u> mistakes when you learn something. ${chip("to make")}</li></ol></div>
+  </div>${FT}<div class="bp">18</div>`);
+add("POP","4",`${MPH}<div class="mp">
+  <div class="mq"><h4><span class="no">4</span>우리말과 의미가 같도록 주어진 말을 바르게 배열하시오. (필요시 형태를 변형할 것) ${exb("POP-4")}</h4><ol>
+    <li><span class="ko">(1) 나는 아침 일찍 일어나는 것이 어렵게 느껴진다. (wake up / hard / it)</span><span class="en">→ I find ${b("it hard to wake up","m")} early in the morning.</span></li>
+    <li><span class="ko">(2) 강변에 서 있는 그 집에는 두 개의 창문이 있다. (near the river / have / that / stand)</span><span class="en">→ The house ${b("that stands near the river has","m")} two windows.</span></li>
+    <li><span class="ko">(3) 이 앱을 사용하는 방법을 배우는 것은 쉽니? (easy / how / to use / is / learn / it)</span><span class="en">→ ${b("Is it easy to learn how to use","m")} this app?</span></li>
+    <li><span class="ko">(4) 그가 진실을 말하고 있다는 것은 분명하다. (is / that / he / clear / tell the truth / is / it)</span><span class="en">→ ${b("It is clear that he is telling the truth.","w")}</span></li></ol></div>
+  </div>${FT}<div class="bp">19</div>`);
+
+add("POP","A",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">A</span>다음 글의 밑줄 친 부분 중, 문맥상 낱말의 쓰임이 적절하지 <u>않은</u> 것은? ${chip("③")} ${exb("POP-A")}</h4>
+  <p>We used to think that our brains could not change. But now scientists know that they can. A scientist named Richard Davidson says that our brains are shaped by ① <u>repeating</u> the same thoughts again and again. He explains, “Being happy is like learning to play the cello. If we practice, we can get ② <u>better</u>.” In other words, we can train our brains to feel more thankful, relaxed, or brave. When we repeat the same thoughts and actions, our brain cells work together. As these brain cells continue to work together, their connections get <span class="ok">③</span> <u>weaker</u>. Over time, these strong connections help us form new habits and change our brains. This idea is ④ <u>supported</u> by another scientist, Donald Hebb. He says, “Brain cells that work together connect together.” This is good news. If we keep thinking ⑤ <u>positive</u> thoughts, our brains can become happier.</p></div>
+  ${FT}<div class="bp">19</div>`);
+
+add("POP","B",`<div class="pinkbg"></div><div class="su"><span>수능 유형</span>어휘·어법</div>
+  <div class="ab"><h4><span class="c">B</span>다음 글의 밑줄 친 부분 중, 어법상 <u>틀린</u> 것은? ${chip("⑤")} ${exb("POP-B")}</h4>
+  <p>Do you know how big the fish in the ocean are? A new report says that fish are smaller than before due to global warming. According to the research, most fish will become even smaller by the year 2050 ① <u>because</u> the ocean is getting warmer. The biggest changes will be seen in tropical areas. The scientists say ② <u>that</u> the fish cannot grow enough because there is less oxygen in warmer water. They also say that many ③ <u>fish</u> will move to cooler water outside the tropics. Professor William Cheung said, “We found that the fish are ④ <u>much</u> smaller these days. It occurred over a short period of time. It is very surprising. It is known that fish respond to climate change. Thus, it is very important to reduce greenhouse gases and <span class="ok">⑤</span> <u>controlling</u> global warming.”</p></div>
+  ${FT}<div class="bp">19</div>`);
+
+
+/* ---------- 화면 ---------- */
+const stage = document.getElementById("stage");
+let slides = [];
+const slideHTML = x => x.raw ? x.raw : `<section class="slide ${x.cls||""}">${x.html}<div class="pg"></div></section>`;
+function render(){
+  stage.innerHTML = SS.map(slideHTML).join("");
+  slides = [...stage.querySelectorAll(".slide")];
+  slides.forEach((s,i)=>{ const p=s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
+}
+/* 본문: 한 줄에 한 문장씩 나누고, 슬라이드에 들어가는 가장 큰 글씨로 맞춤 */
+function splitPsg(){
+  stage.querySelectorAll(".psg:not(.one)").forEach(p=>{
+    const rows = []; let row = null;
+    [...p.childNodes].forEach(nd=>{
+      if(nd.nodeType===1 && nd.classList.contains("nm")){ row = document.createElement("div"); row.className = "ps1"; rows.push(row); }
+      if(row){ if(nd.nodeType===3) nd.textContent = nd.textContent.replace(/^⁠/,""); row.appendChild(nd); }
+    });
+    rows.forEach(r=>{ r.lastChild.nodeType===3 && (r.lastChild.textContent = r.lastChild.textContent.replace(/\s+$/,"")); });
+    p.replaceChildren(...rows); p.classList.add("one");
+  });
+}
+function fitPsg(){
+  slides.forEach(sl=>{
+    const p = sl.querySelector(".psg.one"); if(!p) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const lim = 664;
+    for(let f=25; f>=17; f-=.5){
+      p.style.fontSize = f+"px";
+      if(p.offsetTop + p.offsetHeight <= lim) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitRc(){
+  slides.forEach(sl=>{
+    const ss = sl.querySelector(".rc .ss"); if(!ss) return;
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const top = sl.getBoundingClientRect().top, sc = sl.getBoundingClientRect().height/720;
+    for(let f=28; f>=22; f-=.5){
+      ss.querySelectorAll(".sen").forEach(e=>e.style.fontSize = f+"px");
+      const last = ss.lastElementChild.getBoundingClientRect().bottom;
+      if((last-top)/sc <= 668) break;
+    }
+    if(!was) sl.classList.remove("on");
+  });
+}
+/* 해설 창: 위쪽 문제는 아래에, 아래쪽 문제는 위에 띄움 */
+function placeEx(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    const t = sl.getBoundingClientRect(), sc = t.height/720;
+    sl.querySelectorAll(".exq").forEach(q=>{ q.classList.toggle("lo", (q.getBoundingClientRect().top - t.top)/sc < 330); });
+    if(!was) sl.classList.remove("on");
+  });
+}
+function fitKo(){
+  slides.forEach(sl=>{
+    const was = sl.classList.contains("on"); sl.classList.add("on");
+    sl.querySelectorAll(".wls").forEach(w=>{
+      const ko = w.querySelector(".ko"); let n = w.querySelectorAll(".wl").length;
+      while(ko.offsetHeight > n*34 + 2 && n < 4){ ko.insertAdjacentHTML("beforebegin",'<div class="wl"></div>'); n++; }
+    });
+    if(!was) sl.classList.remove("on");
+  });
+}
+stage.addEventListener("click", e=>{ const q = e.target.closest(".q"); if(!q) return; q.classList.toggle("open");
+  if(q.classList.contains("exq") && q.classList.contains("open")) q.closest(".slide").querySelectorAll(".exq.open").forEach(o=>{ if(o!==q) o.click(); }); });
+render();
+
+let cur = 0;
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+}
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+}
+function tg(c){ document.body.classList.toggle(c); }
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+addEventListener("resize", fit);
+addEventListener("keydown", e=>{
+  const k = e.key;
+  if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
+  else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home") go(0);
+  else if(k==="End") go(slides.length-1);
+  else if(k==="f"||k==="F") fs();
+});
+fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+splitPsg(); fitPsg(); fitKo(); fitRc(); placeEx(); document.fonts.ready.then(()=>{ fitPsg(); fitKo(); fitRc(); placeEx(); });
+</script>
+<script src="https://s2ionn.github.io/class-tools/board.js"></script>
+<script>
+/* 아래 막대에 정답 버튼: 이 장의 정답을 한꺼번에 보이기/숨기기 (A) */
+(function addAns(){
+  const ui = document.getElementById("ui"), ko = document.getElementById("koBtn");
+  if(!ko) return setTimeout(addAns, 100);
+  ko.insertAdjacentHTML("beforebegin", `<button id="ansBtn" title="정답 보이기/숨기기 (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg><span>정답</span></button>`);
+  const btn = document.getElementById("ansBtn");
+  const qs = () => slides[cur] ? [...slides[cur].querySelectorAll(".q:not(.exq)")] : [];
+  function sync(){ const q = qs(); btn.style.display = q.length ? "" : "none"; btn.classList.toggle("on", q.length>0 && q.every(x=>x.classList.contains("open"))); }
+  function toggle(){ const q = qs(), all = q.length && q.every(x=>x.classList.contains("open")); q.forEach(x=>{ if(x.classList.contains("open")===all) x.click(); }); sync(); }
+  btn.onclick = toggle;
+  addEventListener("keydown", e=>{ if((e.key==="a"||e.key==="A") && !e.ctrlKey && !e.metaKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) toggle(); });
+  setInterval(sync, 300); sync();
+})();
+</script>
+</body>
+</html>
