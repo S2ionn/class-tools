@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-04";
+const VERSION = "2026-11-04-2";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -952,6 +952,7 @@ function apply(msg, from){
   else if(t==="blank"){ insertBlank(msg.id, msg.after, false); }
   else if(t==="unblank"){ removeBlank(msg.id); }
   else if(t==="cur"){ showRcur(msg); }
+  else if(t==="app"){ dispatchEvent(new CustomEvent("boardapp", {detail:msg.data})); }   /* 페이지가 보낸 자기 메시지(예: 소리 맞추기) */
   else if(t==="laser"){
     const Lz = LASER[msg.who] ||= {pts:[], down:false, hover:null}, now = performance.now();
     if(msg.out){ Lz.hover = null; Lz.down = false; }
@@ -1244,5 +1245,5 @@ addEventListener("keydown", e=>{
 buildBar(); drawInk();
 const roomQ = new URLSearchParams(location.search).get("room");
 if(roomQ){ autoOpen = true; coPanel(true); coStart(roomQ); }
-window.Board = {VERSION, INK, REDO, UNDO, QUIZ, BLANKS, setTool, togglePen, skey, recognize, rdp, get state(){ return {tool, LOCK, CID, isHost, conns:conns.length, cur}; }, sel, insertBlank};
+window.Board = {appSend: d=>send({type:"app", data:d}), get connected(){ return connected(); }, VERSION, INK, REDO, UNDO, QUIZ, BLANKS, setTool, togglePen, skey, recognize, rdp, get state(){ return {tool, LOCK, CID, isHost, conns:conns.length, cur}; }, sel, insertBlank};
 })();
