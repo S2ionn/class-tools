@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-02-3";
+const VERSION = "2026-11-04";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -453,13 +453,15 @@ function paint(st, g = ctx){
 }
 /* 다 그은 획은 한 장에 모아 두고, 긋는 중에는 그 장 + 지금 획만 다시 그림 */
 const done = document.createElement("canvas"); done.width = ink.width; done.height = ink.height;
-const dctx = done.getContext("2d"); let doneSig = "";
+const dctx = done.getContext("2d"); let doneSig = "", doneAt = null;
 function drawInk(){
   const k = skey(), arr = INK[k] || [], sig = k + ":" + arr.length + ":" + (arr.length ? arr[arr.length-1].id : "") + ":" + (arr.length ? arr[0].id : "");
   if(sig !== doneSig){
-    doneSig = sig;
-    dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,done.width,done.height);
-    dctx.setTransform(2,0,0,2,0,0); arr.forEach(st=>paint(st, dctx));
+    const d = doneAt, n = arr.length;           /* 획 하나만 늘었으면 그 획만 더 그림(전부 다시 그리지 않음) */
+    if(doneSig && d && d.k===k && n===d.n+1 && n>1 && arr[0].id===d.first && arr[n-2].id===d.last){ dctx.setTransform(2,0,0,2,0,0); paint(arr[n-1], dctx); }
+    else { dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,done.width,done.height);
+      dctx.setTransform(2,0,0,2,0,0); arr.forEach(st=>paint(st, dctx)); }
+    doneSig = sig; doneAt = {k, n, first: n ? arr[0].id : "", last: n ? arr[n-1].id : ""};
   }
   ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height); ctx.drawImage(done, 0, 0);
   ctx.setTransform(2,0,0,2,0,0);
@@ -608,8 +610,11 @@ function snapStroke(){
 function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*1280, (e.clientY-r.top)/r.height*720, e.pointerType==="pen" && e.pressure ? e.pressure : .5]; }
 let lastLive = 0;
 function sendLive(force){ if(conns.length && (force || Date.now()-lastLive > 40)){ lastLive = Date.now(); send({type:"live", who:ME, st:stroke}); } }
+let activeId = null;                              /* 지금 긋고 있는 펜(마우스)의 번호. 다른 포인터(손바닥)의 움직임·떼기는 무시 */
 ink.addEventListener("pointerdown", e=>{
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
+  if(stroke && activeId!==null && e.pointerId!==activeId) return;
+  activeId = e.pointerId;
   try{ ink.setPointerCapture(e.pointerId); }catch(err){}
   const q = pos(e);
   if(tool==="laser"){ laserDown = true; laserAt(q, "down"); return; }
@@ -625,6 +630,8 @@ ink.addEventListener("pointerdown", e=>{
   drawInk();
 });
 ink.addEventListener("pointermove", e=>{
+  if(e.pointerType==="touch") return;
+  if(activeId!==null && e.pointerId!==activeId) return;
   if(tool==="laser"){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>laserAt(pos(x), laserDown ? "move" : "hover")); return; }
   if(tool==="se"){ if(seDown){ const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>eraseAt(pos(x))); } return; }
   if(!stroke) return;
@@ -643,9 +650,14 @@ ink.addEventListener("pointermove", e=>{
   else if(stroke.snap==="line") stroke.pts = underline(stroke.pts[0], hv(stroke.pts[0], q, 15));
   else if(stroke.snap) return;
   else { const ev = e.getCoalescedEvents?.() || []; (ev.length ? ev : [e]).forEach(x=>addPt(pos(x))); }
-  drawInk(); sendLive();
+  drawSoon(); sendLive();
 });
-const endStroke = ()=>{
+let drawQ = 0;                                    /* 긋는 중 다시 그리기는 한 화면(프레임)에 한 번만 */
+function drawSoon(){ if(!drawQ) drawQ = requestAnimationFrame(()=>{ drawQ = 0; drawInk(); }); }
+const endStroke = e=>{
+  if(e && e.pointerId!==undefined && activeId!==null && e.pointerId!==activeId) return;   /* 손바닥 등 다른 손가락이 떨어진 것은 무시 */
+  activeId = null;
+  if(drawQ){ cancelAnimationFrame(drawQ); drawQ = 0; }
   if(laserDown){ laserDown = false; laserAt(null, "up"); }
   if(seDown){ seDown = false; if(seGone.length) pushAct(skey(), {a:"rm", list:seGone}); seGone = []; buildUndoState(); }
   clearTimeout(holdT); holdAt = null;
@@ -668,7 +680,7 @@ const penErase = e => e.pointerType==="pen" && ((e.buttons & 32) || (e.buttons &
 ink.addEventListener("pointerdown", e=>{
   if(penErase(e) && tool!=="er" && tool!=="se"){ penSwap = tool; setTool(eraseMode); }
 }, true);                                          /* 그리기 처리보다 먼저 */
-const penBack = ()=>{ if(penSwap){ const t = penSwap; penSwap = null; setTool(t); ERING = null; kickFx(); } };
+const penBack = e=>{ if(e && e.pointerType!=="pen") return; if(penSwap){ const t = penSwap; penSwap = null; setTool(t); ERING = null; kickFx(); } };
 ink.addEventListener("pointerup", penBack);
 ink.addEventListener("pointercancel", penBack);
 ink.addEventListener("contextmenu", e=>e.preventDefault());   /* 펜 옆 버튼이 오른쪽 클릭 메뉴를 띄우지 않게 */
@@ -676,10 +688,12 @@ ink.addEventListener("contextmenu", e=>e.preventDefault());   /* 펜 옆 버튼�
 const TAPPABLE = ".q, button, a[href], [onclick], input, select, label, summary, [role=button]";
 let tapAt = null;
 const tapTarget = (x, y) => { for(const el of document.elementsFromPoint(x, y)){ if(bd.contains(el)) continue; const t = el.closest(TAPPABLE); if(t && stage.contains(t)) return t; } return null; };
-ink.addEventListener("pointerdown", e=>{ tapAt = e.pointerType==="touch" ? null : {x:e.clientX, y:e.clientY, t:performance.now(), el:tapTarget(e.clientX, e.clientY)}; }, true);
+ink.addEventListener("pointerdown", e=>{ if(e.pointerType==="touch") return; tapAt = {x:e.clientX, y:e.clientY, t:performance.now(), el:tapTarget(e.clientX, e.clientY)}; }, true);
+ink.addEventListener("pointermove", e=>{ const p = tapAt; if(p && e.pointerType!=="touch") p.m = Math.max(p.m||0, Math.hypot(e.clientX-p.x, e.clientY-p.y)); }, true);
 ink.addEventListener("pointerup", e=>{
+  if(e.pointerType==="touch") return;
   const p = tapAt; tapAt = null;
-  if(!p || !p.el || performance.now()-p.t > 400 || Math.hypot(e.clientX-p.x, e.clientY-p.y) > 8) return;
+  if(!p || !p.el || performance.now()-p.t > 300 || (p.m||0) > 6 || Math.hypot(e.clientX-p.x, e.clientY-p.y) > 6) return;   /* 움직인 거리 전체로 판단: 빈칸에 o를 쓰고 제자리로 와도 그림으로 남음 */
   if(stroke){ stroke = null; clearTimeout(holdT); holdAt = null; send({type:"live", who:ME, st:{k:null}}); drawInk(); }
   p.el.click();
 }, true);                                          /* 그리기 끝내기(endStroke)보다 먼저 */
