@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>불규칙동사 마스터</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  :root { --gold: #e0a100; --past: #2f6fdb; --pp: #8a4fd6; }
+  @media (prefers-color-scheme: dark) { :root { --past: #7ea8f5; --pp: #b995f0; } }
+  button { touch-action: manipulation; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.mini { padding: 4px 10px; font-size: 13px; border-radius: 999px; }
+  .center { text-align: center; }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  .spacer { flex: 1; }
+
+  /* 홈 */
+  .rank { display: flex; align-items: center; gap: 14px; }
+  .rank .em { font-size: 44px; line-height: 1; }
+  .rank .info { flex: 1; min-width: 0; }
+  .bar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width .3s; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chip { border-radius: 999px; padding: 7px 14px; font-size: 14px; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip small { opacity: .75; margin-left: 4px; font-weight: 500; }
+  .games { margin-top: 16px; }
+  .gcard { text-align: left; display: block; width: 100%; padding: 18px; border-radius: var(--radius); transition: transform .1s, border-color .1s; }
+  .gcard:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--accent); }
+  .gcard .emoji { font-size: 34px; line-height: 1.2; }
+  .gcard h2 { margin: 4px 0 4px; font-size: 17px; }
+  .gcard p { margin: 0; }
+  .gcard .best { margin-top: 8px; font-size: 12px; color: var(--gold); font-weight: 700; }
+
+  /* 게임 공통 */
+  .hud { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 700; margin: 4px 0 8px; flex-wrap: wrap; }
+  .stage { padding: 20px 16px; margin-top: 12px; }
+  .big { font-size: 40px; font-weight: 800; letter-spacing: .5px; word-break: break-word; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--muted); }
+  .tag.boss { color: var(--bad); }
+  .monster { font-size: 64px; line-height: 1.1; }
+  .monster.hit { animation: pop .6s forwards; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.4) rotate(10deg); } 100% { transform: scale(0) rotate(40deg); opacity: 0; } }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+  .ins { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; text-align: left; }
+  @media (max-width: 480px) { .ins { grid-template-columns: 1fr; gap: 4px; } }
+  input.ans { font-size: 20px; text-align: center; padding: 10px; }
+  input.ans.right { border-color: var(--ok) !important; outline: none; background: color-mix(in srgb, var(--ok) 16%, var(--bg)); }
+  input.ans.wrong { border-color: var(--bad) !important; outline: none; background: color-mix(in srgb, var(--bad) 14%, var(--bg)); }
+  .fb { min-height: 28px; margin-top: 12px; font-weight: 700; font-size: 17px; }
+  .fb.ok { color: var(--ok); } .fb.bad { color: var(--bad); }
+  .badge { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 800; font-size: 15px; color: #fff; }
+  .badge.past { background: var(--past); } .badge.pp { background: var(--pp); }
+  .opt { display: block; width: 100%; padding: 14px; font-size: 21px; margin-top: 10px; }
+  .opt.right { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .opt small { opacity: .7; font-size: 12px; margin-right: 8px; }
+  .opt-pat { text-align: left; }
+  .opt-pat b { font-size: 19px; margin-right: 8px; }
+  .opt-pat span { font-size: 13px; opacity: .8; }
+  .opt:disabled { opacity: 1; }
+  .triple { font-size: 30px; font-weight: 800; margin: 8px 0 4px; word-break: break-word; }
+  .triple .arrow { color: var(--muted); font-weight: 400; margin: 0 4px; }
+  .timer { height: 12px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .timer > i { display: block; height: 100%; width: 100%; background: var(--accent); }
+  .timer.low > i { background: var(--bad); }
+
+  /* 카드 짝 맞추기 */
+  .mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  @media (min-width: 640px) { .mgrid { grid-template-columns: repeat(4, 1fr); } }
+  .mc { position: relative; height: 92px; padding: 0; background: none; border: none; perspective: 600px; }
+  .mc .in { position: absolute; inset: 0; transition: transform .35s; transform-style: preserve-3d; }
+  .mc.up .in, .mc.done .in { transform: rotateY(180deg); }
+  .mc .f, .mc .b { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--line); backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 4px; line-height: 1.25; }
+  .mc .b { background: var(--accent); color: #fff; font-size: 28px; font-weight: 800; }
+  .mc .f { background: var(--surface); transform: rotateY(180deg); font-size: 15px; font-weight: 700; }
+  .mc .f small { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .mc.done .f { background: color-mix(in srgb, var(--ok) 18%, var(--surface)); border-color: var(--ok); }
+  .mc.kb .f b { color: var(--past); } .mc.kb .f { color: var(--pp); }
+
+  /* 학습 */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .vt { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .vt th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 4px 6px; }
+  .vt td { padding: 8px 6px; border-top: 1px solid var(--line); vertical-align: middle; }
+  .vt td small { display: block; color: var(--muted); font-size: 12px; }
+  .vt td.cv.cov { cursor: pointer; }
+  .vt td.cv.cov > span { background: var(--line); color: transparent; border-radius: 6px; display: inline-block; user-select: none; }
+  .vt .p { color: var(--past); font-weight: 700; } .vt .q { color: var(--pp); font-weight: 700; }
+  .vt .bad-n { color: var(--bad); font-weight: 700; }
+  .grp h3 { margin: 0 0 2px; font-size: 16px; }
+  .grp { margin-top: 12px; }
+  .flash { width: 100%; min-height: 220px; padding: 24px 12px; border-radius: var(--radius); background: var(--surface); }
+  .flash .big { font-size: 46px; }
+  .flash .back { margin-top: 8px; font-size: 24px; font-weight: 800; line-height: 1.7; }
+  .flash .back .p { color: var(--past); } .flash .back .q { color: var(--pp); }
+  .flash .back small { font-size: 12px; font-weight: 600; color: var(--muted); display: block; line-height: 1; }
+  .newbest { color: var(--gold); font-weight: 800; }
+  .stars { font-size: 36px; letter-spacing: 4px; }
+  .note { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="index.html">← 수업 도구 모음</a>
+    <span class="spacer"></span>
+    <button class="mini" id="snd" type="button"></button>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+/* =====================================================================
+   동사 데이터  (원형|과거|과거분사|뜻|레벨)
+   - 여러 형태가 허용되면 / 로 구분 (맨 앞이 대표형)
+   - 레벨 1: 중등 기본, 2: 중등 심화, 3: 고등·수능
+   - 빠진 동사는 아래에 한 줄 추가하면 모든 게임에 바로 반영돼요.
+   ===================================================================== */
+const RAW = `
+be|was/were|been|이다, 있다|1
+become|became|become|~이 되다|1
+begin|began|begun|시작하다|1
+bite|bit|bitten|물다|1
+blow|blew|blown|불다|1
+break|broke|broken|깨뜨리다, 부수다|1
+bring|brought|brought|가져오다|1
+build|built|built|짓다|1
+buy|bought|bought|사다|1
+catch|caught|caught|잡다|1
+choose|chose|chosen|고르다|1
+come|came|come|오다|1
+cost|cost|cost|(비용이) 들다|1
+cut|cut|cut|자르다|1
+do|did|done|하다|1
+draw|drew|drawn|그리다, 끌다|1
+drink|drank|drunk|마시다|1
+drive|drove|driven|운전하다|1
+eat|ate|eaten|먹다|1
+fall|fell|fallen|떨어지다|1
+feel|felt|felt|느끼다|1
+fight|fought|fought|싸우다|1
+find|found|found|찾다, 발견하다|1
+fly|flew|flown|날다|1
+forget|forgot|forgotten|잊다|1
+get|got|got/gotten|얻다, 받다|1
+give|gave|given|주다|1
+go|went|gone|가다|1
+grow|grew|grown|자라다, 기르다|1
+have|had|had|가지다, 먹다|1
+hear|heard|heard|듣다|1
+hide|hid|hidden|숨다, 숨기다|1
+hit|hit|hit|치다, 때리다|1
+hold|held|held|잡다, 열다|1
+hurt|hurt|hurt|다치게 하다|1
+keep|kept|kept|유지하다, 계속 ~하다|1
+know|knew|known|알다|1
+leave|left|left|떠나다, 남기다|1
+lend|lent|lent|빌려주다|1
+let|let|let|~하게 해 주다|1
+lose|lost|lost|잃다, 지다|1
+make|made|made|만들다|1
+mean|meant|meant|의미하다|1
+meet|met|met|만나다|1
+pay|paid|paid|지불하다|1
+put|put|put|놓다|1
+read|read|read|읽다 (과거형 발음 [red])|1
+ride|rode|ridden|타다|1
+ring|rang|rung|(종·전화가) 울리다|1
+rise|rose|risen|오르다, 떠오르다|1
+run|ran|run|달리다|1
+say|said|said|말하다|1
+see|saw|seen|보다|1
+sell|sold|sold|팔다|1
+send|sent|sent|보내다|1
+set|set|set|놓다, 설정하다|1
+shoot|shot|shot|쏘다|1
+show|showed|shown/showed|보여 주다|1
+shut|shut|shut|닫다|1
+sing|sang|sung|노래하다|1
+sit|sat|sat|앉다|1
+sleep|slept|slept|자다|1
+speak|spoke|spoken|말하다|1
+spend|spent|spent|(돈·시간을) 쓰다|1
+stand|stood|stood|서 있다|1
+steal|stole|stolen|훔치다|1
+swim|swam|swum|수영하다|1
+take|took|taken|가져가다, (시간이) 걸리다|1
+teach|taught|taught|가르치다|1
+tell|told|told|말해 주다|1
+think|thought|thought|생각하다|1
+throw|threw|thrown|던지다|1
+understand|understood|understood|이해하다|1
+wake|woke|woken|깨다, 깨우다|1
+wear|wore|worn|입다, 쓰다|1
+win|won|won|이기다|1
+write|wrote|written|쓰다|1
+bend|bent|bent|구부리다|2
+bind|bound|bound|묶다|2
+bleed|bled|bled|피를 흘리다|2
+beat|beat|beaten|이기다, 두드리다|2
+burn|burned/burnt|burned/burnt|타다, 태우다|2
+creep|crept|crept|기어가다|2
+deal|dealt|dealt|다루다, 거래하다|2
+dig|dug|dug|파다|2
+dream|dreamed/dreamt|dreamed/dreamt|꿈꾸다|2
+feed|fed|fed|먹이를 주다|2
+flee|fled|fled|달아나다|2
+forgive|forgave|forgiven|용서하다|2
+freeze|froze|frozen|얼다, 얼리다|2
+hang|hung|hung|걸다, 매달다|2
+kneel|knelt/kneeled|knelt/kneeled|무릎을 꿇다|2
+lay|laid|laid|놓다, 눕히다|2
+lead|led|led|이끌다|2
+learn|learned/learnt|learned/learnt|배우다|2
+lie|lay|lain|눕다, 놓여 있다|2
+light|lit/lighted|lit/lighted|불을 붙이다|2
+mistake|mistook|mistaken|오해하다|2
+quit|quit|quit|그만두다|2
+seek|sought|sought|찾다, 추구하다|2
+shake|shook|shaken|흔들다|2
+shine|shone|shone|빛나다|2
+shrink|shrank|shrunk|줄어들다|2
+sink|sank|sunk|가라앉다|2
+slide|slid|slid|미끄러지다|2
+spell|spelled/spelt|spelled/spelt|철자를 쓰다|2
+spin|spun|spun|돌리다|2
+spit|spat|spat|(침을) 뱉다|2
+spread|spread|spread|퍼지다, 펴다|2
+stick|stuck|stuck|붙이다, 찌르다|2
+sting|stung|stung|쏘다, 따끔거리다|2
+strike|struck|struck|치다, 부딪치다|2
+swear|swore|sworn|맹세하다, 욕하다|2
+sweep|swept|swept|쓸다|2
+swing|swung|swung|흔들다, 휘두르다|2
+tear|tore|torn|찢다|2
+weep|wept|wept|울다|2
+wind|wound|wound|감다|2
+arise|arose|arisen|생기다, 일어나다|3
+awake|awoke|awoken|깨다, 깨우다|3
+bear|bore|borne/born|참다, 낳다|3
+bet|bet|bet|돈을 걸다|3
+bid|bid|bid|값을 부르다|3
+breed|bred|bred|기르다, 번식하다|3
+broadcast|broadcast|broadcast|방송하다|3
+burst|burst|burst|터지다|3
+cast|cast|cast|던지다, 배역을 맡기다|3
+cling|clung|clung|달라붙다|3
+fling|flung|flung|내던지다|3
+forbid|forbade|forbidden|금지하다|3
+forecast|forecast|forecast|예보하다|3
+foresee|foresaw|foreseen|예견하다|3
+grind|ground|ground|갈다, 빻다|3
+overcome|overcame|overcome|극복하다|3
+overtake|overtook|overtaken|따라잡다|3
+prove|proved|proven/proved|증명하다|3
+rid|rid|rid|없애다|3
+shed|shed|shed|(눈물·피를) 흘리다|3
+speed|sped|sped|속도를 내다|3
+split|split|split|쪼개다, 갈라지다|3
+spring|sprang|sprung|튀어 오르다|3
+stink|stank|stunk|악취가 나다|3
+thrust|thrust|thrust|밀다, 찌르다|3
+undergo|underwent|undergone|겪다|3
+undertake|undertook|undertaken|떠맡다|3
+upset|upset|upset|속상하게 하다|3
+withdraw|withdrew|withdrawn|철수하다, 인출하다|3
+withstand|withstood|withstood|견디다|3
+`;
+
+const VERBS = RAW.trim().split('\n').map(l => {
+  const [base, past, pp, ko, lv] = l.split('|');
+  return { base, past: past.split('/'), pp: pp.split('/'), ko, lv: +lv };
+});
+const BY = Object.fromEntries(VERBS.map(v => [v.base, v]));
+const LEVELS = { 1: '중등 기본', 2: '중등 심화', 3: '고등·수능' };
+
+/* 모양으로 분류 (맨 앞 대표형 기준) */
+function pattern(v) {
+  const b = v.base, p = v.past[0], q = v.pp[0];
+  if (b === p && p === q) return 'AAA';
+  if (b === q && b !== p) return 'ABA';
+  if (p === q && b !== p) return 'ABB';
+  if (b === p && p !== q) return 'AAB';
+  return 'ABC';
+}
+const PATS = {
+  AAA: { name: 'A-A-A', short: '셋 다 똑같아요', desc: '모양이 안 바뀌어요' },
+  ABA: { name: 'A-B-A', short: '원형 = 과거분사', desc: '과거형만 달라요' },
+  ABB: { name: 'A-B-B', short: '과거 = 과거분사', desc: '가장 많은 유형이에요' },
+  AAB: { name: 'A-A-B', short: '원형 = 과거', desc: '과거분사만 달라요' },
+  ABC: { name: 'A-B-C', short: '셋 다 달라요', desc: '하나씩 외워야 해요' },
+};
+VERBS.forEach(v => v.pat = pattern(v));
+
+/* 소리가 비슷한 동사끼리 묶어 외우기 */
+const TIPS = [
+  { t: '-ought / -aught 형제', h: '과거·과거분사가 똑같이 ought / aught로 끝나요', v: 'bring buy fight seek think catch teach' },
+  { t: 'i → a → u 삼형제', h: '모음이 i - a - u 로 바뀌어요', v: 'begin drink ring sing swim sink shrink spring stink' },
+  { t: '-ew / -own', h: '과거는 -ew, 과거분사는 -n 이 붙어요', v: 'know grow throw blow draw fly withdraw' },
+  { t: '-oke / -oken (o 소리)', h: '과거 = o, 과거분사 = o + (e)n', v: 'break speak wake awake choose freeze steal forget' },
+  { t: '-ore / -orn', h: '과거는 -ore, 과거분사는 -orn', v: 'wear tear swear bear' },
+  { t: 'e 빠지고 -en', h: '과거분사가 -en 으로 끝나요', v: 'write drive ride rise arise hide bite eat give forgive forbid' },
+  { t: 'a → oo → a 계열', h: 'take 가족: took - taken', v: 'take shake mistake overtake undertake' },
+  { t: '받침 d → t', h: '끝소리 d 가 t 로 바뀌어요', v: 'build bend lend send spend' },
+  { t: 'ee → e + t', h: '모음이 짧아지고 t 가 붙어요', v: 'keep sleep sweep weep creep feel kneel leave' },
+  { t: 'ay → aid', h: '-ay 동사가 -aid 로', v: 'say pay lay' },
+  { t: '-old / -ound / -ood', h: '자기 모양을 닮은 소리로 바뀌어요', v: 'sell tell hold find bind wind grind stand understand withstand' },
+  { t: 'u 로 변신 (u - u)', h: '과거 = 과거분사 = u 소리', v: 'dig stick strike win hang swing sting cling fling spin' },
+  { t: 'ee → e (d)', h: '모음만 짧아지고 d 로 끝나요', v: 'feed lead bleed breed flee meet speed' },
+  { t: 'come 가족 (A-B-A)', h: '원형과 과거분사가 같아요', v: 'come become run overcome' },
+  { t: '모양 그대로 (A-A-A)', h: '아무것도 안 바뀌어요! (read 는 발음만 [red])', v: 'cut put set hit hurt cost let shut quit read spread bet bid burst cast forecast broadcast shed split thrust upset rid' },
+  { t: '기타 (하나씩 외우기)', h: '규칙이 약해서 하나씩 외워요', v: 'be do go see fall foresee have make hear mean deal lose shoot sit get spit shine slide beat show prove lie light undergo burn dream learn spell' },
+];
+
+/* =====================================================================
+   저장 / 설정
+   ===================================================================== */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+let stats = store.get('irv:stats', {});   // 동사 -> {c:맞힌 수, w:틀린 수, box:0~3}
+let best = store.get('irv:best', {});
+let prefs = Object.assign({ levels: [1, 2], review: false, sound: true }, store.get('irv:prefs', {}));
+const savePrefs = () => store.set('irv:prefs', prefs);
+const box = v => (stats[v.base] ? stats[v.base].box : 0);
+const needReview = v => stats[v.base] && stats[v.base].w > 0 && stats[v.base].box < 3;
+
+function mark(v, ok) {
+  const s = stats[v.base] || (stats[v.base] = { c: 0, w: 0, box: 0 });
+  if (ok) { s.c++; s.box = Math.min(3, s.box + 1); } else { s.w++; s.box = 0; }
+  store.set('irv:stats', stats);
+}
+
+/* =====================================================================
+   유틸
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const norm = s => s.trim().toLowerCase();
+const rand = a => a[Math.floor(Math.random() * a.length)];
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+/* 약한 동사(오답·안 본 동사)가 더 자주 나오게 뽑기 */
+function pick(n, P) {
+  const w = v => { const s = stats[v.base]; return s ? [4, 3, 2, 1][s.box] : 3; };
+  return P.map(v => ({ v, k: -Math.log(Math.random() || 1e-9) / w(v) }))
+    .sort((a, b) => a.k - b.k).slice(0, n).map(x => x.v);
+}
+function pool() {
+  if (prefs.review) return VERBS.filter(needReview);
+  return VERBS.filter(v => prefs.levels.includes(v.lv));
+}
+function regular(b) {
+  if (/e$/.test(b)) return b + 'd';
+  if (/[^aeiou]y$/.test(b)) return b.slice(0, -1) + 'ied';
+  if (/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(b)) return b + b.slice(-1) + 'ed';
+  return b + 'ed';
+}
+const fmt = a => a.join(' / ');
+
+let cleanups = [];
+function cleanup() {
+  cleanups.forEach(f => { try { f(); } catch (e) {} });
+  cleanups = [];
+  document.onkeydown = null;
+  try { speechSynthesis.cancel(); } catch (e) {}
+}
+function later(fn, ms) { const t = setTimeout(fn, ms); cleanups.push(() => clearTimeout(t)); return t; }
+
+/* 소리 */
+let ac;
+function beep(freq, dur, type, when, vol) {
+  if (!prefs.sound) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq; g.gain.value = vol || .08;
+    o.connect(g); g.connect(ac.destination);
+    const t = ac.currentTime + (when || 0);
+    o.start(t); g.gain.setTargetAtTime(0.0001, t + dur * .7, dur * .15); o.stop(t + dur + .05);
+  } catch (e) {}
+}
+const sfx = {
+  ok() { beep(660, .1); beep(880, .16, 'sine', .09); },
+  bad() { beep(170, .3, 'sawtooth', 0, .06); },
+  win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, .18, 'triangle', i * .12)); },
+  flip() { beep(500, .05, 'square', 0, .03); },
+};
+function say(text) {
+  if (!prefs.sound) return;
+  try {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = .85;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+function sayVerb(v) {
+  say(v.base === 'read' ? 'read, red, red' : [v.base, v.past[0], v.pp[0]].join(', '));
+}
+function renderSound() { $('#snd').textContent = prefs.sound ? '🔊 소리 켜짐' : '🔇 소리 꺼짐'; }
+$('#snd').onclick = () => { prefs.sound = !prefs.sound; savePrefs(); renderSound(); if (prefs.sound) sfx.ok(); };
+renderSound();
+
+/* 공통 조각 */
+const backBtn = '<button class="mini" id="back" type="button">← 그만하기</button>';
+function bindBack() { const b = $('#back'); if (b) b.onclick = home; }
+function hearts(n) { return '❤️'.repeat(n) + '🖤'.repeat(3 - n); }
+function rowHtml(v, mask) {
+  return `<tr>
+    <td><b>${v.base}</b><small>${v.ko}</small></td>
+    <td class="cv${mask ? ' cov' : ''}"><span class="p">${fmt(v.past)}</span></td>
+    <td class="cv${mask ? ' cov' : ''}"><span class="q">${fmt(v.pp)}</span></td>
+    <td><button class="mini spk" data-b="${v.base}" type="button" aria-label="발음 듣기">🔊</button></td></tr>`;
+}
+function tableHtml(list, mask) {
+  return `<table class="vt"><thead><tr><th>원형</th><th>과거</th><th>과거분사</th><th></th></tr></thead>
+    <tbody>${list.map(v => rowHtml(v, mask)).join('')}</tbody></table>`;
+}
+function bindTable(root) {
+  root.querySelectorAll('.spk').forEach(b => b.onclick = () => sayVerb(BY[b.dataset.b]));
+  root.querySelectorAll('td.cv').forEach(td => td.onclick = () => td.classList.toggle('cov'));
+}
+
+/* 게임 종료 화면 */
+function finish(o) {
+  cleanup();
+  const prev = best[o.key] || 0;
+  const isBest = o.score > prev;
+  if (isBest) { best[o.key] = o.score; store.set('irv:best', best); }
+  sfx.win();
+  const wrongHtml = o.wrong.length ? `
+    <h2>틀린 동사 ${o.wrong.length}개 — 다시 확인!</h2>
+    ${tableHtml(o.wrong, false)}` : '<p class="newbest">🎉 하나도 안 틀렸어요!</p>';
+  app.innerHTML = `
+    <div class="card center">
+      <div class="stars">${'⭐'.repeat(o.stars)}${'☆'.repeat(3 - o.stars)}</div>
+      <h1 style="margin-top:8px">${o.title}</h1>
+      <div class="big">${o.score}점</div>
+      ${isBest ? '<p class="newbest">🏆 최고 기록!</p>' : `<p class="muted">최고 기록 ${prev}점</p>`}
+      <p>${o.lines.join(' · ')}</p>
+    </div>
+    <div class="card" style="margin-top:12px">${wrongHtml}</div>
+    <div class="actions">
+      <button class="primary" id="again" type="button">다시 하기</button>
+      <button id="tohome" type="button">처음으로</button>
+    </div>`;
+  bindTable(app);
+  $('#again').onclick = o.again;
+  $('#tohome').onclick = home;
+}
+const starsFor = acc => acc >= .9 ? 3 : acc >= .7 ? 2 : 1;
+
+/* =====================================================================
+   홈
+   ===================================================================== */
+function rank(pct) {
+  if (pct < .1) return ['🥚', '알'];
+  if (pct < .3) return ['🐣', '병아리'];
+  if (pct < .6) return ['🐥', '아기 새'];
+  if (pct < .9) return ['🦅', '독수리'];
+  return ['🐉', '불규칙동사 마스터'];
+}
+function home() {
+  cleanup();
+  const P = pool();
+  const mastered = VERBS.filter(v => box(v) >= 3).length;
+  const pct = mastered / VERBS.length;
+  const [em, name] = rank(pct);
+  const review = VERBS.filter(needReview).length;
+  const cnt = lv => VERBS.filter(v => v.lv === lv).length;
+  const games = [
+    ['study', '📖', '암기표 · 플래시카드', '모양별 표, 소리가 비슷한 동사 묶음, 가려서 외우기'],
+    ['typing', '⚔️', '몬스터 타자 배틀', '과거·과거분사를 직접 써서 몬스터를 물리쳐요. 하트 3개!'],
+    ['speed', '⚡', '60초 스피드 퀴즈', '4지선다를 빠르게! 콤보를 쌓아 최고점에 도전'],
+    ['pattern', '🧩', '모양 분류 게임', 'A-B-C 중 어떤 유형인지 맞혀요. 규칙이 보이기 시작해요'],
+    ['match', '🃏', '카드 짝 맞추기', '원형 카드와 변화형 카드를 찾아 짝을 맞춰요'],
+    ['notes', '📕', '오답 노트', `틀린 동사 ${review}개 · 마스터까지 복습해요`],
+  ];
+  const bestOf = { typing: 'typing', speed: 'speed', pattern: 'pattern', match: 'match' };
+  app.innerHTML = `
+    <h1>불규칙동사 마스터 🎮</h1>
+    <p class="muted">중·고등 내신과 수능에 나오는 불규칙동사 ${VERBS.length}개를 게임으로 외워요.</p>
+
+    <div class="card rank">
+      <div class="em">${em}</div>
+      <div class="info">
+        <b>${name}</b> <span class="muted">· 마스터 ${mastered} / ${VERBS.length}개</span>
+        <div class="bar"><i style="width:${Math.round(pct * 100)}%"></i></div>
+        <div class="note" style="margin-top:4px">같은 동사를 연속 3번 맞히면 마스터! 틀리면 처음부터예요.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <b>범위 고르기</b>
+      <div class="chips">
+        ${[1, 2, 3].map(lv => `<button class="chip ${!prefs.review && prefs.levels.includes(lv) ? 'on' : ''}" data-lv="${lv}" type="button">${LEVELS[lv]}<small>${cnt(lv)}</small></button>`).join('')}
+        <button class="chip ${prefs.review ? 'on' : ''}" id="rv" type="button" ${review ? '' : 'disabled'}>오답만<small>${review}</small></button>
+      </div>
+      <p class="muted" style="margin:10px 0 0">지금 범위: <b>${P.length}개</b>${P.length ? '' : ' — 범위를 골라 주세요'}</p>
+    </div>
+
+    <div class="grid games">
+      ${games.map(([k, e, t, d]) => `
+        <button class="gcard card" data-g="${k}" type="button" ${k !== 'notes' && !P.length ? 'disabled' : ''}>
+          <div class="emoji">${e}</div><h2>${t}</h2><p class="muted">${d}</p>
+          ${bestOf[k] && best[k] ? `<div class="best">🏆 최고 ${best[k]}점</div>` : ''}
+        </button>`).join('')}
+    </div>`;
+
+  app.querySelectorAll('[data-lv]').forEach(b => b.onclick = () => {
+    const lv = +b.dataset.lv;
+    if (prefs.review) { prefs.review = false; prefs.levels = [lv]; }
+    else if (prefs.levels.includes(lv)) { if (prefs.levels.length > 1) prefs.levels = prefs.levels.filter(x => x !== lv); }
+    else prefs.levels = prefs.levels.concat(lv).sort();
+    savePrefs(); home();
+  });
+  $('#rv').onclick = () => { prefs.review = !prefs.review; savePrefs(); home(); };
+  const run = { study, typing, speed, pattern: patternGame, match: matchGame, notes };
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => run[b.dataset.g]());
+}
+
+/* =====================================================================
+   학습: 표 / 묶음 / 플래시카드
+   ===================================================================== */
+let sMask = false;
+function study(tab) {
+  cleanup();
+  tab = tab || 'table';
+  const P = pool();
+  const tabs = [['table', '📋 한눈에 표'], ['tips', '🧠 묶어서 외우기'], ['cards', '🎴 플래시카드']];
+  app.innerHTML = `
+    <div class="top-actions"><h1 style="margin:0">암기하기</h1><span class="spacer"></span>${backBtn.replace('그만하기', '홈')}</div>
+    <div class="tabs">${tabs.map(([k, t]) => `<button class="chip ${tab === k ? 'on' : ''}" data-tab="${k}" type="button">${t}</button>`).join('')}</div>
+    <div id="body"></div>`;
+  bindBack();
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => study(b.dataset.tab));
+  const body = $('#body');
+
+  const maskBar = `<label style="display:flex;align-items:center;gap:8px;font-weight:600;margin:0 0 8px">
+      <input type="checkbox" id="mask" ${sMask ? 'checked' : ''} style="width:auto"> 과거·과거분사 가리기 <span class="note">(칸을 누르면 보여요)</span></label>`;
+  function bindMask() {
+    $('#mask').onchange = e => {
+      sMask = e.target.checked;
+      body.querySelectorAll('td.cv').forEach(td => td.classList.toggle('cov', sMask));
+    };
+  }
+
+  if (tab === 'table') {
+    body.innerHTML = maskBar + Object.keys(PATS).map(k => {
+      const list = P.filter(v => v.pat === k);
+      if (!list.length) return '';
+      return `<div class="card grp"><h3>${PATS[k].name} · ${PATS[k].short}</h3><div class="note" style="margin-bottom:6px">${PATS[k].desc} · ${list.length}개</div>${tableHtml(list, sMask)}</div>`;
+    }).join('');
+    bindMask(); bindTable(body);
+  } else if (tab === 'tips') {
+    const inPool = new Set(P.map(v => v.base));
+    body.innerHTML = maskBar + TIPS.map(g => {
+      const list = g.v.split(' ').filter(b => inPool.has(b)).map(b => BY[b]);
+      if (!list.length) return '';
+      return `<div class="card grp"><h3>${g.t}</h3><div class="note" style="margin-bottom:6px">${g.h}</div>${tableHtml(list, sMask)}</div>`;
+    }).join('');
+    bindMask(); bindTable(body);
+  } else {
+    flashcards(body, P);
+  }
+}
+
+function flashcards(host, P) {
+  const deck = pick(Math.min(30, P.length), P);
+  let i = 0, known = 0;
+  const hard = [];
+  function show() {
+    if (i >= deck.length) return end();
+    const v = deck[i];
+    host.innerHTML = `
+      <div class="hud"><span>${i + 1} / ${deck.length}</span><span>😎 ${known} · 😵 ${hard.length}</span></div>
+      <button class="flash center" id="flip" type="button">
+        <div class="note">${PATS[v.pat].name}</div>
+        <div class="big">${v.base}</div>
+        <div class="muted">${v.ko}</div>
+        <div id="cardback" class="back hidden">
+          <div><small>과거</small><span class="p">${fmt(v.past)}</span></div>
+          <div><small>과거분사</small><span class="q">${fmt(v.pp)}</span></div>
+        </div>
+        <div class="note" id="hint" style="margin-top:14px">👆 눌러서 정답 보기 (먼저 속으로 말해 보세요!)</div>
+      </button>
+      <div class="actions hidden" id="judge" style="justify-content:center">
+        <button id="no" type="button">😵 헷갈려요</button>
+        <button class="primary" id="yes" type="button">😎 알아요</button>
+      </div>`;
+    $('#flip').onclick = () => {
+      if (!$('#cardback').classList.contains('hidden')) return sayVerb(v);
+      $('#cardback').classList.remove('hidden'); $('#hint').textContent = '🔊 다시 누르면 발음을 들려줘요';
+      $('#judge').classList.remove('hidden'); sfx.flip(); sayVerb(v);
+    };
+    $('#yes').onclick = () => { mark(v, true); known++; i++; show(); };
+    $('#no').onclick = () => { mark(v, false); hard.push(v); i++; show(); };
+  }
+  function end() {
+    sfx.win();
+    host.innerHTML = `
+      <div class="card center"><div class="stars">🎉</div><h2>카드 끝!</h2>
+        <p>알아요 <b>${known}</b>개 · 헷갈려요 <b>${hard.length}</b>개</p></div>
+      ${hard.length ? `<div class="card grp"><h3>헷갈린 동사</h3>${tableHtml(hard, false)}</div>` : ''}
+      <div class="actions"><button class="primary" id="re" type="button">한 번 더</button><button id="th" type="button">처음으로</button></div>`;
+    bindTable(host);
+    $('#re').onclick = () => study('cards');
+    $('#th').onclick = home;
+  }
+  show();
+}
+
+/* =====================================================================
+   게임 1: 몬스터 타자 배틀
+   ===================================================================== */
+const MON = ['👾', '👻', '🤖', '🦖', '🐙', '🦑', '👹', '🐲'];
+function typing() {
+  cleanup();
+  const P = pool();
+  const qs = pick(Math.min(15, P.length), P);
+  let i = 0, life = 3, score = 0, combo = 0, good = 0, answered = 0, state = 'ask', hinted = false;
+  const wrong = [];
+
+  app.innerHTML = `
+    <div class="top-actions">${backBtn}<span class="spacer"></span><span id="h-prog" class="muted"></span></div>
+    <div class="hud"><span id="h-life"></span><span id="h-combo"></span><span id="h-score"></span></div>
+    <div class="card center stage">
+      <div class="monster" id="mon"></div>
+      <div class="tag" id="tag"></div>
+      <div><span class="big" id="q-base"></span> <button class="mini" id="spk" type="button" aria-label="발음 듣기">🔊</button></div>
+      <div class="muted" id="q-ko"></div>
+      <div class="ins">
+        <label>과거형<input class="ans" id="i1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+        <label>과거분사형<input class="ans" id="i2" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      </div>
+      <div class="fb" id="fb" aria-live="polite"></div>
+      <div class="actions" style="justify-content:center">
+        <button class="primary" id="go" type="button">공격! ⚔️</button>
+        <button id="hint" type="button">💡 힌트</button>
+      </div>
+    </div>`;
+  bindBack();
+
+  const hud = () => {
+    $('#h-life').textContent = hearts(life);
+    $('#h-score').textContent = score + '점';
+    $('#h-combo').textContent = combo >= 2 ? `🔥 ${combo}콤보` : '';
+    $('#h-prog').textContent = `${Math.min(i + 1, qs.length)} / ${qs.length}`;
+  };
+  function ask() {
+    const v = qs[i], boss = i === qs.length - 1;
+    state = 'ask'; hinted = false;
+    $('#mon').className = 'monster';
+    $('#mon').textContent = boss ? '😈' : MON[i % MON.length];
+    $('#tag').textContent = boss ? 'BOSS' : 'STAGE ' + (i + 1);
+    $('#tag').className = 'tag' + (boss ? ' boss' : '');
+    $('#q-base').textContent = v.base;
+    $('#q-ko').textContent = v.ko;
+    ['i1', 'i2'].forEach(id => { const el = $('#' + id); el.value = ''; el.readOnly = false; el.className = 'ans'; el.placeholder = ''; });
+    $('#fb').textContent = ''; $('#fb').className = 'fb';
+    $('#go').textContent = '공격! ⚔️';
+    hud(); $('#i1').focus();
+  }
+  function submit() {
+    if (state === 'over') return next();
+    if (state !== 'ask') return;
+    const v = qs[i];
+    const a = norm($('#i1').value), b = norm($('#i2').value);
+    if (!a && !b) return;
+    const ok1 = v.past.includes(a), ok2 = v.pp.includes(b);
+    $('#i1').classList.add(ok1 ? 'right' : 'wrong');
+    $('#i2').classList.add(ok2 ? 'right' : 'wrong');
+    ['i1', 'i2'].forEach(id => $('#' + id).readOnly = true);
+    answered++;
+    if (ok1 && ok2) {
+      state = 'win'; good++; mark(v, true);
+      score += (hinted ? 50 : 100) + Math.min(combo, 10) * 10; combo++;
+      $('#fb').textContent = '✅ 정답! ' + [v.base, fmt(v.past), fmt(v.pp)].join(' – ');
+      $('#fb').className = 'fb ok';
+      $('#mon').classList.add('hit'); sfx.ok();
+      hud(); later(next, 800);
+    } else {
+      state = 'over'; life--; combo = 0; mark(v, false); wrong.push(v);
+      $('#fb').innerHTML = '❌ 정답: ' + [v.base, fmt(v.past), fmt(v.pp)].join(' – ');
+      $('#fb').className = 'fb bad';
+      $('.stage').classList.remove('shake'); void $('.stage').offsetWidth; $('.stage').classList.add('shake');
+      $('#go').textContent = life > 0 ? '다음 ▶' : '결과 보기 ▶';
+      sfx.bad(); sayVerb(v); hud();
+    }
+  }
+  function next() {
+    i++;
+    if (life <= 0 || i >= qs.length) return end();
+    ask();
+  }
+  function end() {
+    if (life > 0) score += life * 50;
+    const acc = answered ? good / answered : 0;
+    finish({
+      key: 'typing', title: life > 0 ? '모든 몬스터 처치! 🎉' : '게임 오버 💀', score,
+      stars: life > 0 ? starsFor(acc) : (acc >= .6 ? 1 : 0),
+      lines: [`정답 ${good} / ${answered}`, `남은 하트 ${life}`], wrong, again: typing,
+    });
+  }
+  $('#go').onclick = submit;
+  $('#spk').onclick = () => sayVerb(qs[i]);
+  $('#hint').onclick = () => {
+    if (state !== 'ask') return;
+    const v = qs[i]; hinted = true;
+    $('#i1').placeholder = v.past[0][0] + '_'.repeat(v.past[0].length - 1);
+    $('#i2').placeholder = v.pp[0][0] + '_'.repeat(v.pp[0].length - 1);
+    $('#i1').focus();
+  };
+  ['i1', 'i2'].forEach(id => $('#' + id).onkeydown = e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (state === 'ask' && id === 'i1' && !$('#i2').value.trim()) $('#i2').focus();
+    else submit();
+  });
+  ask();
+}
+
+/* =====================================================================
+   게임 2: 60초 스피드 퀴즈
+   ===================================================================== */
+function speed() {
+  cleanup();
+  const P = pool();
+  let time = 60, score = 0, combo = 0, good = 0, total = 0, busy = false, last = null, cur;
+  const bag = [], wrong = [];
+  app.innerHTML = `
+    <div class="top-actions">${backBtn}<span class="spacer"></span><span class="muted">키보드 1~4로도 선택!</span></div>
+    <div class="hud"><span id="h-time"></span><span id="h-combo"></span><span id="h-score"></span></div>
+    <div class="timer" id="tm"><i></i></div>
+    <div class="card center stage">
+      <span class="badge" id="kind"></span>
+      <div style="margin-top:8px"><span class="big" id="q-base"></span> <button class="mini" id="spk" type="button" aria-label="발음 듣기">🔊</button></div>
+      <div class="muted" id="q-ko"></div>
+      <div id="opts"></div>
+    </div>`;
+  bindBack();
+
+  const nextVerb = () => {
+    if (!bag.length) bag.push(...pick(P.length, P));
+    let v = bag.shift();
+    if (v === last && bag.length) { bag.push(v); v = bag.shift(); }
+    return (last = v);
+  };
+  const rnd = () => { const w = rand(VERBS); return rand([w.base, w.past[0], w.pp[0]]); };
+  function makeQ() {
+    const v = nextVerb(), kind = Math.random() < .5 ? 'past' : 'pp';
+    const valid = new Set(v[kind]);
+    const cands = shuffle([regular(v.base), v.base, ...v.past, ...v.pp, rnd(), rnd(), rnd(), rnd()]);
+    const out = [];
+    for (const c of cands) { if (!valid.has(c) && !out.includes(c)) out.push(c); if (out.length === 3) break; }
+    return { v, kind, valid, opts: shuffle([v[kind][0], ...out]) };
+  }
+  function show() {
+    cur = makeQ(); busy = false;
+    $('#kind').textContent = cur.kind === 'past' ? '과거형은?' : '과거분사형은?';
+    $('#kind').className = 'badge ' + cur.kind;
+    $('#q-base').textContent = cur.v.base;
+    $('#q-ko').textContent = cur.v.ko;
+    $('#opts').innerHTML = cur.opts.map((o, k) => `<button class="opt" data-o="${o}" type="button"><small>${k + 1}</small>${o}</button>`).join('');
+    app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(b));
+    hud();
+  }
+  function choose(btn) {
+    if (busy) return; busy = true; total++;
+    const ok = cur.valid.has(btn.dataset.o);
+    btn.classList.add(ok ? 'right' : 'wrong');
+    mark(cur.v, ok);
+    if (ok) {
+      good++; score += 10 + Math.min(combo, 10); combo++; sfx.ok();
+      later(show, 350);
+    } else {
+      combo = 0; time -= 3; sfx.bad();
+      if (!wrong.includes(cur.v)) wrong.push(cur.v);
+      app.querySelectorAll('.opt').forEach(b => { if (cur.valid.has(b.dataset.o)) b.classList.add('right'); });
+      later(show, 1000);
+    }
+    hud();
+  }
+  function hud() {
+    $('#h-time').textContent = '⏱ ' + Math.max(0, Math.ceil(time)) + '초';
+    $('#h-score').textContent = score + '점';
+    $('#h-combo').textContent = combo >= 2 ? `🔥 ${combo}콤보` : '';
+    $('#tm').classList.toggle('low', time <= 10);
+    $('#tm i').style.width = Math.max(0, time / 60 * 100) + '%';
+  }
+  const tick = setInterval(() => {
+    time -= 0.1; hud();
+    if (time <= 0) {
+      const acc = total ? good / total : 0;
+      finish({ key: 'speed', title: '타임 업! ⏰', score, stars: total < 5 ? 1 : starsFor(acc),
+        lines: [`정답 ${good} / ${total}`], wrong, again: speed });
+    }
+  }, 100);
+  cleanups.push(() => clearInterval(tick));
+  document.onkeydown = e => {
+    const n = +e.key;
+    if (n >= 1 && n <= 4) { const b = app.querySelectorAll('.opt')[n - 1]; if (b) choose(b); }
+  };
+  $('#spk').onclick = () => cur && sayVerb(cur.v);
+  show();
+}
+
+/* =====================================================================
+   게임 3: 모양 분류 (A-B-C)
+   ===================================================================== */
+function patternGame() {
+  cleanup();
+  const P = pool();
+  const qs = pick(Math.min(15, P.length), P);
+  let i = 0, score = 0, combo = 0, good = 0, busy = false;
+  const wrong = [];
+  app.innerHTML = `
+    <div class="top-actions">${backBtn}<span class="spacer"></span><span id="h-prog" class="muted"></span></div>
+    <div class="hud"><span class="muted">원형 · 과거 · 과거분사의 모양을 비교해요</span><span id="h-combo"></span><span id="h-score"></span></div>
+    <div class="card center stage">
+      <div class="triple" id="tri"></div>
+      <div class="muted" id="q-ko"></div>
+      <div id="opts" style="margin-top:8px"></div>
+      <div class="fb" id="fb" aria-live="polite"></div>
+      <div class="actions hidden" id="nx" style="justify-content:center"><button class="primary" id="next" type="button">다음 ▶</button></div>
+    </div>`;
+  bindBack();
+  function show() {
+    const v = qs[i]; busy = false;
+    $('#tri').innerHTML = `${v.base}<span class="arrow">–</span>${fmt(v.past)}<span class="arrow">–</span>${fmt(v.pp)}`;
+    $('#q-ko').textContent = v.ko;
+    $('#fb').textContent = ''; $('#fb').className = 'fb';
+    $('#nx').classList.add('hidden');
+    $('#opts').innerHTML = Object.keys(PATS).map(k =>
+      `<button class="opt opt-pat" data-p="${k}" type="button"><b>${PATS[k].name}</b><span>${PATS[k].short}</span></button>`).join('');
+    app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(b));
+    $('#h-prog').textContent = `${i + 1} / ${qs.length}`;
+    $('#h-score').textContent = score + '점';
+    $('#h-combo').textContent = combo >= 2 ? `🔥 ${combo}콤보` : '';
+  }
+  function choose(btn) {
+    if (busy) return; busy = true;
+    const v = qs[i], ok = btn.dataset.p === v.pat;
+    btn.classList.add(ok ? 'right' : 'wrong');
+    if (ok) {
+      good++; score += 100 + Math.min(combo, 10) * 10; combo++; sfx.ok();
+      $('#fb').textContent = `✅ ${PATS[v.pat].name} · ${PATS[v.pat].short}`; $('#fb').className = 'fb ok';
+      later(next, 900);
+    } else {
+      combo = 0; wrong.push(v); sfx.bad();
+      app.querySelectorAll('.opt').forEach(b => { if (b.dataset.p === v.pat) b.classList.add('right'); });
+      $('#fb').textContent = `❌ 정답은 ${PATS[v.pat].name} (${PATS[v.pat].short})`; $('#fb').className = 'fb bad';
+      $('#nx').classList.remove('hidden');
+    }
+    $('#h-score').textContent = score + '점';
+    $('#h-combo').textContent = combo >= 2 ? `🔥 ${combo}콤보` : '';
+  }
+  function next() {
+    i++;
+    if (i >= qs.length) return finish({ key: 'pattern', title: '분류 완료! 🧩', score, stars: starsFor(good / qs.length),
+      lines: [`정답 ${good} / ${qs.length}`], wrong, again: patternGame });
+    show();
+  }
+  $('#next').onclick = next;
+  document.onkeydown = e => {
+    if (e.key === 'Enter' && !$('#nx').classList.contains('hidden')) next();
+    const n = +e.key;
+    if (n >= 1 && n <= 5) { const b = app.querySelectorAll('.opt')[n - 1]; if (b) choose(b); }
+  };
+  show();
+}
+
+/* =====================================================================
+   게임 4: 카드 짝 맞추기
+   ===================================================================== */
+function matchGame() {
+  cleanup();
+  const P = pool();
+  /* 같은 "과거·과거분사" 글자가 겹치지 않는 동사만 고르기 */
+  const chosen = [], seen = new Set();
+  for (const v of pick(P.length, P)) {
+    const key = fmt(v.past) + '|' + fmt(v.pp);
+    if (seen.has(key)) continue;
+    seen.add(key); chosen.push(v);
+    if (chosen.length === 6) break;
+  }
+  const n = chosen.length;
+  const cards = shuffle(chosen.flatMap(v => [
+    { id: v.base, v, kind: 'a', html: `<b>${v.base}</b><small>${v.ko}</small>` },
+    { id: v.base, v, kind: 'b', html: `<span>${v.past[0]}</span><span>${v.pp[0]}</span>` },
+  ]));
+  let moves = 0, found = 0, sec = 0, open = [], busy = false;
+  app.innerHTML = `
+    <div class="top-actions">${backBtn}<span class="spacer"></span></div>
+    <div class="hud"><span id="h-moves"></span><span id="h-time"></span><span id="h-found"></span></div>
+    <p class="muted" style="margin:0">원형(뜻) 카드와 <b>과거 · 과거분사</b> 카드를 짝지어 보세요.</p>
+    <div class="mgrid" id="grid">${cards.map((c, k) => `
+      <button class="mc ${c.kind === 'b' ? 'kb' : ''}" data-k="${k}" type="button" aria-label="카드">
+        <div class="in"><div class="b">?</div><div class="f">${c.html}</div></div></button>`).join('')}
+    </div>`;
+  bindBack();
+  const hud = () => {
+    $('#h-moves').textContent = '🔁 ' + moves + '번';
+    $('#h-time').textContent = '⏱ ' + sec + '초';
+    $('#h-found').textContent = `✅ ${found} / ${n}`;
+  };
+  hud();
+  const t = setInterval(() => { sec++; hud(); }, 1000);
+  cleanups.push(() => clearInterval(t));
+  app.querySelectorAll('.mc').forEach(el => el.onclick = () => {
+    const k = +el.dataset.k;
+    if (busy || open.includes(k) || el.classList.contains('done')) return;
+    el.classList.add('up'); open.push(k); sfx.flip();
+    if (open.length < 2) return;
+    moves++;
+    const [a, b] = open.map(x => cards[x]);
+    const els = open.map(x => app.querySelector(`.mc[data-k="${x}"]`));
+    if (a.id === b.id && a.kind !== b.kind) {
+      found++; sfx.ok(); sayVerb(a.v);
+      els.forEach(e => { e.classList.remove('up'); e.classList.add('done'); });
+      open = [];
+      hud();
+      if (found === n) later(() => {
+        clearInterval(t);
+        const score = Math.max(100, 1000 - 40 * (moves - n) - 5 * sec);
+        finish({ key: 'match', title: '짝 맞추기 완료! 🃏', score,
+          stars: moves <= n + 3 ? 3 : moves <= n * 2 ? 2 : 1,
+          lines: [`${moves}번 만에`, `${sec}초`], wrong: [], again: matchGame });
+      }, 900);
+    } else {
+      busy = true; sfx.bad();
+      later(() => { els.forEach(e => e.classList.remove('up')); open = []; busy = false; hud(); }, 900);
+    }
+    hud();
+  });
+}
+
+/* =====================================================================
+   오답 노트
+   ===================================================================== */
+function notes() {
+  cleanup();
+  const list = VERBS.filter(needReview).sort((a, b) => stats[b.base].w - stats[a.base].w);
+  const mastered = VERBS.filter(v => box(v) >= 3);
+  app.innerHTML = `
+    <div class="top-actions"><h1 style="margin:0">오답 노트 📕</h1><span class="spacer"></span>${backBtn.replace('그만하기', '홈')}</div>
+    <p class="muted">틀린 적 있는 동사예요. 게임에서 연속 3번 맞히면 이 목록에서 졸업해요.</p>
+    ${list.length ? `
+      <div class="card"><table class="vt"><thead><tr><th>원형</th><th>과거</th><th>과거분사</th><th>오답</th></tr></thead><tbody>
+        ${list.map(v => `<tr><td><b>${v.base}</b><small>${v.ko}</small></td><td><span class="p">${fmt(v.past)}</span></td><td><span class="q">${fmt(v.pp)}</span></td><td class="bad-n">${stats[v.base].w}</td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="actions"><button class="primary" id="only" type="button">오답만 게임하기</button></div>`
+    : '<div class="card center"><div class="big">🎉</div><p>복습할 오답이 없어요!</p></div>'}
+    <p class="muted" style="margin-top:20px">마스터한 동사 ${mastered.length}개</p>
+    <div class="actions"><button class="danger" id="reset" type="button">모든 기록 지우기</button></div>`;
+  bindBack();
+  const only = $('#only');
+  if (only) only.onclick = () => { prefs.review = true; savePrefs(); home(); };
+  $('#reset').onclick = () => {
+    if (!confirm('학습 기록과 최고 점수를 모두 지울까요?')) return;
+    stats = {}; best = {}; store.set('irv:stats', stats); store.set('irv:best', best);
+    prefs.review = false; savePrefs(); home();
+  };
+}
+
+home();
+</script>
+</body>
+</html>
