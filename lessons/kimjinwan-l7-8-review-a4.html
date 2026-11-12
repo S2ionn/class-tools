@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7~8과 총정리 학습지</title>
+<style>
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("../fonts/Dunggeunmiso-R.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("../fonts/Dunggeunmiso-B.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{--ink:#1d2433;--sub:#5b6475;--line:#c9ced8;--l7:#b8441f;--l7m:#ffe08a;--l8:#2f3aa0;--l8m:#cfe9ff}
+@page{size:A4;margin:12mm 13mm 14mm;@bottom-center{content:counter(page) " / " counter(pages);font:8pt "Malgun Gothic",sans-serif;color:#8a90a0}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#e9ebef}
+body{font-family:Body,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--ink);font-size:9.6pt;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.doc{width:210mm;margin:0 auto;background:#fff;padding:12mm 13mm 14mm}
+@media screen and (max-width:820px){.doc{width:auto;padding:16px}}
+@media print{html{background:#fff}.doc{width:auto;padding:0}}
+b,strong{font-weight:800}
+
+.top{display:flex;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:10px}
+.top h1{font-size:17pt;font-weight:900;line-height:1.2}
+.top .src{font-size:9pt;color:var(--sub)}
+.top .nm{margin-left:auto;font-size:9.5pt;white-space:nowrap}
+.top .nm span{display:inline-block;width:32mm;border-bottom:1px solid var(--ink);margin-left:6px}
+
+.part{font-size:13pt;font-weight:900;margin:14px 0 6px;padding:3px 0;border-bottom:1.5px solid var(--ink);break-after:avoid}
+.part:first-of-type{margin-top:4px}
+.blk{margin:0 0 10px}
+.blk:not(:has(.rd)){break-inside:avoid}
+table.cmp{break-inside:avoid}
+.bh{font-size:10.5pt;font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:7px;break-after:avoid}
+.bh .ls{font-size:8pt;font-weight:800;color:#fff;padding:1px 6px;border-radius:3px}
+.l7 .bh .ls{background:var(--l7)} .l8 .bh .ls{background:var(--l8)}
+.l7{--acc:var(--l7);--mark:var(--l7m)} .l8{--acc:var(--l8);--mark:var(--l8m)}
+.bh .sub{font-weight:600;color:var(--sub);font-size:9.5pt}
+
+mark{background:var(--mark);color:inherit;padding:0 2px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{border:1px solid var(--line);padding:7px 9px;break-inside:avoid}
+.box.f{background:#f7f8fa}
+.box h3{font-size:10pt;font-weight:800;color:var(--acc);margin-bottom:3px}
+.box p,.box li{font-size:9.4pt;line-height:1.5}
+.box p[style]{font-size:9.6pt!important}
+.box ul{padding-left:16px}
+.tag{display:inline-block;font-size:8.5pt;font-weight:800;color:var(--acc);border-bottom:1.5px solid var(--acc);margin-bottom:4px}
+.ex{margin-top:4px;font-size:9.4pt;line-height:1.45;padding:3px 7px;border-left:2px solid var(--line)}
+.ex i{font-style:normal;color:var(--sub);font-size:8.6pt;display:block}
+.lead{font-size:9.4pt;color:var(--ink);margin-top:5px;line-height:1.55}
+table.cmp{width:100%;border-collapse:collapse;font-size:9.2pt}
+table.cmp th,table.cmp td{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top;line-height:1.45}
+table.cmp th{font-size:8.5pt;color:var(--sub);font-weight:700;background:#f7f8fa}
+table.cmp td:first-child{font-weight:800;color:var(--acc);white-space:nowrap}
+table.cmp tr{break-inside:avoid}
+
+.rd .ln{display:grid;grid-template-columns:20px 1fr;column-gap:6px;padding:3px 0;border-bottom:1px dotted #dde0e6;break-inside:avoid}
+.rd .no{font-size:8.5pt;font-weight:800;color:var(--acc);padding-top:1px}
+.rd .e{font-size:9.8pt;line-height:1.45}
+.rd .e.hh{font-weight:800;color:var(--acc)}
+.rd .k{font-size:8.7pt;color:var(--sub);line-height:1.4}
+.rd .spk{display:inline-block;font-size:7.5pt;font-weight:800;color:#fff;background:#7b8394;border-radius:3px;padding:0 5px;margin-right:5px;vertical-align:1px}
+.rd .spk.dr{background:var(--acc)}
+</style>
+</head>
+<body>
+<div class="doc" id="doc"></div>
+<script>
+/* ---------- 본문 데이터 ---------- */
+const R7 = [
+ {n:1,en:"Have you ever [wondered] / [why you've bought] / things / that you don't even want or need?",ko:"여러분은 원하지도, 필요하지도 않은 물건을 왜 샀는지 궁금했던 적이 있나요?",nt:["Have you ever p.p.? : 경험 (현재완료)","why + 주어 + 동사 : wondered의 목적어 (간접의문문)","that : things를 꾸미는 목적격 관계대명사"]},
+ {n:2,en:"Let's consider / [what affects us] / [when it comes to] / buying things.",ko:"물건을 사는 것에 관해서라면, 무엇이 우리에게 영향을 주는지 생각해 봅시다.",nt:["what affects us : 의문사 what이 주어인 간접의문문 (what + 동사)","when it comes to + (동)명사 : ~에 관해서라면"]},
+ {n:3,h:1,en:"Why do I want / to buy / [what my friends bought]?",ko:"나는 왜 내 친구들이 산 것을 사고 싶어 할까?",nt:["want + to부정사 (목적어)","what = the thing(s) that : 선행사를 포함한 관계대명사"]},
+ {n:4,en:"Jeff [goes] / to the shopping center / and [sees] / a pair of soccer shoes / on display.",ko:"Jeff는 쇼핑센터에 가서 진열된 축구화 한 켤레를 본다.",nt:["goes ~ and sees : 병렬 구조","a pair of : 한 켤레의","on display : 진열된"]},
+ {n:5,en:"He recognizes / the shoes / at a glance / because more than [half of the boys] / on his soccer team / [wear] them.",ko:"그의 축구팀 소년들 중 절반 이상이 그 신발을 신기 때문에, 그는 한눈에 그 신발을 알아본다.",nt:["at a glance : 한눈에","more than : ~ 이상","half of + 복수명사 → 복수 동사 wear"]},
+ {n:6,en:"[Although] he already has / many pairs of soccer shoes, / he [ends up buying] / another new pair.",ko:"그는 이미 축구화가 여러 켤레 있지만, 결국 새 축구화를 또 한 켤레 사고 만다.",nt:["Although (= though) : 비록 ~이지만","end up + -ing : 결국 ~하게 되다","another + 단수명사 : 또 하나의"]},
+ {n:7,en:"We can use / the “bandwagon effect” / [to explain] / Jeff's behavior.",ko:"우리는 Jeff의 행동을 설명하기 위해 ‘밴드왜건 효과’를 사용할 수 있다.",nt:["to explain : 목적 ‘~하기 위해’ (to부정사 부사적 용법)","behavior : 행동"]},
+ {n:8,en:"A bandwagon is / a wagon / in a parade / [that] [encourages people / to jump] aboard and enjoy / the music.",ko:"밴드왜건은 사람들이 올라타서 음악을 즐기도록 부추기는, 퍼레이드 속 마차이다.",nt:["that : a wagon을 꾸미는 주격 관계대명사","encourage + 목적어 + to V : ~가 …하도록 부추기다","jump aboard : 올라타다"]},
+ {n:9,en:"[As] more and more people get on / the bandwagon, / others [are more likely to] / get on or follow it.",ko:"점점 더 많은 사람들이 밴드왜건에 탈수록, 다른 사람들도 그것에 올라타거나 따라갈 가능성이 더 커진다.",nt:["As : ~함에 따라, ~할수록 (접속사)","be likely to V : ~할 것 같다","others : 다른 사람들"]},
+ {n:10,en:"In this way, / people [tend to buy] / something / [just because] other people have bought / it.",ko:"이런 식으로, 사람들은 단지 다른 사람들이 샀다는 이유로 무언가를 사는 경향이 있다.",nt:["tend to V : ~하는 경향이 있다","just because : 단지 ~라는 이유로","it = something"]},
+ {n:11,h:1,en:"Why do I buy / a pair of pants and a bag / after I [have bought] / a new coat?",ko:"나는 왜 새 코트를 산 뒤에 바지와 가방을 살까?",nt:["have bought : 현재완료 (완료)"]},
+ {n:12,en:"Lisa buys / a coat / [that she really loves].",ko:"Lisa는 정말 마음에 드는 코트를 산다.",nt:["that : a coat를 꾸미는 목적격 관계대명사 (생략 가능)"]},
+ {n:13,en:"Immediately, / she realizes / [that] her pants do not [match] / her new coat.",ko:"그녀는 곧바로 자신의 바지가 새 코트와 어울리지 않는다는 것을 깨닫는다.",nt:["Immediately : 즉시","that : realizes의 목적어절을 이끄는 접속사","match : ~와 어울리다"]},
+ {n:14,en:"So, / she buys / new pants / [that go] perfectly [with] her new coat.",ko:"그래서 그녀는 새 코트와 완벽하게 어울리는 새 바지를 산다.",nt:["that : new pants를 꾸미는 주격 관계대명사 → 복수 동사 go","go with : ~와 어울리다"]},
+ {n:15,en:"But / she sees / that [none of her bags match] / her new clothes. // So, / she buys / a new bag.",ko:"하지만 그녀는 자신의 가방 중 어느 것도 새 옷과 어울리지 않는다는 것을 알게 된다. 그래서 그녀는 새 가방을 산다.",nt:["none of + 복수명사 : 아무것도 ~ 않다 (복수 동사 match도 가능)","that : sees의 목적어절 접속사"]},
+ {n:16,en:"[Most of her money is] [spent] / [on buying] the new items / [to complete] her new look.",ko:"그녀의 돈 대부분은 새로운 모습을 완성하기 위해 새 물건들을 사는 데 쓰인다.",nt:["most of + 셀 수 없는 명사 → 단수 동사 is","be spent : 수동태 / spend A on -ing : ~하는 데 A를 쓰다","to complete : 목적 ‘~하기 위해’","look : (겉)모습"]},
+ {n:17,en:"What [made Lisa / search for] new items / immediately [after buying] / a new coat?",ko:"무엇이 Lisa가 새 코트를 사자마자 새로운 물건들을 찾게 만들었을까?",nt:["make(사역동사) + 목적어 + 동사원형 : ~가 …하게 하다","search for : ~을 찾다","after buying = after she bought"]},
+ {n:18,en:"The “Diderot effect” [may] explain / it. // [Denis Diderot, a French writer], received / a new gown / [as] a gift.",ko:"‘디드로 효과’가 그것을 설명해 줄지도 모른다. 프랑스 작가 드니 디드로는 선물로 새 가운을 받았다.",nt:["may : ~일지도 모른다 (추측)","Denis Diderot = a French writer (동격)","as : ~로서 (전치사)","gown : 가운"]},
+ {n:19,en:"Soon [after receiving] the gift, / he noticed / that [all of his furniture did] not [go well with] / his new gown.",ko:"선물을 받은 직후, 그는 자신의 모든 가구가 새 가운과 잘 어울리지 않는다는 것을 알아차렸다.",nt:["after receiving = after he received","all of + 셀 수 없는 명사 furniture → 단수 취급","go well with : ~와 잘 어울리다"]},
+ {n:20,en:"So, / he [ended up replacing] / most of [it].",ko:"그래서 그는 결국 가구 대부분을 바꾸고 말았다.",nt:["end up -ing : 결국 ~하게 되다","replace : 바꾸다, 교체하다","it = his furniture"]},
+ {n:21,en:"The Diderot effect, therefore, is the concept / [that] [purchasing a new item] / often [leads to] / more unplanned purchases.",ko:"그러므로 디드로 효과는 새 물건을 구입하는 것이 종종 더 많은 계획에 없던 구매로 이어진다는 개념이다.",nt:["that : the concept의 내용을 설명하는 동격 접속사","purchasing a new item : 동명사 주어 → 단수 동사 leads","lead to : ~로 이어지다","unplanned : 계획되지 않은"]},
+ {n:22,h:1,en:"Why do I buy / things / just because they are [on sale]?",ko:"나는 왜 단지 할인 중이라는 이유로 물건을 살까?",nt:["on sale : 할인[판매] 중인"]},
+ {n:23,en:"Nathan [goes window shopping] / and sees / a pair of headphones.",ko:"Nathan은 아이쇼핑을 하러 갔다가 헤드폰 하나를 본다.",nt:["go window shopping : 진열된 상품을 구경하러 가다 (go + -ing)","goes ~ and sees : 병렬"]},
+ {n:24,en:"He checks / the price / and [finds out] / [that] they are / $200.",ko:"그는 가격을 확인하고 그것이 200달러라는 것을 알게 된다.",nt:["find out that ~ : ~라는 것을 알아내다","they = the headphones"]},
+ {n:25,en:"He thinks / [that] the headphones are / too expensive.",ko:"그는 그 헤드폰이 너무 비싸다고 생각한다.",nt:["that : thinks의 목적어절 접속사"]},
+ {n:26,en:"The sales person [approaches / him] / and says, / “You can [get a 20 percent discount] / on those headphones.”",ko:"점원이 그에게 다가와 “그 헤드폰을 20% 할인받으실 수 있어요.”라고 말한다.",nt:["approach + 목적어 : ~에게 다가가다 (전치사 X)","get a discount : 할인을 받다"]},
+ {n:27,en:"[Even though] the [discounted price] is still not / very low, / Nathan [decides / to buy] the headphones.",ko:"할인된 가격이 여전히 아주 낮지는 않지만, Nathan은 그 헤드폰을 사기로 결정한다.",nt:["Even though : 비록 ~이지만 (양보)","discounted : price를 꾸미는 과거분사","decide + to V : ~하기로 결정하다"]},
+ {n:28,en:"The situation [described above] is / an example of the “anchoring effect.”",ko:"위에서 설명한 상황은 ‘앵커링 효과’의 한 예이다.",nt:["described above : The situation을 뒤에서 꾸미는 과거분사구 (= which is described)","주어 The situation → 단수 동사 is"]},
+ {n:29,en:"The price [mentioned first] affects / our opinion of prices / [mentioned afterwards].",ko:"처음 언급된 가격은 나중에 언급되는 가격에 대한 우리의 생각에 영향을 준다.",nt:["mentioned first / mentioned afterwards : 앞의 명사를 꾸미는 과거분사구","주어 The price → 단수 동사 affects"]},
+ {n:30,en:"For example, / [if we start] / with $200, / then $160 will [seem cheap] / in comparison.",ko:"예를 들어, 200달러로 시작하면 비교했을 때 160달러는 싸 보일 것이다.",nt:["조건 부사절 : 미래 대신 현재시제 (if we start)","seem + 형용사 : ~해 보이다","in comparison : 비교해 볼 때"]},
+ {n:31,en:"Furthermore, / [as] the difference of the two prices becomes bigger, / the effect will be / more powerful.",ko:"게다가 두 가격의 차이가 커질수록 그 효과는 더 강력해질 것이다.",nt:["Furthermore : 게다가","as : ~함에 따라, ~할수록 (접속사)"]},
+ {n:32,en:"[As such], / the price [mentioned first] acts / as an “anchor” / [that] fixes our thoughts / about the price of an item.",ko:"이처럼, 처음 언급된 가격은 물건의 가격에 대한 우리의 생각을 고정하는 ‘닻’ 역할을 한다.",nt:["As such : 이와 같이","act as : ~로서 작용하다","that : an anchor를 꾸미는 주격 관계대명사"]},
+ {n:33,en:"Just [like] Jeff and his friends, / we tend to buy things / [without seriously considering] / [why we are buying] / them.",ko:"Jeff와 그의 친구들처럼, 우리는 왜 사는지 진지하게 생각하지 않고 물건을 사는 경향이 있다.",nt:["like : ~처럼 (전치사)","without + -ing : ~하지 않고","why we are buying them : considering의 목적어 (간접의문문)"]},
+ {n:34,en:"[As] these effects [have shown], / many things influence / our purchases.",ko:"이러한 효과들이 보여 주듯이, 많은 것들이 우리의 구매에 영향을 준다.",nt:["As : ~하듯이, ~대로 (접속사)","have shown : 현재완료"]},
+ {n:35,en:"[The next time you decide] / to buy something, / think / for a moment / about [why you are buying] / it.",ko:"다음번에 무언가를 사기로 결정할 때는, 그것을 왜 사는지 잠시 생각해 보세요.",nt:["The next time + 주어 + 동사 : 다음번에 ~할 때","for a moment : 잠시","about + why ~ : 전치사의 목적어 (간접의문문)"]}
+];
+const R8 = [
+ {n:1,sp:"Sci Teen",en:"Hi, science fans. // Today, / we're [going to talk] / about space travel.",ko:"안녕하세요, 과학 팬 여러분. 오늘은 우주여행에 대해 이야기해 볼게요.",nt:["be going to V : ~할 것이다, ~할 예정이다"]},
+ {n:2,en:"[As we all know], / there is [nothing faster] / [than] light / in the universe.",ko:"우리 모두 알다시피, 우주에서 빛보다 빠른 것은 없어요.",nt:["As : ~(이)듯이","-thing 대명사는 형용사가 뒤에서 수식 (nothing faster)","nothing + 비교급 + than = 최상급 의미 (빛이 가장 빠르다)"]},
+ {n:3,en:"So, / [if] we travel / at the speed of light, / we [should be able to] get to / another planet / in the blink of an eye, / [right?]",ko:"그러니까 빛의 속도로 여행하면 눈 깜짝할 사이에 다른 행성에 도착할 수 있겠죠, 그렇죠?",nt:["should be able to : 조동사 두 개는 연달아 못 씀 (should can ✕)","in the blink of an eye : 눈 깜짝할 사이에",", right? = shouldn't we? (확인)"]},
+ {n:4,sp:"Dr. Sci",en:"That would be / nice, / but space is / [so vast / that] it is not possible.",ko:"그러면 좋겠지만, 우주는 너무 광대해서 그건 불가능해요.",nt:["so + 형용사 + that + 주어 + 동사 : 너무 ~해서 …하다","vast : 광대한","it = 눈 깜짝할 사이에 다른 행성에 가는 것"]},
+ {n:5,en:"In the movie, Passengers, / a spaceship [headed to a different planet] / [travels] / at one-half the speed of light.",ko:"영화 ‘패신저스’에서, 다른 행성으로 향하는 우주선은 빛의 절반 속도로 이동해요.",nt:["headed to ~ : a spaceship을 꾸미는 과거분사구 (= that is headed)","주어 a spaceship → 단수 동사 travels","one-half : 2분의 1"]},
+ {n:6,en:"So / it should get to / another planet / very quickly, / [right?]",ko:"그러면 그 우주선은 다른 행성에 아주 빨리 도착해야겠죠, 그렇죠?",nt:[", right? = shouldn't it?"]},
+ {n:7,en:"But, / the passengers sleep / for 120 years / because [it is expected to take] / that much time / [to get to] a different planet.",ko:"하지만 승객들은 120년 동안 잠을 자요. 다른 행성에 도착하는 데 그만큼 오랜 시간이 걸릴 것으로 예상되기 때문이에요.",nt:["be expected to V : ~할 것으로 예상되다","It takes + 시간 + to V : ~하는 데 (시간)이 걸리다","that much : 그만큼 (부사)"]},
+ {n:8,sp:"Sci Teen",en:"120 years? // Wow, / that's / a long time! // Is there / a faster way / [to travel] through space?",ko:"120년이요? 와, 정말 긴 시간이네요! 우주를 여행하는 더 빠른 방법이 있나요?",nt:["to travel : a faster way를 꾸미는 to부정사 (형용사적 용법)","that = 120 years"]},
+ {n:9,sp:"Dr. Sci",en:"Well, / [in order to answer] / that question, / [I'd like / you / to think] about / this apple / for a second.",ko:"음, 그 질문에 답하기 위해, 여러분이 잠시 이 사과에 대해 생각해 봤으면 해요.",nt:["in order to V (= so as to V) : ~하기 위해","would like + 목적어 + to V : ~가 …하기를 바라다","for a second (= for a moment) : 잠시"]},
+ {n:10,en:"[Imagine] / a worm is / on this apple. // It detects / [something sweet] / at the bottom / and wants to move / [from] the top [to] the bottom.",ko:"이 사과 위에 벌레 한 마리가 있다고 상상해 보세요. 벌레는 맨 아래에서 달콤한 무언가를 감지하고, 꼭대기에서 맨 아래로 이동하고 싶어 해요.",nt:["Imagine ~ : 명령문 (동사원형으로 시작)","something sweet : -thing + 형용사","from A to B : A에서 B로","It = a worm"]},
+ {n:11,en:"For the worm, / the apple's surface is / [as vast as] our universe.",ko:"그 벌레에게는 사과의 표면이 우리 우주만큼 광대해요.",nt:["as + 원급 + as : ~만큼 …한 (원급 비교)","surface : 표면"]},
+ {n:12,en:"Now / the worm can [either] move / around the outer layer / [or] down a wormhole.",ko:"이제 벌레는 바깥 표면을 빙 돌아서 가거나, 벌레 구멍을 통해 아래로 내려갈 수 있어요.",nt:["either A or B : A 또는 B 둘 중 하나","or (move) down : 반복되는 move 생략","outer layer : 바깥층"]},
+ {n:13,en:"[Which / do you think / it will choose]? // Well, / it would choose / the wormhole / because it is / a shortcut.",ko:"여러분은 벌레가 어느 쪽을 선택할 거라고 생각하나요? 음, 벌레는 벌레 구멍을 선택할 거예요. 그게 지름길이니까요.",nt:["think·believe·guess·imagine + 간접의문문 → 의문사가 문장 맨 앞으로","Do you think? + Which will it choose? → Which do you think it will choose?","shortcut : 지름길"]},
+ {n:14,sp:"Sci Teen",en:"Is there / [such a shortcut] / in the universe?",ko:"우주에도 그런 지름길이 있나요?",nt:["such a(n) (+ 형용사) + 명사 : 그런 ~"]},
+ {n:15,sp:"Dr. Sci",en:"[According to] some researchers, / yes. // Einstein figured out / that space and time [are connected], / and he [called / it / space-time].",ko:"몇몇 연구자들에 따르면, 있어요. 아인슈타인은 공간과 시간이 연결되어 있다는 것을 알아냈고, 그것을 ‘시공간’이라고 불렀어요.",nt:["According to : ~에 따르면","과학적 사실 → 주절이 과거(figured out)여도 현재시제 are","are connected : 현재시제 수동태","call A B : A를 B라고 부르다"]},
+ {n:16,en:"He thought / that space-time [could actually be bent].",ko:"그는 시공간이 실제로 휘어질 수 있다고 생각했어요.",nt:["조동사가 있는 수동태 : 조동사 + be + p.p.","bend – bent – bent : 구부리다"]},
+ {n:17,en:"When it is bent, / parts [that are far away from] / each other / are suddenly closer.",ko:"시공간이 휘어지면, 서로 멀리 떨어져 있던 부분들이 갑자기 더 가까워져요.",nt:["it = space-time","that : parts를 꾸미는 주격 관계대명사","far away from : ~에서 멀리 떨어진"]},
+ {n:18,en:"[To understand] this, / take / a sheet of paper / and make / a small dot / at the top of the paper / and [another] / at the bottom of the paper.",ko:"이것을 이해하기 위해, 종이 한 장을 가지고 종이 윗부분에 작은 점을 하나, 아랫부분에 또 다른 점을 하나 찍어 보세요.",nt:["To understand : 목적 ‘~하기 위해’","this = 시공간이 휘면 먼 부분이 가까워진다는 내용","another = another dot (또 다른 하나)"]},
+ {n:19,en:"On a flat sheet of paper, / the dots are / far away from / [one another].",ko:"평평한 종이 위에서는 두 점이 서로 멀리 떨어져 있어요.",nt:["one another (= each other) : 서로","flat : 평평한"]},
+ {n:20,en:"Now, / take / the paper / and fold it / [with the dots matched up].",ko:"이제 그 종이를 잡고 두 점이 맞닿도록 접어 보세요.",nt:["with + 명사 + 분사 : ~한 채로, ~하면서","점들이 ‘맞춰지는’ 것 → 수동 → 과거분사 matched","match up : 맞추다"]},
+ {n:21,en:"[Punch / a hole / in the paper / and] the dots [will be instantly connected].",ko:"종이에 구멍을 뚫어 보세요. 그러면 두 점이 즉시 연결될 거예요.",nt:["명령문 + and ~ : …해라, 그러면 ~할 것이다","조동사 수동태 : will be connected","instantly : 즉시"]},
+ {n:22,en:"Like this, / wormholes in space [may] contain / two mouths, / [with a throat connecting] the two.",ko:"이처럼, 우주의 웜홀은 두 개의 입구와, 그 둘을 연결하는 목구멍으로 이루어져 있을지도 몰라요.",nt:["with + 명사 + 분사 : 목구멍이 ‘연결하는’ 것 → 능동 → 현재분사 connecting","may : ~일지도 모른다","contain : 포함하다"]},
+ {n:23,sp:"Sci Teen",en:"Just like a wormhole / in the apple, / right?",ko:"사과 속 벌레 구멍처럼요, 그렇죠?",nt:["just like : 꼭 ~처럼"]},
+ {n:24,en:"[If] such wormholes [existed] / in space, / we [could get] to / places / billions of light-years away / quickly!",ko:"만약 우주에 그런 웜홀이 존재한다면, 우리는 수십억 광년 떨어진 곳에도 빨리 갈 수 있을 텐데요!",nt:["가정법 과거 : If + 주어 + 동사 과거형, 주어 + could/would + 동사원형 (현재 사실의 반대)","billions of : 수십억의","light-year : 광년"]},
+ {n:25,sp:"Dr. Sci",en:"Yes, / but it's [too early / to celebrate]. // Wormholes exist / [in theory] only.",ko:"맞아요, 하지만 축하하기엔 너무 일러요. 웜홀은 이론상으로만 존재하거든요.",nt:["too + 형용사 + to V : …하기에 너무 ~한","in theory : 이론상으로"]},
+ {n:26,sp:"Sci Teen",en:"So / [all we need to do is / find] one, / right?",ko:"그럼 우리가 해야 할 일은 웜홀을 찾는 것뿐이네요, 그렇죠?",nt:["all (that) we need to do is (to) V : 우리가 할 일은 ~하는 것뿐이다 (to 생략 가능)","one = a wormhole",", right? = isn't it?"]},
+ {n:27,sp:"Dr. Sci",en:"[Even if] we find / one, / there are / many things / [to consider] / before actually [going] through / one.",ko:"설령 웜홀을 찾는다 해도, 실제로 그것을 통과하기 전에 고려해야 할 것들이 많아요.",nt:["Even if : 만약 ~라 하더라도","to consider : many things를 꾸미는 to부정사 (형용사적 용법)","before + -ing : 전치사 뒤에는 동명사"]},
+ {n:28,en:"A wormhole would be / very unstable. // [If] a spaceship [flew] / into one, / it [might be] / crushed or broken into pieces.",ko:"웜홀은 매우 불안정할 거예요. 만약 우주선이 그 안으로 날아 들어간다면, 우주선은 찌그러지거나 산산조각 날지도 몰라요.",nt:["가정법 과거 : If + flew ~, might + be ~","be crushed or broken : 수동태 병렬","unstable : 불안정한"]},
+ {n:29,sp:"Sci Teen",en:"Ouch! // That's not / a pretty picture. // So, / are we hopeless?",ko:"아야! 끔찍한 장면이네요. 그럼 우리는 희망이 없는 건가요?",nt:["That = 우주선이 찌그러지거나 산산조각 나는 장면","hopeless : 희망이 없는"]},
+ {n:30,en:"Is [traveling in space] / through a wormhole / simply an idea / [that only exists] / in theory?",ko:"웜홀을 통해 우주를 여행하는 것은 그저 이론상으로만 존재하는 생각일 뿐인가요?",nt:["traveling ~ : 동명사 주어 → 단수 동사 Is","that : an idea를 꾸미는 주격 관계대명사"]},
+ {n:31,sp:"Dr. Sci",en:"I wouldn't say / so. // [The debate] about wormholes [is] / still ongoing, / but with persistent exploration and research, / I believe / we will eventually find / one / and learn / [how to travel] / through it.",ko:"저는 그렇게 생각하지 않아요. 웜홀에 관한 논쟁은 아직 진행 중이지만, 끈질긴 탐구와 연구로 우리가 결국 웜홀을 찾아내고 그것을 통과해 여행하는 법을 알게 될 거라고 믿어요.",nt:["so = 웜홀 여행은 이론상으로만 존재한다는 것","주어 The debate → 단수 동사 is","persistent : 끈질긴, 끊임없이 지속되는","how to V : ~하는 방법","I believe (that) ~ : 접속사 that 생략"]},
+ {n:32,en:"[Look back] / at our history. // We[’ve achieved] / so many things / [that seemed impossible] / at first.",ko:"우리의 역사를 돌아보세요. 우리는 처음에는 불가능해 보였던 아주 많은 것들을 이뤄 냈어요.",nt:["look back : 돌아보다","have achieved : 현재완료 (계속·완료)","that : so many things를 꾸미는 주격 관계대명사","seem + 형용사 : ~해 보이다"]},
+ {n:33,en:"[Who knows]? // Maybe you can be / the one / [to find] the answer!",ko:"누가 알겠어요? 어쩌면 여러분이 그 답을 찾는 사람이 될지도 몰라요!",nt:["Who knows? = Nobody knows. (아무도 모른다)","to find : the one을 꾸미는 to부정사 (형용사적 용법)"]}
+];
+const KO7 = [
+ "원하지도, 필요하지도 않은 물건을 왜 샀는지 궁금했던 적 있나요?",
+ "우리가 물건을 살 때 무엇이 영향을 미치는지 생각해 봅시다.",
+ "나는 왜 친구들이 산 걸 나도 사고 싶을까?",
+ "Jeff는 쇼핑센터에 갔다가 진열된 축구화 한 켤레를 본다.",
+ "축구팀 친구들 절반 넘게 그 신발을 신고 있어서, Jeff는 한눈에 알아본다.",
+ "이미 축구화가 여러 켤레 있는데도, Jeff는 결국 새 축구화를 또 사고 만다.",
+ "Jeff의 이런 행동은 ‘밴드왜건 효과’로 설명할 수 있다.",
+ "밴드왜건은 퍼레이드에서 사람들이 올라타 음악을 즐기도록 이끄는 마차다.",
+ "밴드왜건에 올라타는 사람이 많아질수록, 다른 사람들도 따라 타기 쉬워진다.",
+ "이처럼 사람들은 남들이 샀다는 이유만으로 물건을 사곤 한다.",
+ "나는 왜 새 코트를 사고 나면 바지와 가방까지 사게 될까?",
+ "Lisa는 마음에 쏙 드는 코트를 산다.",
+ "그런데 사자마자, 지금 있는 바지가 새 코트와 어울리지 않는다는 걸 깨닫는다.",
+ "그래서 새 코트에 딱 어울리는 바지를 새로 산다.",
+ "그런데 이번엔 가방 중에 새 옷과 어울리는 게 하나도 없다. 그래서 가방도 새로 산다.",
+ "새로운 스타일을 완성하느라 Lisa는 돈의 대부분을 새 물건 사는 데 쓴다.",
+ "Lisa는 왜 새 코트를 사자마자 다른 물건들을 찾아 나섰을까?",
+ "‘디드로 효과’로 설명할 수 있을지 모른다. 프랑스 작가 드니 디드로는 새 가운을 선물로 받았다.",
+ "선물을 받고 얼마 지나지 않아, 그는 집에 있는 가구가 하나같이 새 가운과 어울리지 않는다는 걸 알게 됐다.",
+ "그래서 결국 가구를 거의 다 바꾸고 말았다.",
+ "즉, 디드로 효과란 새 물건 하나를 사면 계획에 없던 물건까지 줄줄이 사게 되는 현상이다.",
+ "나는 왜 할인한다는 이유만으로 물건을 살까?",
+ "Nathan은 아이쇼핑을 하다가 헤드폰 하나를 발견한다.",
+ "가격을 확인해 보니 200달러다.",
+ "Nathan은 너무 비싸다고 생각한다.",
+ "그때 점원이 다가와 “이 헤드폰 20% 할인해 드릴게요.”라고 말한다.",
+ "할인된 가격도 여전히 싸지 않지만, Nathan은 헤드폰을 사기로 한다.",
+ "이 상황이 바로 ‘앵커링 효과’의 예다.",
+ "처음 들은 가격이 그다음에 듣는 가격을 판단하는 데 영향을 준다.",
+ "예를 들어 처음에 200달러를 보고 나면, 160달러는 상대적으로 싸게 느껴진다.",
+ "게다가 두 가격의 차이가 클수록 이 효과는 더 강해진다.",
+ "이처럼 처음 제시된 가격은 물건값에 대한 우리의 생각을 붙잡아 두는 ‘닻’ 역할을 한다.",
+ "Jeff와 친구들처럼, 우리는 왜 사는지 깊이 생각해 보지 않고 물건을 사곤 한다.",
+ "이 효과들에서 알 수 있듯, 우리의 소비에는 여러 가지가 영향을 미친다.",
+ "다음에 무언가를 사려고 할 때는, 내가 이걸 왜 사려는지 잠깐 생각해 보자."
+];
+const KO8 = [
+ "안녕하세요, 과학 팬 여러분! 오늘은 우주여행에 대해 이야기해 볼게요.",
+ "다들 알다시피 우주에서 빛보다 빠른 건 없잖아요.",
+ "그러니까 빛의 속도로 날아가면 눈 깜짝할 사이에 다른 행성에 갈 수 있겠죠?",
+ "그러면 참 좋겠지만, 우주는 너무 넓어서 그건 불가능해요.",
+ "영화 ‘패신저스’에서는 다른 행성으로 가는 우주선이 빛의 절반 속도로 날아가요.",
+ "그럼 다른 행성에 금방 도착하겠네요?",
+ "그런데 승객들은 120년 동안 잠들어 있어요. 다른 행성까지 가는 데 그만큼 걸릴 거라서요.",
+ "120년이요? 와, 엄청 길다! 우주를 더 빨리 여행하는 방법은 없나요?",
+ "음, 그 질문에 답하기 전에 잠깐 이 사과를 한번 떠올려 볼까요?",
+ "사과 위에 벌레 한 마리가 있다고 상상해 보세요. 벌레는 사과 맨 아래에 달콤한 게 있다는 걸 알아채고, 꼭대기에서 맨 아래까지 가고 싶어 해요.",
+ "벌레에게 사과 표면은 우리에게 우주만큼이나 넓어요.",
+ "이제 벌레는 껍질을 따라 빙 돌아가거나, 벌레 구멍을 따라 곧장 내려갈 수 있어요.",
+ "벌레가 어느 쪽을 고를 것 같나요? 당연히 벌레 구멍이겠죠. 그게 지름길이니까요.",
+ "우주에도 그런 지름길이 있어요?",
+ "몇몇 연구자들 말로는 있대요. 아인슈타인은 공간과 시간이 연결되어 있다는 걸 알아내고, 그걸 ‘시공간’이라고 불렀어요.",
+ "그리고 시공간이 실제로 휘어질 수 있다고 생각했죠.",
+ "시공간이 휘면, 서로 멀리 떨어져 있던 곳들이 갑자기 가까워져요.",
+ "이해하기 쉽게 종이 한 장을 준비해서, 위쪽에 작은 점 하나, 아래쪽에 점 하나를 찍어 보세요.",
+ "종이가 평평할 때는 두 점이 서로 멀리 떨어져 있죠.",
+ "이제 두 점이 딱 겹치도록 종이를 접어 보세요.",
+ "그 자리에 구멍을 뚫으면, 두 점이 바로 이어져요.",
+ "우주의 웜홀도 이렇게 입구 두 개와, 그 둘을 잇는 통로(목구멍)로 이루어져 있을지 몰라요.",
+ "사과에 난 벌레 구멍처럼요?",
+ "우주에 그런 웜홀이 있다면, 수십억 광년 떨어진 곳에도 금방 갈 수 있을 텐데요!",
+ "맞아요. 하지만 아직 좋아하기엔 일러요. 웜홀은 이론으로만 존재하거든요.",
+ "그럼 웜홀을 찾기만 하면 되는 거네요?",
+ "웜홀을 찾는다 해도, 실제로 통과하기 전에 따져 봐야 할 게 많아요.",
+ "웜홀은 아주 불안정할 거예요. 우주선이 그 안으로 날아 들어가면 찌그러지거나 산산조각 날 수도 있어요.",
+ "으악! 상상만 해도 끔찍하네요. 그럼 희망이 없는 건가요?",
+ "웜홀을 통한 우주여행은 그냥 이론 속 이야기일 뿐인가요?",
+ "꼭 그렇지는 않아요. 웜홀에 대한 논쟁은 아직 진행 중이지만, 끈기 있게 탐구하고 연구하다 보면 언젠가 웜홀을 찾아내고, 그걸 통해 여행하는 방법도 알게 될 거라고 믿어요.",
+ "우리 역사를 돌아보세요. 처음엔 불가능해 보였던 일들을 정말 많이 해냈잖아요.",
+ "누가 알아요? 어쩌면 그 답을 찾는 사람이 바로 여러분일지도 몰라요!"
+];
+
+
+/* ---------- 슬라이드 구성 ---------- */
+const M7 = {cls:"l7", ls:"Lesson 07", t:"7~8과 총정리"};
+const M8 = {cls:"l8", ls:"Lesson 08", t:"7~8과 총정리"};
+const S = [];
+const page = (m, sec, html) => S.push({m, sec, html});
+
+/* 본문 전체: 영어(핵심 표현 형광펜) + 우리말 해석 */
+function readHTML(data, ko, a, b){
+  const e = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/ \/\/ /g," ").replace(/ \/ /g," ").replace(/\[([^\]]+)\]/g,"<mark>$1</mark>");
+  let h = '<div class="dlg rd">';
+  for(let n=a;n<=b;n++){ const o = data[n-1];
+    const sp = o.sp ? `<span class="spk${o.sp.startsWith("Dr")?" dr":""}">${o.sp}</span>` : "";
+    h += `<div class="ln"><div class="no">${String(n).padStart(2,"0")}</div><div><div class="e${o.h?" hh":""}">${sp}${e(o.en)}</div><div class="k">${e(ko[n-1])}</div></div></div>`; }
+  return h + '</div>';
+}
+
+/* 표지 */
+S.push({raw:`<section class="slide cover main">
+  <div class="k">중3 2학기 비상(김진완)</div>
+  <h1>Lesson 7, 8<br>총정리</h1>
+  <div class="t">문법, 대화문, 본문</div>
+  <div class="d">Lesson 07 Spend Wisely (Why We Buy What We Buy)<br>Lesson 08 Wonders of Space Travel (Wormholes: Fact or Theory?)</div>
+</section>`});
+
+/* ===================== 1. 문법 ===================== */
+page(M7,"문법 ① 접속사 as",`
+  <h2>접속사 as</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">형태와 뜻</span>
+      <p style="font-size:21px;font-weight:700">As + 주어 + 동사 ~, 주어 + 동사 …</p>
+      <p>~함에 따라, ~하는 대로, ~ 때문에, ~할 때 (부사절)</p>
+      <p>비교급과 함께 쓰이면 ‘~할수록’ (하나가 변하면 다른 것도 함께 변함)</p>
+      <div class="ex"><mark>As</mark> more and more people get on the bandwagon, others are more likely to get on it. <i>더 많은 사람들이 시류에 편승함에 따라 다른 사람들이 더욱 그것에 올라타려 한다.</i></div>
+      <div class="ex"><mark>As</mark> the price of apples falls, more people want to buy them. <i>사과의 가격이 떨어질수록 더 많은 사람들이 사과를 사고 싶어 한다.</i></div>
+      <p style="margin-top:6px">more and more + 명사 : 점점 더 많은 ~ (비교급 + and + 비교급)</p>
+    </div>
+    <div class="box"><span class="tag">본문 속 as</span>
+      <div class="ex"><mark>As</mark> more and more people get on the bandwagon, ~ <i>(9) 접속사 : ~할수록</i></div>
+      <div class="ex"><mark>as</mark> the difference of the two prices becomes bigger, ~ <i>(31) 접속사 : ~할수록</i></div>
+      <div class="ex"><mark>As</mark> these effects have shown, ~ <i>(34) 접속사 : ~하듯이, ~대로</i></div>
+      <div class="ex">received a new gown <mark>as</mark> a gift <i>(18) 전치사 : ~로서</i></div>
+      <div class="ex"><mark>As such</mark>, the price mentioned first acts <mark>as</mark> an “anchor” <i>(32) 이와 같이 / 전치사 : ~로서</i></div>
+      <p style="margin-top:8px">as 뒤에 <b>주어 + 동사</b>가 오면 접속사, <b>명사</b>만 오면 전치사</p>
+    </div>
+  </div>
+`);
+
+page(M7,"문법 ② 수의 일치",`
+  <h2>수의 일치</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">규칙</span>
+      <p style="font-size:21px;font-weight:700">most / all / some / half / percent / 분수 + of + 명사 + 동사</p>
+      <p>동사의 수는 <b>of 뒤의 명사</b>에 맞춘다.</p>
+      <div class="ex"><mark>Half of the boys</mark> on his soccer team <mark>wear</mark> those shoes. <i>복수명사 boys에 맞춰 복수 동사</i></div>
+      <div class="ex"><mark>All of the paintings were</mark> sold in a day. <i>복수명사 paintings에 맞춰 were</i></div>
+      <div class="ex"><mark>Half of the money was</mark> donated to people in need. <i>셀 수 없는 명사 money는 단수 취급</i></div>
+    </div>
+    <div class="box"><span class="tag">본문 속 수의 일치</span>
+      <div class="ex">more than <mark>half of the boys</mark> on his soccer team <mark>wear</mark> them <i>(5)</i></div>
+      <div class="ex"><mark>none of her bags match</mark> her new clothes <i>(15)</i></div>
+      <div class="ex"><mark>Most of her money is</mark> spent on buying the new items <i>(16) money는 단수</i></div>
+      <div class="ex"><mark>all of his furniture did</mark> not go well with his new gown <i>(19) furniture는 셀 수 없는 명사</i></div>
+      <div class="ex"><mark>purchasing a new item</mark> often <mark>leads</mark> to ~ <i>(21) 동명사 주어는 단수</i></div>
+      <div class="ex"><mark>The situation</mark> described above <mark>is</mark> ~ <i>(28) 수식어구를 빼고 주어 찾기</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"문법 ① 가정법 과거",`
+  <h2>가정법 과거</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">형태와 뜻</span>
+      <p style="font-size:21px;font-weight:700">If + 주어 + 동사의 과거형 ~, 주어 + 조동사의 과거형(would / could) + 동사원형 …</p>
+      <p>현재 사실과 반대되는 상황을 가정한다. 해석은 ‘만약 ~라면, …할 텐데’</p>
+      <p>be동사는 주어가 단수여도 <b>were</b></p>
+      <div class="ex">If I <mark>were</mark> an astronaut, I <mark>would walk</mark> in space. <i>내가 우주 비행사라면, 난 우주를 걸어 다닐 텐데. (실제로는 우주 비행사가 아님)</i></div>
+      <div class="ex">If I <mark>went</mark> to space, I <mark>would take</mark> a selfie. <i>내가 우주에 간다면, 난 셀피를 찍을 텐데.</i></div>
+    </div>
+    <div class="box"><span class="tag">본문, 대화문 속 가정법</span>
+      <div class="ex">If such wormholes <mark>existed</mark> in space, we <mark>could get</mark> to places billions of light-years away quickly! <i>(본문 24) 실제로는 존재하지 않음</i></div>
+      <div class="ex">If a spaceship <mark>flew</mark> into one, it <mark>might be</mark> crushed or broken into pieces. <i>(본문 28)</i></div>
+      <div class="ex">I wish I <mark>could</mark> have a flying skateboard. <i>(대화 01) I wish + 주어 + 과거형 : ~라면 좋을 텐데</i></div>
+      <div class="ex">the top three things from movies that we wish <mark>were</mark> real <i>(대화 01)</i></div>
+      <div class="ex">That way, I <mark>could become</mark> taller. <i>(대화 07)</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"문법 ② with + 명사 + 분사",`
+  <h2>with + 명사 + 분사</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">형태와 뜻</span>
+      <p style="font-size:21px;font-weight:700">with + 명사 + 현재분사 / 과거분사</p>
+      <p>‘~이 …하고 있는 채로, ~이 …하면서’ (동시동작, 부대상황)</p>
+      <p>명사와 분사가 <b>능동</b>이면 현재분사(-ing), <b>수동</b>이면 과거분사(p.p.)</p>
+      <div class="ex">Wormholes may contain two mouths, with a throat <mark>connecting</mark> the two. <i>목구멍이 둘을 ‘연결하는’ 능동 관계</i></div>
+      <div class="ex">Jenny counted the stars with her finger <mark>pointing</mark> at each of them. <i>손가락이 ‘가리키는’ 능동 관계</i></div>
+      <div class="ex">Chris looked at the stars through a telescope with one eye <mark>closed</mark>. <i>한쪽 눈이 ‘감기는’ 수동 관계</i></div>
+    </div>
+    <div class="box"><span class="tag">본문 속 with + 명사 + 분사</span>
+      <div class="ex">take the paper and fold it with the dots <mark>matched</mark> up <i>(20) 점들이 ‘맞춰지는’ 수동 관계</i></div>
+      <div class="ex">wormholes in space may contain two mouths, with a throat <mark>connecting</mark> the two <i>(22) 능동 관계</i></div>
+      <p style="margin-top:10px">구분하는 방법</p>
+      <div class="ex">명사가 직접 하는 동작이면 -ing <i>a throat connects the two</i></div>
+      <div class="ex">명사가 당하는 동작이면 p.p. <i>the dots are matched up / one eye is closed</i></div>
+    </div>
+  </div>
+`);
+
+/* ===================== 2. 대화문 ===================== */
+page(M7,"대화문 ① 의사소통 기능",`
+  <h2>만족, 불만족 묻고 답하기 / 후회 표현하기</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">만족 묻기</span>
+      <p style="font-size:21px;font-weight:700">How do you like ~? <span style="font-weight:500">~은 마음에 드니?</span></p>
+      <p style="font-size:17px;color:var(--sub)">= Are you happy[satisfied] with ~? / What do you think of ~?</p>
+      <div class="ex">How do you like it? <i>(01, 02, 04)</i></div>
+      <div class="ex">How do you like them? <i>(03)</i> / How do you like this red one? <i>(08)</i></div>
+      <p style="margin-top:8px">만족 : I'm (pretty) happy with it. <i style="font-style:normal;color:var(--sub)">(04)</i></p>
+      <p>불만족 : I'm not happy with it. <i style="font-style:normal;color:var(--sub)">(01)</i><br>The design is nice, but I don't think the color suits me. <i style="font-style:normal;color:var(--sub)">(02)</i></p>
+    </div>
+    <div class="box f"><span class="tag">후회 표현하기</span>
+      <p style="font-size:21px;font-weight:700">I should have + p.p. <span style="font-weight:500">~했어야 했는데</span></p>
+      <p style="font-size:17px;color:var(--sub)">= I'm sorry (that) I didn't ~. / I regret not -ing ~.</p>
+      <div class="ex">I should have <mark>read</mark> more reviews. <i>(01)</i></div>
+      <div class="ex">I should have <mark>tried</mark> it on. <i>(05)</i></div>
+      <div class="ex">I should have <mark>kept</mark> track of my spending. <i>(06)</i></div>
+      <div class="ex">I should have <mark>checked</mark> the sales before buying mine. <i>(07)</i></div>
+      <p style="margin-top:8px">should + 동사원형 : ~해야 한다 (충고) <i style="font-style:normal;color:var(--sub)">You should ask for your money back. (01)</i></p>
+    </div>
+  </div>
+`);
+
+page(M7,"대화문 ② 대화 한눈에",`
+  <h2>Lesson 7 대화 8개</h2>
+  <table class="cmp">
+    <tr><th>대화</th><th>장면</th><th>핵심 표현</th></tr>
+    <tr><td>01 Communication</td><td>온라인으로 산 노트북이 시끄럽고 과열됨</td><td>How do you like it? / I should have read more reviews.</td></tr>
+    <tr><td>02 Listen &amp; Talk 1</td><td>별무늬 모자를 검은색으로 사기</td><td>How do you like it?</td></tr>
+    <tr><td>03 Listen &amp; Talk 1</td><td>더 가벼운 초록 등산 배낭 고르기</td><td>How do you like them?</td></tr>
+    <tr><td>04 Listen &amp; Talk 1</td><td>배터리는 짧지만 만족하는 스피커</td><td>How do you like it? / I'm pretty happy with it.</td></tr>
+    <tr><td>05 Listen &amp; Talk 2</td><td>입어 보지 않고 산 꽉 끼는 코트</td><td>I should have tried it on.</td></tr>
+    <tr><td>06 Listen &amp; Talk 2</td><td>용돈을 다 써서 영화를 못 봄</td><td>I should have kept track of my spending.</td></tr>
+    <tr><td>07 Listen &amp; Talk 2</td><td>정가에 산 휴대폰이 40% 할인 중</td><td>I should have checked the sales.</td></tr>
+    <tr><td>08 Wrap Up</td><td>여동생 티셔츠로 파란 줄무늬를 고름</td><td>How do you like this red one?</td></tr>
+  </table>
+`);
+
+page(M7,"대화문 ③ 대화문 속 문법",`
+  <h2>Lesson 7 대화문 속 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>현재완료 (have + p.p.)</h3>
+      <div class="ex">I've used it <mark>for a week</mark>. <i>계속 : 일주일째 써 왔다 (01)</i></div>
+      <div class="ex">I've spent all of my allowance. <i>완료, 결과 : 다 써서 지금 없다 (06)</i></div>
+      <div class="ex">It has just been released, <mark>hasn't it</mark>? <i>현재완료 수동태 + 부가의문문 (07)</i></div>
+      <div class="ex">I bought it <mark>a few weeks ago</mark>. <i>ago는 과거시제와 함께 (04)</i></div>
+    </div>
+    <div class="box"><h3>동명사, 대명사</h3>
+      <div class="ex">How about <mark>calling</mark> ~ and <mark>explaining</mark> ~? <i>How about + -ing (01)</i></div>
+      <div class="ex">before <mark>buying</mark> it / mine <i>전치사 뒤 동명사 (05, 07)</i></div>
+      <div class="ex">The green <mark>one</mark> / this red <mark>one</mark> <i>one = 앞에 나온 같은 종류 (03, 08)</i></div>
+      <div class="ex">try <mark>it</mark> on <i>대명사는 동사와 부사 사이 (05)</i></div>
+      <div class="ex"><mark>Didn't you</mark> try it on? No. <i>부정의문문 : 안 입어 봤으면 No (05)</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"대화문 ① 의사소통 기능",`
+  <h2>가능한지 묻기 / 이루어지기를 바라는 일 표현하기</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">가능한지 묻기</span>
+      <p style="font-size:21px;font-weight:700">Is it possible to + 동사원형 ~? <span style="font-weight:500">~하는 것이 가능하니?</span></p>
+      <p style="font-size:17px;color:var(--sub)">= Can I[we] (actually) ~? / Am I able to ~? / Is there a possibility that ~?</p>
+      <div class="ex">Is it <mark>actually</mark> possible to fly on a skateboard? <i>(01)</i></div>
+      <div class="ex">Is it possible to see the sunrise several times a day in space? <i>(02)</i></div>
+      <div class="ex">Is it possible to grow vegetables in the space station? <i>(03)</i></div>
+      <div class="ex">Is it possible to print out food using a 3D printer? <i>(04)</i></div>
+    </div>
+    <div class="box f"><span class="tag">바라는 일 표현하기</span>
+      <p style="font-size:21px;font-weight:700">I wish I could + 동사원형 ~. <span style="font-weight:500">~할 수 있으면 좋겠어.</span></p>
+      <p style="font-size:17px;color:var(--sub)">현재 사실과 반대되거나 실현 가능성이 거의 없는 소망 (가능성이 있으면 I hope ~.)</p>
+      <div class="ex">I wish I could <mark>have</mark> a flying skateboard. <i>(01)</i></div>
+      <div class="ex">I wish I could <mark>see</mark> Earth from space with my own eyes. <i>(05)</i></div>
+      <div class="ex">I wish I could <mark>float</mark> around like an astronaut! <i>(06)</i></div>
+      <div class="ex">I wish I could <mark>live</mark> in space. <i>(07)</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"대화문 ② 대화 한눈에",`
+  <h2>Lesson 8 대화 7개</h2>
+  <table class="cmp">
+    <tr><th>대화</th><th>장면</th><th>핵심 표현</th></tr>
+    <tr><td>01 Communication</td><td>영화 속에서 진짜였으면 하는 것, 하늘을 나는 스케이트보드</td><td>I wish I could have a flying skateboard.<br>Is it actually possible to fly on a skateboard?</td></tr>
+    <tr><td>02 Listen &amp; Talk 1</td><td>우주 정거장에서 하루에 16번 본 일출</td><td>Is it possible to see the sunrise several times a day in space?</td></tr>
+    <tr><td>03 Listen &amp; Talk 1</td><td>우주 정거장에서 특수 주머니에 기른 채소</td><td>Is it possible to grow vegetables in the space station?</td></tr>
+    <tr><td>04 Listen &amp; Talk 1</td><td>NASA가 우주로 보내는 3D 프린터</td><td>Is it possible to print out food using a 3D printer?</td></tr>
+    <tr><td>05 Listen &amp; Talk 2</td><td>우주 센터의 VR 안경으로 지구 보기</td><td>I wish I could see Earth from space with my own eyes.</td></tr>
+    <tr><td>06 Listen &amp; Talk 2</td><td>우주 생활 다큐멘터리, 떠다니고 싶은 남자</td><td>I wish I could float around like an astronaut!</td></tr>
+    <tr><td>07 Listen &amp; Talk 2</td><td>우주에서 1년 살고 2인치 자란 사람</td><td>I wish I could live in space.</td></tr>
+  </table>
+`);
+
+page(M8,"대화문 ③ 대화문 속 문법",`
+  <h2>Lesson 8 대화문 속 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>추측, 간접의문문, 접속사</h3>
+      <div class="ex">It <mark>must have been</mark> tough for him. <i>must have p.p. : ~했음이 틀림없다 (07)</i></div>
+      <div class="ex">I wonder <mark>what it would taste like</mark>. <i>의문사 + 주어 + 동사 (04)</i></div>
+      <div class="ex"><mark>Since</mark> there's no gravity in space, ~ <i>since = because (03)</i></div>
+      <div class="ex">He grew 2 inches <mark>while in space</mark>. <i>while (he was) in space (07)</i></div>
+    </div>
+    <div class="box"><h3>to부정사, 동명사, 그 밖의 구문</h3>
+      <div class="ex">have applied physics <mark>to create</mark> flying skateboards <i>목적 : ~하기 위해 (01)</i></div>
+      <div class="ex">other ways <mark>to become</mark> taller <i>형용사적 용법 (07)</i></div>
+      <div class="ex">The bags <mark>helped the roots to grow</mark>. <i>help + 목적어 + (to) 동사원형 (03)</i></div>
+      <div class="ex">will <mark>be used</mark> to print out food <i>조동사 + be + p.p. (04)</i></div>
+      <div class="ex"><mark>every 90 minutes</mark> <i>every + 기수 + 복수명사 (02)</i></div>
+    </div>
+  </div>
+`);
+
+/* ===================== 3. 본문 ===================== */
+page(M7,"본문 ① 내용 정리",`
+  <h2>Why We Buy What We Buy</h2>
+  <table class="cmp">
+    <tr><th>효과</th><th>사례</th><th>핵심 내용</th><th>본문 표현</th></tr>
+    <tr><td>밴드왜건 효과</td><td>Jeff의 축구화</td><td>남들이 사니까 나도 산다</td><td>just because other people have bought it</td></tr>
+    <tr><td>디드로 효과</td><td>Lisa의 코트, 바지, 가방<br>Diderot의 가운, 가구</td><td>새 물건 하나가 계획에 없던 구매로 이어진다</td><td>leads to more unplanned purchases</td></tr>
+    <tr><td>앵커링 효과</td><td>Nathan의 헤드폰<br>$200에서 $160</td><td>처음 가격이 기준(닻)이 되어 나중 가격 판단에 영향을 준다</td><td>acts as an “anchor” that fixes our thoughts</td></tr>
+  </table>
+  <p class="lead">도입 (1~2) : 원하지도 필요하지도 않은 물건을 왜 샀을까?<br>마무리 (33~35) : 우리는 왜 사는지 진지하게 생각하지 않고 물건을 사므로, 다음에 살 때는 왜 사는지 잠시 생각해 보자.</p>
+`);
+[[1,5],[6,10],[11,16],[17,21],[22,27],[28,32],[33,35]].forEach(([a,b])=>page(M7,`본문 ② 본문 전체 (${a}~${b})`, readHTML(R7, KO7, a, b)));
+
+page(M7,"본문 ③ 핵심 문법",`
+  <h2>Lesson 7 본문 핵심 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>관계대명사 what</h3>
+      <p>what = the thing(s) that (선행사 포함)</p>
+      <div class="ex">Why do I want to buy <mark>what</mark> my friends bought? <i>(3) 내 친구들이 산 것</i></div>
+      <p style="margin-top:6px;font-size:17px;color:var(--sub)">관계대명사 that은 앞에 선행사가 있음 : a coat <b>that</b> she really loves (12)</p>
+    </div>
+    <div class="box"><h3>간접의문문 (의문사 + 주어 + 동사)</h3>
+      <div class="ex">wondered <mark>why you've bought</mark> things <i>(1)</i></div>
+      <div class="ex">consider <mark>what affects us</mark> <i>(2) 의문사가 주어이면 의문사 + 동사</i></div>
+      <div class="ex">think about <mark>why you are buying</mark> it <i>(35)</i></div>
+    </div>
+    <div class="box"><h3>동사 + 목적어 + (to) 동사원형</h3>
+      <div class="ex">encourage people <mark>to jump</mark> aboard <i>(8) encourage + 목적어 + to V</i></div>
+      <div class="ex">What made Lisa <mark>search</mark> for new items? <i>(17) 사역동사 make + 목적어 + 동사원형</i></div>
+      <div class="ex">he ended up <mark>buying</mark> / <mark>replacing</mark> <i>(6, 20) end up + -ing</i></div>
+    </div>
+    <div class="box"><h3>과거분사의 뒤 수식, 양보 접속사</h3>
+      <div class="ex">The situation <mark>described above</mark> <i>(28) = which is described above</i></div>
+      <div class="ex">The price <mark>mentioned first</mark> <i>(29, 32)</i></div>
+      <div class="ex"><mark>Although</mark> he already has ~ / <mark>Even though</mark> the discounted price ~ <i>(6, 27) 비록 ~이지만</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"본문 ① 내용 정리",`
+  <h2>Wormholes: Fact or Theory?</h2>
+  <table class="cmp">
+    <tr><th>구분</th><th>내용</th><th>본문 표현</th></tr>
+    <tr><td>문제</td><td>빛보다 빠른 건 없지만 우주는 너무 넓다. 빛의 절반 속도로도 120년</td><td>space is so vast that it is not possible</td></tr>
+    <tr><td>아이디어</td><td>사과 속 벌레 구멍처럼 우주에도 지름길이 있을까?</td><td>Is there such a shortcut in the universe?</td></tr>
+    <tr><td>과학적 근거</td><td>아인슈타인 : 공간과 시간은 연결되어 있고(시공간) 휘어질 수 있다</td><td>space-time could actually be bent</td></tr>
+    <tr><td>웜홀 구조</td><td>두 개의 입구와 둘을 잇는 목구멍</td><td>two mouths, with a throat connecting the two</td></tr>
+    <tr><td>한계</td><td>이론상으로만 존재하고 매우 불안정해서 우주선이 부서질 수 있다</td><td>exist in theory only / very unstable</td></tr>
+    <tr><td>결론</td><td>논쟁은 진행 중이지만 끈질긴 탐구와 연구로 결국 찾게 될 것</td><td>with persistent exploration and research</td></tr>
+  </table>
+  <p class="lead">Sci Teen(질문하는 진행자)과 Dr. Sci(설명하는 과학자)의 대화 형식</p>
+`);
+[[1,4],[5,8],[9,13],[14,18],[19,23],[24,28],[29,31],[32,33]].forEach(([a,b])=>page(M8,`본문 ② 본문 전체 (${a}~${b})`, readHTML(R8, KO8, a, b)));
+
+page(M8,"본문 ③ 핵심 문법",`
+  <h2>Lesson 8 본문 핵심 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>조동사가 있는 수동태 (조동사 + be + p.p.)</h3>
+      <div class="ex">space-time <mark>could</mark> actually <mark>be bent</mark> <i>(16)</i></div>
+      <div class="ex">the dots <mark>will be</mark> instantly <mark>connected</mark> <i>(21)</i></div>
+      <div class="ex">it <mark>might be crushed</mark> or <mark>broken</mark> into pieces <i>(28)</i></div>
+    </div>
+    <div class="box"><h3>think류 동사 + 간접의문문</h3>
+      <div class="ex">Do you think? + Which will it choose?<br><mark>Which</mark> do you think <mark>it will choose</mark>? <i>(13) 의문사가 맨 앞, 뒤는 주어 + 동사</i></div>
+      <p style="margin-top:6px;font-size:17px;color:var(--sub)">think, believe, guess, imagine, suppose</p>
+    </div>
+    <div class="box"><h3>비교, 정도 구문</h3>
+      <div class="ex">space is <mark>so</mark> vast <mark>that</mark> it is not possible <i>(4) 너무 ~해서 …하다</i></div>
+      <div class="ex">it's <mark>too</mark> early <mark>to</mark> celebrate <i>(25) …하기에 너무 ~하다</i></div>
+      <div class="ex"><mark>as</mark> vast <mark>as</mark> our universe <i>(11)</i> / <mark>nothing faster than</mark> light <i>(2) 최상급 의미</i></div>
+    </div>
+    <div class="box"><h3>to부정사, 시제 일치의 예외</h3>
+      <div class="ex">a faster way <mark>to travel</mark> / many things <mark>to consider</mark> / the one <mark>to find</mark> <i>(8, 27, 33) 형용사적 용법</i></div>
+      <div class="ex">Einstein figured out that space and time <mark>are</mark> connected. <i>(15) 과학적 사실은 현재시제</i></div>
+    </div>
+  </div>
+`);
+
+/* ---------- 학습지로 펼치기 ---------- */
+const doc = document.getElementById("doc");
+let h = `<div class="top"><div><div class="src">중3 2학기 비상(김진완) Lesson 07 Spend Wisely / Lesson 08 Wonders of Space Travel</div><h1>Lesson 7, 8 총정리</h1></div><div class="nm">이름<span></span></div></div>`;
+const PARTS = {"문법":"1. 문법","대화문":"2. 대화문","본문":"3. 본문"};
+let part = "";
+const items = S.filter(x=>!x.raw);
+for(let i=0;i<items.length;i++){
+  const x = items[i];
+  const p = x.sec.split(" ")[0];
+  if(p!==part){ part=p; h += `<div class="part">${PARTS[p]}</div>`; }
+  let body = x.html.replace(/<h2>[\s\S]*?<\/h2>/,"");
+  let title = x.sec;
+  if(x.sec.startsWith("본문 ② 본문 전체")){
+    while(items[i+1] && items[i+1].m===x.m && items[i+1].sec.startsWith("본문 ② 본문 전체")){ i++; body += items[i].html; }
+    title = "본문 ② 본문 전체";
+  }
+  const sub = (x.html.match(/<h2>([\s\S]*?)<\/h2>/)||[])[1] || "";
+  const showSub = sub && !title.includes(sub) && !/^Lesson \d/.test(sub);
+  h += `<section class="blk ${x.m.cls}"><div class="bh"><span class="ls">${x.m.ls}</span>${title}${showSub?` <span class="sub">${sub}</span>`:""}</div>${body}</section>`;
+}
+doc.innerHTML = h;
+</script>
+</body>
+</html>
