@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8과 대화문 설명</title>
+<style>
+/* 설치된 글꼴을 먼저 쓰고, 없으면 웹 글꼴(../fonts)을 내려받아 어디서든 똑같이 보이게 함 */
+@font-face{font-family:"Title";font-weight:100 900;font-display:swap;src:local("Cafe24SsurroundOTF"),local("카페24 써라운드 OTF"),url("../fonts/Cafe24Ssurround.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Cafe24Ssurround.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:100 500;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF R"),url("../fonts/Dunggeunmiso-R.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-R.woff2") format("woff2")}
+@font-face{font-family:"Body";font-weight:600 900;font-display:swap;src:local("Hakgyoansim Dunggeunmiso TTF B"),url("../fonts/Dunggeunmiso-B.woff2") format("woff2"),url("https://s2ionn.github.io/class-tools/fonts/Dunggeunmiso-B.woff2") format("woff2")}
+:root{
+  --ink:#1d2433; --sub:#5b6475; --line:#e3e6ee; --paper:#ffffff; --bg:#20242c;
+  --acc:#e8633a; --acc2:#fff1ea; --acc3:#b8441f; --mark:#ffe08a;
+}
+.l8{ --acc:#4b5bd6; --acc2:#eef0ff; --acc3:#2f3aa0; --mark:#cfe9ff; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:Body,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
+.cover h1,.cover .t,h2,.hd .sec,.hd .ls,.box h3,.s .n,.tag,.q .qn,.main .card div,.flow .st b,table.cmp td:first-child{font-family:Title,Body,"Malgun Gothic",sans-serif;font-weight:400}
+h2 small{font-family:Title,Body,sans-serif}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{display:none;position:absolute;inset:0;background:var(--paper);overflow:hidden;flex-direction:column}
+.slide.on{display:flex}
+
+/* header */
+.hd{height:64px;flex:none;display:flex;align-items:center;gap:16px;padding:0 48px;border-bottom:1px solid var(--line)}
+.hd .ls{font-weight:800;font-size:15px;color:#fff;background:var(--acc);padding:6px 12px;border-radius:6px;letter-spacing:.02em}
+.hd .sec{font-weight:700;font-size:19px;color:var(--ink)}
+.hd .rng{margin-left:auto;font-size:15px;color:var(--sub);font-variant-numeric:tabular-nums}
+.bd{flex:1;padding:18px 56px 38px;display:flex;flex-direction:column;justify-content:safe center;gap:16px;min-height:0}
+.ft{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;padding:0 48px;font-size:13px;color:#9aa1b0}
+.ft .pg{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* sentence */
+.s{display:grid;grid-template-columns:52px 1fr;column-gap:16px}
+.s .n{width:44px;height:44px;border-radius:50%;background:var(--acc2);color:var(--acc3);font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.s .en{font-size:25px;line-height:1.48;font-weight:500;letter-spacing:-.003em}
+.s.h .en{font-weight:800;color:var(--acc3)}
+.s .sp{display:inline-block;font-size:15px;font-weight:700;color:#fff;background:#7b8394;border-radius:5px;padding:2px 8px;margin-right:10px;vertical-align:4px}
+.s .sp.dr{background:var(--acc3)}
+.sl{color:#c2c7d2;font-weight:300;margin:0 .1em}
+mark{background:linear-gradient(transparent 58%,var(--mark) 58%);color:inherit;padding:0 1px}
+.s .nt{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px}
+.s .nt span{font-size:14.5px;line-height:1.35;color:var(--acc3);background:var(--acc2);border-radius:999px;padding:4px 11px}
+.s .ko,.s .kc{display:grid;grid-template-columns:80px 1fr;align-items:baseline;font-size:17.5px;line-height:1.5;margin-top:6px}
+.s .kc{color:#4a5263}
+.s .ko{color:var(--ink);margin-top:3px}
+.s .ko b,.s .kc b{font-size:13px;font-weight:700;border-radius:5px;padding:1px 0;text-align:center;margin-right:10px;white-space:nowrap}
+.s .kc b{color:var(--sub);background:#eef0f4}
+.s .ko b{color:#fff;background:var(--acc)}
+.s .kc .sl{color:#b7bcc7}
+.hideKo .s .ko,.hideKo .s .kc{visibility:hidden}
+img.art{display:block;object-fit:cover;border-radius:14px}
+.cover img.art{position:absolute;right:80px;top:50%;transform:translateY(-50%);width:440px;height:440px;border-radius:28px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.cover:has(img.art) .big{display:none}
+.hideNt .s .nt{visibility:hidden}
+
+/* cover */
+.cover{background:var(--acc);color:#fff;justify-content:center;padding:0 110px}
+.cover .k{font-size:22px;font-weight:600;opacity:.85}
+.cover h1{font-size:82px;font-weight:900;line-height:1.08;margin:16px 0 18px;letter-spacing:-.01em}
+.cover .t{font-size:30px;font-weight:600}
+.cover .d{margin-top:40px;font-size:19px;opacity:.85;line-height:1.6}
+.cover .big{position:absolute;right:80px;bottom:30px;font-size:300px;font-weight:900;opacity:.12;line-height:1}
+.main{background:#1d2433;color:#fff}
+.main .row{display:flex;gap:28px;margin-top:44px}
+.main .card{flex:1;border-radius:16px;padding:26px 30px;background:rgba(255,255,255,.07)}
+.main .card b{display:block;font-size:15px;opacity:.7;margin-bottom:8px}
+.main .card div{font-size:28px;font-weight:800}
+.main .card p{margin-top:8px;font-size:17px;opacity:.8}
+
+/* general content */
+h2{font-size:34px;font-weight:800;letter-spacing:-.01em}
+h2 small{display:block;font-size:17px;font-weight:600;color:var(--acc);margin-bottom:6px;letter-spacing:.02em}
+.lead{font-size:19px;color:var(--sub);line-height:1.55}
+.grid{display:grid;gap:14px}
+.box{border:1px solid var(--line);border-radius:14px;padding:16px 20px;background:#fff}
+.box.f{background:var(--acc2);border-color:transparent}
+.box h3{font-size:20px;font-weight:800;margin-bottom:6px;color:var(--acc3)}
+.box p,.box li{font-size:17px;line-height:1.55}
+.box ul{padding-left:20px}
+.box .ex{margin-top:7px;font-size:16.5px;line-height:1.45;background:#fff;border-radius:8px;padding:7px 12px;border:1px dashed var(--line)}
+.box .ex i{font-style:normal;color:var(--sub);font-size:15px;display:block}
+.tag{display:inline-block;font-size:14px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:3px 9px;margin-bottom:10px}
+.flow{display:flex;align-items:stretch;gap:10px}
+.flow .st{flex:1;border-radius:12px;background:var(--acc2);padding:16px 14px}
+.flow .st b{display:block;font-size:14px;color:var(--acc);margin-bottom:4px}
+.flow .st div{font-size:17px;font-weight:700;line-height:1.35}
+.flow .st p{font-size:14.5px;color:var(--sub);margin-top:6px;line-height:1.45}
+.flow .ar{display:flex;align-items:center;color:var(--acc);font-size:22px;font-weight:800}
+table.cmp{width:100%;border-collapse:collapse;font-size:17px}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--line);padding:13px 12px;text-align:left;vertical-align:top;line-height:1.45}
+table.cmp th{font-size:15px;color:var(--sub);font-weight:700}
+table.cmp td:first-child{font-weight:800;color:var(--acc3);white-space:nowrap}
+
+/* quiz */
+.q{display:grid;grid-template-columns:40px 1fr;gap:6px 14px;border:1px solid var(--line);border-radius:14px;padding:16px 20px;cursor:pointer}
+.q .qn{font-weight:900;color:var(--acc);font-size:22px}
+.q .qq{font-size:19px;line-height:1.5;font-weight:600}
+.q .qa{grid-column:2;font-size:18px;color:var(--acc3);font-weight:700;background:var(--acc2);border-radius:8px;padding:8px 12px;opacity:0;transition:opacity .2s}
+.q.open .qa{opacity:1}
+.q .hint{grid-column:2;font-size:13px;color:#a0a6b3}
+.q.open .hint{display:none}
+
+/* controls */
+#ui{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;z-index:9;opacity:.35;transition:opacity .2s}
+#ui:hover{opacity:1}
+#ui button{font:600 13px Body,"Malgun Gothic",sans-serif;background:#fff;border:0;border-radius:8px;padding:7px 11px;cursor:pointer;color:#1d2433}
+
+/* ===== 글씨 크게 ===== */
+.hd .ls{font-size:17px}.hd .sec{font-size:22px}.hd .rng{font-size:17px}
+.ft{font-size:14px}
+.s{grid-template-columns:58px 1fr}
+.s .n{width:50px;height:50px;font-size:22px}
+.s .en{font-size:29px}
+.s .sp{font-size:17px}
+.s .nt span{font-size:16.5px}
+.s .ko,.s .kc{grid-template-columns:96px 1fr;font-size:20.5px}
+.s .ko b,.s .kc b{font-size:15px}
+.cover .k{font-size:24px}.cover .t{font-size:32px}.cover .d{font-size:21px}
+h2{font-size:38px}h2 small{font-size:18px}
+.lead{font-size:21px}
+.box h3{font-size:22px}
+.box p,.box li{font-size:19px}
+.box .ex{font-size:18.5px}.box .ex i{font-size:16.5px}
+.tag{font-size:15.5px}
+.flow .st b{font-size:15.5px}.flow .st div{font-size:19px}.flow .st p{font-size:16px}
+table.cmp{font-size:19px}table.cmp th{font-size:16px}
+.q{padding:12px 18px;gap:4px 14px}.q .qn{font-size:24px}.q .qq{font-size:21px;line-height:1.4}.q .qa{font-size:20px;padding:6px 12px}
+#bar{position:fixed;left:0;top:0;height:3px;background:#e8633a;z-index:9;transition:width .2s}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff}
+  #stage{position:static;transform:none!important}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page}
+  #ui,#bar{display:none}
+  .q .qa{opacity:1}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ===== 전체 대화 한 장 ===== */
+.dlg{display:flex;flex-direction:column;gap:9px}
+.dlg .ln{display:grid;grid-template-columns:34px 40px 1fr;column-gap:10px;align-items:start}
+.dlg .no{font-family:Title,Body,sans-serif;font-size:15px;color:var(--acc3);background:var(--acc2);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.dlg .who{font-weight:800;font-size:16px;color:#fff;background:#7b8394;border-radius:6px;text-align:center;padding:3px 0;margin-top:4px}
+.dlg .who.w{background:var(--acc3)}
+.dlg .e{font-size:23px;line-height:1.38;font-weight:500}
+.dlg .k{font-size:16.5px;line-height:1.4;color:var(--sub);margin-top:1px}
+.hideKo .dlg .k{visibility:hidden}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage"></div>
+<div id="ui">
+  <button onclick="go(cur-1)">◀</button>
+  <button onclick="go(cur+1)">▶</button>
+  <button onclick="tg('hideKo')" title="K">해석 숨기기</button>
+  <button onclick="tg('hideNt')" title="N">문법 숨기기</button>
+  <button onclick="fs()" title="F">전체화면</button>
+</div>
+
+<script>
+/* ---------- 문장 데이터 ----------
+   [ ] = 형광펜(핵심 표현), / = 끊어 읽기, sp = 화자 */
+const D = [
+{n:1,sp:"W",en:"Hello, everyone, / [welcome to] All about Movies! // Today, / [we're going to talk] / about the top three things / from movies / that [we wish were real].",
+ kc:"안녕하세요, 여러분, / All about Movies에 오신 것을 환영합니다! // 오늘, / 우리는 이야기할 거예요 / 상위 세 가지에 대해 / 영화 속 / 우리가 진짜이길 바라는.",
+ ko:"안녕하세요, 여러분, All about Movies에 오신 것을 환영합니다! 오늘은 영화 속에서 진짜였으면 하는 것 세 가지에 대해 이야기해 볼게요.",
+ nt:["Welcome to ~ : ~에 오신 것을 환영합니다","be going to + 동사원형 : ~할 것이다","that : the top three things를 꾸미는 목적격 관계대명사","we wish (that) they were real : 가정법 과거 (실제로는 진짜가 아님)"]},
+{n:2,sp:"M",en:"[Let's start with] number three, / the flying skateboard / from Back to the Future.",
+ kc:"3위부터 시작해 봅시다, / 하늘을 나는 스케이트보드 / 영화 Back to the Future에 나오는.",
+ ko:"3위부터 시작하죠. 영화 ‘백 투 더 퓨처’에 나오는 하늘을 나는 스케이트보드예요.",
+ nt:["Let's start with ~ : ~부터 시작하자","number three = the flying skateboard (동격)","flying : skateboard를 꾸미는 현재분사"]},
+{n:3,sp:"W",en:"It's a cool item. // [I wish I could have] / a flying skateboard.",
+ kc:"그것은 멋진 물건이에요. // 내가 가질 수 있으면 좋겠어요 / 하늘을 나는 스케이트보드를.",
+ ko:"멋진 물건이죠. 하늘을 나는 스케이트보드가 있으면 좋겠어요.",
+ nt:["I wish I could + 동사원형 : 내가 ~할 수 있으면 좋겠다 (현재 사실과 반대되는 소망)"]},
+{n:4,sp:"M",en:"Actually, / [I read somewhere / that] this is / [not entirely] impossible.",
+ kc:"사실, / 나는 어디선가 읽었어요 / 이것이 ~라고 / 완전히 불가능한 것은 아니라고.",
+ ko:"사실, 이게 완전히 불가능한 건 아니라는 글을 어디서 읽었어요.",
+ nt:["I read that ~ : 나는 ~라고 읽었다 (read는 과거형, 발음 [red])","that : read의 목적어절을 이끄는 접속사","not entirely : 완전히 ~한 것은 아닌 (부분 부정)","this = 하늘을 나는 스케이트보드"]},
+{n:5,sp:"W",en:"Really? // [Is it actually possible / to fly] / on a skateboard?",
+ kc:"정말요? // 실제로 가능한가요 / 나는 것이 / 스케이트보드를 타고?",
+ ko:"정말요? 스케이트보드를 타고 나는 게 실제로 가능해요?",
+ nt:["Is it possible to + 동사원형 ~? : ~하는 것이 가능하니? (실제로 가능한지 묻기)","it = 가주어, to fly ~ = 진주어"]},
+{n:6,sp:"M",en:"Yes. // Some companies [have applied] physics / [to create] flying skateboards.",
+ kc:"네. // 몇몇 회사들이 물리학을 적용해 왔어요 / 하늘을 나는 스케이트보드를 만들기 위해.",
+ ko:"네. 몇몇 회사들이 하늘을 나는 스케이트보드를 만들려고 물리학을 적용했어요.",
+ nt:["have applied : 현재완료 (완료)","apply : 적용하다 · physics : 물리학","to create : 목적을 나타내는 부사적 용법의 to부정사 (~하기 위해)"]},
+
+{n:7,sp:"M",en:"[Welcome back to] Earth, Irene. // What was your favorite part / about [being] in the space station?",
+ kc:"지구에 돌아온 것을 환영해요, Irene. // 당신이 가장 좋아한 부분은 무엇이었나요 / 우주 정거장에 있었던 것에 대해?",
+ ko:"지구 귀환을 환영해요, Irene. 우주 정거장에서 지낼 때 가장 좋았던 건 뭐였어요?",
+ nt:["Welcome back to ~ : ~에 돌아온 것을 환영해","about + being : 전치사의 목적어로 동명사","space station : 우주 정거장"]},
+{n:8,sp:"W",en:"I could see / a beautiful sunrise / [16 times a day]. // It was great.",
+ kc:"나는 볼 수 있었어요 / 아름다운 일출을 / 하루에 16번. // 그것은 멋졌어요.",
+ ko:"아름다운 일출을 하루에 16번 볼 수 있었어요. 정말 멋졌어요.",
+ nt:["could : can의 과거 (~할 수 있었다)","~ times a day : 하루에 ~번"]},
+{n:9,sp:"M",en:"[Is it possible to see] the sunrise / several times a day / in space?",
+ kc:"일출을 보는 것이 가능한가요 / 하루에 여러 번 / 우주에서는?",
+ ko:"우주에서는 하루에 여러 번 일출을 보는 게 가능해요?",
+ nt:["Is it possible to + 동사원형 ~? : 실제로 가능한지 묻기","several times : 여러 번"]},
+{n:10,sp:"W",en:"Yes, / it's possible / [because] we moved around Earth / [every 90 minutes] / in the station.",
+ kc:"네, / 그것은 가능해요 / 왜냐하면 우리는 지구 주위를 돌았기 때문에 / 90분마다 / 정거장 안에서.",
+ ko:"네, 가능해요. 정거장에 있으면서 90분마다 지구를 한 바퀴씩 돌았거든요.",
+ nt:["because + 주어 + 동사 : ~ 때문에","every + 기수 + 복수명사 : ~마다 (every 90 minutes, minute ✕)","move around : ~ 주위를 돌다"]},
+{n:11,sp:"M",en:"Wow, / that's [amazing]!",
+ kc:"와, / 그것은 놀라워요!",
+ ko:"와, 정말 놀랍네요!",
+ nt:["that = 90분마다 지구를 돌아서 하루에 여러 번 일출을 보는 것","사물이 놀라움을 주는 것 : 현재분사형 감정형용사 amazing (amazed ✕)"]},
+
+{n:12,sp:"M",en:"Irene, / [what was the best food] / you ate / in the space station?",
+ kc:"Irene, / 가장 좋았던 음식은 무엇이었나요 / 당신이 먹은 / 우주 정거장에서?",
+ ko:"Irene, 우주 정거장에서 먹은 음식 중 가장 좋았던 건 뭐였어요?",
+ nt:["the best food (that) you ate : 목적격 관계대명사 생략","the best : good의 최상급"]},
+{n:13,sp:"W",en:"Hmm.... // We [grew] some vegetables / and [ate] them / every day. // They were [pretty] fresh and tasty!",
+ kc:"음…. // 우리는 채소를 좀 길렀어요 / 그리고 그것들을 먹었어요 / 매일. // 그것들은 꽤 신선하고 맛있었어요!",
+ ko:"음…. 채소를 길러서 매일 먹었어요. 꽤 신선하고 맛있었어요!",
+ nt:["grew ~ and ate ~ : 과거 동사 병렬 (grow – grew – grown)","them, They = some vegetables","pretty : (부사) 꽤, 매우"]},
+{n:14,sp:"M",en:"Wow, / [is it possible to grow] vegetables / in the space station?",
+ kc:"와, / 채소를 기르는 것이 가능한가요 / 우주 정거장에서?",
+ ko:"와, 우주 정거장에서 채소를 기르는 게 가능해요?",
+ nt:["Is it possible to + 동사원형 ~? : 실제로 가능한지 묻기"]},
+{n:15,sp:"W",en:"Yes. // [Since] there's no gravity / in space, / we [had to] grow them / in special bags. // The bags [helped the roots to grow].",
+ kc:"네. // 중력이 없기 때문에 / 우주에는, / 우리는 그것들을 길러야 했어요 / 특수한 주머니에서. // 그 주머니가 뿌리가 자라는 것을 도와줬어요.",
+ ko:"네. 우주에는 중력이 없어서 특수한 주머니에 길러야 했어요. 주머니 덕분에 뿌리가 잘 자랐어요.",
+ nt:["Since : (접속사) ~ 때문에 (= because)","had to + 동사원형 : ~해야 했다 (have to의 과거)","help + 목적어 + (to) 동사원형 : ~가 …하는 것을 돕다","gravity : 중력 · root : 뿌리"]},
+{n:16,sp:"M",en:"[How interesting]!",
+ kc:"정말 흥미롭네요!",
+ ko:"정말 흥미롭네요!",
+ nt:["How + 형용사 (+ 주어 + 동사)! : 정말 ~하구나! (감탄문)","= How interesting it is!"]},
+
+{n:17,sp:"M",en:"[Have you heard / that] NASA [is going to send] / a 3D printer / into space?",
+ kc:"너는 들어 봤니 / NASA가 보낼 거라는 것을 / 3D 프린터를 / 우주로?",
+ ko:"NASA가 3D 프린터를 우주로 보낼 거라는 얘기 들어 봤어?",
+ nt:["Have you heard that + 주어 + 동사 ~? : ~을 들어 본 적 있니? (경험의 현재완료)","be going to + 동사원형 : ~할 예정이다","send A into B : A를 B로 보내다"]},
+{n:18,sp:"W",en:"They're going to send / a 3D printer / into space? // Why?",
+ kc:"그들이 보낼 거라고 / 3D 프린터를 / 우주로? // 왜?",
+ ko:"3D 프린터를 우주로 보낸다고? 왜?",
+ nt:["They = NASA (사람들)","평서문 어순 + 끝을 올려 읽기 : 놀라서 되묻는 말"]},
+{n:19,sp:"M",en:"[I've heard / that] the 3D printer / [will be used / to print out] food / for astronauts.",
+ kc:"나는 들었어 / 그 3D 프린터가 / 사용될 거라고 / 음식을 출력하기 위해 / 우주 비행사들을 위한.",
+ ko:"그 3D 프린터가 우주 비행사들이 먹을 음식을 출력하는 데 쓰일 거래.",
+ nt:["I've heard that ~ : ~라고 들었다","will be used : 조동사가 있는 수동태 (조동사 + be + p.p.)","be used to + 동사원형 : ~하는 데 사용되다 (to부정사, 목적)","print out : (프린터로) ~을 출력하다"]},
+{n:20,sp:"W",en:"[Is it possible to print out] food / [using] a 3D printer?",
+ kc:"음식을 출력하는 것이 가능하니 / 3D 프린터를 사용해서?",
+ ko:"3D 프린터로 음식을 출력하는 게 가능해?",
+ nt:["Is it possible to + 동사원형 ~? : 실제로 가능한지 묻기","using ~ : ~을 사용해서 (분사구문)"]},
+{n:21,sp:"M",en:"Yes, / it's possible. // It can print out / a fresh pizza / in [less than] five minutes.",
+ kc:"응, / 그것은 가능해. // 그것은 출력할 수 있어 / 신선한 피자를 / 5분도 안 되는 시간에.",
+ ko:"응, 가능해. 5분도 안 걸려서 신선한 피자를 출력할 수 있대.",
+ nt:["It = the 3D printer","less than ~ : ~보다 적은, ~ 미만의","in + 시간 : ~ 만에"]},
+{n:22,sp:"W",en:"Really? // [I wonder / what it would taste like].",
+ kc:"정말? // 나는 궁금해 / 그것이 어떤 맛이 날지.",
+ ko:"정말? 무슨 맛일지 궁금하다.",
+ nt:["I wonder + 의문사 + 주어 + 동사 : 간접의문문 (wonder의 목적어)","What would it taste like? 를 간접의문문으로 바꾸면 what it would taste like","taste like ~ : ~ 같은 맛이 나다","it = 3D 프린터로 출력한 피자"]},
+
+{n:23,sp:"M",en:"Look at / these colorful pictures / of the universe.",
+ kc:"봐 / 이 색색의 사진들을 / 우주의.",
+ ko:"이 알록달록한 우주 사진들 좀 봐.",
+ nt:["Look at ~ : ~을 봐 (명령문)","universe : 우주"]},
+{n:24,sp:"W",en:"Oh, / they're beautiful. // [I wish I could see] Earth / from space / [with my own eyes].",
+ kc:"아, / 그것들은 아름답다. // 나는 지구를 볼 수 있으면 좋겠어 / 우주에서 / 내 눈으로 직접.",
+ ko:"아, 정말 아름답다. 우주에서 내 눈으로 직접 지구를 볼 수 있으면 좋겠어.",
+ nt:["I wish I could + 동사원형 : 이루어지기를 바라는 일 표현하기","with one's own eyes : 자신의 눈으로 직접","they = these colorful pictures"]},
+{n:25,sp:"M",en:"Actually, / you can [do that] / at the National Youth Space Center.",
+ kc:"사실, / 너는 그것을 할 수 있어 / 국립 청소년 우주 센터에서.",
+ ko:"사실 국립 청소년 우주 센터에 가면 그렇게 할 수 있어.",
+ nt:["do that = 우주에서 직접 지구를 보는 것","actually : 사실은"]},
+{n:26,sp:"W",en:"Really?",
+ kc:"정말?",
+ ko:"정말?",
+ nt:["Really? : 놀라움, 관심 표현"]},
+{n:27,sp:"M",en:"Yeah, / you can use / the VR glasses. // [I heard / that] you [feel like] / you are actually in space!",
+ kc:"응, / 너는 사용할 수 있어 / VR 안경을. // 나는 들었어 / 네가 느낀다고 / 실제로 우주에 있는 것처럼!",
+ ko:"응, VR 안경을 쓸 수 있어. 진짜 우주에 있는 것 같은 느낌이 든대!",
+ nt:["that : heard의 목적어절을 이끄는 명사절 접속사","feel like + 주어 + 동사 : ~처럼 느끼다","VR = virtual reality (가상 현실)"]},
+
+{n:28,sp:"W",en:"What are you watching?",
+ kc:"너는 무엇을 보고 있니?",
+ ko:"뭐 보고 있어?",
+ nt:["be + -ing : 현재진행형"]},
+{n:29,sp:"M",en:"It's a documentary / about life in space. // Everything [seems so different].",
+ kc:"그것은 다큐멘터리야 / 우주에서의 생활에 관한. // 모든 것이 아주 달라 보여.",
+ ko:"우주 생활에 관한 다큐멘터리야. 모든 게 정말 달라 보여.",
+ nt:["seem + 형용사 : ~해 보이다","Everything : 단수 취급 (seems)","documentary : 다큐멘터리"]},
+{n:30,sp:"W",en:"Yes, / [it's because] there's no gravity / in space.",
+ kc:"응, / 그건 중력이 없기 때문이야 / 우주에는.",
+ ko:"응, 우주에는 중력이 없기 때문이야.",
+ nt:["it's because + 원인 : 그것은 ~ 때문이다","it = 모든 것이 달라 보이는 것"]},
+{n:31,sp:"M",en:"Right. // [I wish I could float around] / [like] an astronaut!",
+ kc:"맞아. // 나는 둥둥 떠다닐 수 있으면 좋겠어 / 우주 비행사처럼!",
+ ko:"맞아. 나도 우주 비행사처럼 둥둥 떠다닐 수 있으면 좋겠다!",
+ nt:["I wish I could + 동사원형 : 이루어지기를 바라는 일 표현하기","float around : 떠다니다","like : (전치사) ~처럼"]},
+{n:32,sp:"W",en:"Really? // [I don't]. // It [looks uncomfortable].",
+ kc:"정말? // 나는 그렇지 않아. // 그것은 불편해 보여.",
+ ko:"정말? 난 아닌데. 불편해 보여.",
+ nt:["I don't. = I don't wish I could float around like an astronaut.","look + 형용사 : ~해 보이다","It = 떠다니는 것"]},
+
+{n:33,sp:"W",en:"Look at this man, Jake. // He lived in space / [for one year].",
+ kc:"이 남자를 봐, Jake. // 그는 우주에서 살았어 / 1년 동안.",
+ ko:"이 남자 좀 봐, Jake. 우주에서 1년 동안 살았대.",
+ nt:["for + 기간 : ~ 동안"]},
+{n:34,sp:"M",en:"It [must have been] tough / for him.",
+ kc:"그것은 힘들었음이 틀림없어 / 그에게.",
+ ko:"그 사람한테는 정말 힘들었겠다.",
+ nt:["must have + p.p. : ~했음이 틀림없다 (과거에 대한 강한 추측)","tough : 힘든, 어려운","It = 우주에서 1년 동안 산 것"]},
+{n:35,sp:"W",en:"Right, / but [you know what's interesting]? // He grew 2 inches / [while in space].",
+ kc:"맞아, / 하지만 흥미로운 게 뭔지 아니? // 그는 2인치 자랐어 / 우주에 있는 동안.",
+ ko:"맞아, 그런데 재미있는 게 뭔지 알아? 우주에 있는 동안 키가 2인치 자랐대.",
+ nt:["you know what's interesting? : 흥미로운 게 뭔지 아니? (Do you know ~?에서 Do 생략)","while (he was) in space : 부사절의 '주어 + be동사' 생략","while : ~하는 동안 (접속사)"]},
+{n:36,sp:"M",en:"Really? // [How is that possible]?",
+ kc:"정말? // 그게 어떻게 가능하니?",
+ ko:"정말? 그게 어떻게 가능해?",
+ nt:["How is that possible? : 그게 어떻게 가능해?","that = 우주에서 키가 2인치 자란 것"]},
+{n:37,sp:"W",en:"I'm not sure, / but maybe / [it's because] there's no gravity / in space.",
+ kc:"나는 잘 모르겠어, / 하지만 아마 / 그건 중력이 없기 때문일 거야 / 우주에는.",
+ ko:"잘 모르겠지만, 아마 우주에는 중력이 없어서일 거야.",
+ nt:["it's because + 원인 : 그것은 ~ 때문이다","maybe : 아마"]},
+{n:38,sp:"M",en:"That's so cool. // [I wish I could live] in space. // [That way], / I could become taller.",
+ kc:"그거 정말 멋지다. // 나는 우주에서 살 수 있으면 좋겠어. // 그렇게 하면, / 나는 키가 더 커질 수 있을 텐데.",
+ ko:"정말 멋지다. 나도 우주에서 살 수 있으면 좋겠어. 그러면 키가 더 클 수 있을 텐데.",
+ nt:["I wish I could + 동사원형 : 이루어지기를 바라는 일 표현하기","That way : 그렇게 하면","become + 비교급 : 더 ~해지다"]},
+{n:39,sp:"W",en:"I'm sure / there are other ways / [to become] taller / [than] going to space.",
+ kc:"나는 확신해 / 다른 방법들이 있다고 / 키가 더 커지는 / 우주에 가는 것보다.",
+ ko:"우주에 가는 것 말고도 키가 클 방법은 분명히 있을 거야.",
+ nt:["I'm sure (that) ~ : 나는 ~라고 확신한다","to become : other ways를 꾸미는 형용사적 용법의 to부정사","than going ~ : than 뒤에 동명사"]}
+];
+
+/* ---------- 슬라이드 구성 ---------- */
+const M8 = {cls:"l8", ls:"Lesson 08", t:"Wonders of Space Travel"};
+const S = [];
+const sent = (m, data, sec, ns) => S.push({m, sec, ns, data});
+const page = (m, sec, html, extra) => S.push({m, sec, html, extra});
+
+/* 표지 */
+S.push({raw:`<section class="slide cover l8">
+  <div class="k">중3 2학기 비상(김진완) Lesson 08 Wonders of Space Travel</div>
+  <h1>대화문 정리</h1>
+  <div class="t">Communication, Listen &amp; Talk 1, Listen &amp; Talk 2</div>
+  <div class="d">어떤 일이 실제로 가능한지 묻기 (Is it possible to ~?)<br>이루어지기를 바라는 일 표현하기 (I wish I could ~.)</div>
+</section>`});
+
+page(M8,"대화문 한눈에",`
+  <h2>7개의 대화, 2개의 표현</h2>
+  <table class="cmp">
+    <tr><th>대화</th><th>장면</th><th>핵심 표현</th></tr>
+    <tr><td>01 Communication</td><td>영화 속에서 진짜였으면 하는 것, 하늘을 나는 스케이트보드</td><td>I wish I could have a flying skateboard.<br>Is it actually possible to fly on a skateboard?</td></tr>
+    <tr><td>02 Listen &amp; Talk 1</td><td>우주 정거장에서 하루에 16번 본 일출</td><td>Is it possible to see the sunrise several times a day in space?</td></tr>
+    <tr><td>03 Listen &amp; Talk 1</td><td>우주 정거장에서 특수 주머니에 기른 채소</td><td>Is it possible to grow vegetables in the space station?</td></tr>
+    <tr><td>04 Listen &amp; Talk 1</td><td>NASA가 우주로 보내는 3D 프린터</td><td>Is it possible to print out food using a 3D printer?</td></tr>
+    <tr><td>05 Listen &amp; Talk 2</td><td>우주 센터의 VR 안경으로 지구 보기</td><td>I wish I could see Earth from space with my own eyes.</td></tr>
+    <tr><td>06 Listen &amp; Talk 2</td><td>우주 생활 다큐멘터리, 떠다니고 싶은 남자</td><td>I wish I could float around like an astronaut!</td></tr>
+    <tr><td>07 Listen &amp; Talk 2</td><td>우주에서 1년 살고 2인치 자란 사람</td><td>I wish I could live in space.</td></tr>
+  </table>
+`);
+
+page(M8,"의사소통 기능 ① 어떤 일이 실제로 가능한지 묻기",`
+  <h2>어떤 일이 실제로 가능한지 묻기</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">묻기</span>
+      <p style="font-size:21px;font-weight:700">Is it possible to + 동사원형 ~?</p>
+      <p>~하는 것이 가능하니?</p>
+      <div class="ex">A: Is it possible to see the sunrise several times a day in space? <i>우주에서는 하루에 여러 번 일출을 보는 것이 가능하니?</i></div>
+      <div class="ex">B: Yes, it is. <i>응, 그래.</i></div>
+      <p style="margin-top:10px">같은 뜻의 다른 표현</p>
+      <div class="ex">Can I[we] (actually) + 동사원형 ~? <i>내[우리]가 (실제로) ~할 수 있을까?</i></div>
+      <div class="ex">Am I able to + 동사원형 ~? <i>내가 ~할 수 있을까?</i></div>
+      <div class="ex">Is there a possibility that ~? <i>~할 가능성이 있니?</i></div>
+    </div>
+    <div class="box"><span class="tag">대화 속 표현</span>
+      <div class="ex">Is it <mark>actually</mark> possible to fly on a skateboard? <i>(01)</i></div>
+      <div class="ex">Is it possible to see the sunrise several times a day in space? <i>(02)</i></div>
+      <div class="ex">Is it possible to grow vegetables in the space station? <i>(03)</i></div>
+      <div class="ex">Is it possible to print out food using a 3D printer? <i>(04)</i></div>
+      <div class="ex">How is that possible? <i>(07) 그게 어떻게 가능해?</i></div>
+      <p style="margin-top:8px">대답 : Yes, it's possible. (02, 04) / Yes. (03)</p>
+    </div>
+  </div>
+`);
+
+page(M8,"의사소통 기능 ② 이루어지기를 바라는 일 표현하기",`
+  <h2>이루어지기를 바라는 일 표현하기</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box f"><span class="tag">형태와 뜻</span>
+      <p style="font-size:21px;font-weight:700">I wish I could + 동사원형 ~.</p>
+      <p>내가 ~할 수 있으면 좋겠어. (현재 사실과 반대되거나 실현 가능성이 거의 없는 소망)</p>
+      <p style="margin-top:6px">실현 가능성이 있는 희망은 <b>I hope ~.</b></p>
+      <div class="ex">A: I wish I could see Earth from space with my own eyes. <i>난 내 눈으로 우주에서 지구를 볼 수 있으면 좋겠어.</i></div>
+      <div class="ex">B: Me, too. <i>나도 그래.</i></div>
+      <p style="margin-top:10px">같은 뜻의 다른 표현</p>
+      <div class="ex">How I wish I could meet the actor in person!</div>
+      <div class="ex">It would be great if I could meet the actor in person.</div>
+      <div class="ex">Meeting the actor in person would be a dream come true.</div>
+    </div>
+    <div class="box"><span class="tag">대화 속 표현</span>
+      <div class="ex">I wish I could <mark>have</mark> a flying skateboard. <i>(01) 하늘을 나는 스케이트보드가 있으면 좋겠어</i></div>
+      <div class="ex">I wish I could <mark>see</mark> Earth from space with my own eyes. <i>(05) 우주에서 내 눈으로 지구를 볼 수 있으면 좋겠어</i></div>
+      <div class="ex">I wish I could <mark>float</mark> around like an astronaut! <i>(06) 우주 비행사처럼 떠다닐 수 있으면 좋겠어</i></div>
+      <div class="ex">I wish I could <mark>live</mark> in space. <i>(07) 우주에서 살 수 있으면 좋겠어</i></div>
+      <div class="ex">the top three things from movies that we wish <mark>were</mark> real <i>(01) I wish + 주어 + 과거형</i></div>
+    </div>
+  </div>
+`);
+
+/* 대화마다 번호를 1부터 다시 */
+const DSEC = [[1,6],[7,11],[12,16],[17,22],[23,27],[28,32],[33,39]];
+DSEC.forEach(([a,b])=>{ for(let n=a;n<=b;n++) D[n-1].dn = n-a+1; });
+/* 대화 전체를 한 장에: 영어(핵심 표현 형광펜) + 우리말 해석 */
+function scriptHTML(a, b){
+  const e = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/ \/\/ /g," ").replace(/ \/ /g," ").replace(/\[([^\]]+)\]/g,"<mark>$1</mark>");
+  let h = '<div class="dlg">';
+  for(let n=a;n<=b;n++){ const o = D[n-1];
+    h += `<div class="ln"><div class="no">${String(o.dn).padStart(2,"0")}</div><div class="who${o.sp==="W"?" w":""}">${o.sp}</div><div><div class="e">${e(o.en)}</div><div class="k">${e(o.ko)}</div></div></div>`; }
+  return h + '</div>';
+}
+const range = (a,b) => Array.from({length:b-a+1},(_,i)=>a+i);
+const SECS = [
+  "01 Communication (하늘을 나는 스케이트보드)",
+  "02 Listen & Talk 1 (하루에 16번 보는 일출)",
+  "03 Listen & Talk 1 (우주 정거장의 채소)",
+  "04 Listen & Talk 1 (음식을 출력하는 3D 프린터)",
+  "05 Listen & Talk 2 (VR 안경으로 보는 지구)",
+  "06 Listen & Talk 2 (우주 생활 다큐멘터리)",
+  "07 Listen & Talk 2 (우주에서 자란 키)"
+];
+SECS.forEach((t,i)=>{
+  const [a,b] = DSEC[i];
+  page(M8, t.replace(/ \(/," 전체 대화 ("), scriptHTML(a,b));
+  sent(M8, D, t.replace(/&/g,"&amp;"), range(a,b));
+});
+
+page(M8,"대화문 속 문법",`
+  <h2>대화문 속 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>가정법과 추측</h3>
+      <div class="ex">things from movies that we wish <mark>were</mark> real <i>I wish + 주어 + 과거형 : 현재 사실과 반대 (01)</i></div>
+      <div class="ex">That way, I <mark>could become</mark> taller. <i>그렇게 하면 키가 더 클 수 있을 텐데 (07)</i></div>
+      <div class="ex">It <mark>must have been</mark> tough for him. <i>must have p.p. : ~했음이 틀림없다 (07)</i></div>
+    </div>
+    <div class="box"><h3>간접의문문과 접속사</h3>
+      <div class="ex">I wonder <mark>what it would taste like</mark>. <i>의문사 + 주어 + 동사 (04)</i></div>
+      <div class="ex">I heard <mark>that</mark> you feel like you are actually in space! <i>명사절 접속사 that (05)</i></div>
+      <div class="ex"><mark>Since</mark> there's no gravity in space, ~ <i>since = because (03)</i></div>
+      <div class="ex">He grew 2 inches <mark>while in space</mark>. <i>while (he was) in space (07)</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"대화문 속 문법",`
+  <h2>대화문 속 문법</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="box"><h3>to부정사와 동명사</h3>
+      <div class="ex">have applied physics <mark>to create</mark> flying skateboards <i>목적 : ~하기 위해 (01)</i></div>
+      <div class="ex">other ways <mark>to become</mark> taller <i>형용사적 용법 : ~할 (07)</i></div>
+      <div class="ex">your favorite part about <mark>being</mark> in the space station <i>전치사 뒤 동명사 (02)</i></div>
+    </div>
+    <div class="box"><h3>그 밖의 구문</h3>
+      <div class="ex">The bags <mark>helped the roots to grow</mark>. <i>help + 목적어 + (to) 동사원형 (03)</i></div>
+      <div class="ex">The 3D printer <mark>will be used</mark> to print out food. <i>조동사 + be + p.p. (04)</i></div>
+      <div class="ex"><mark>every 90 minutes</mark> <i>every + 기수 + 복수명사 : ~마다 (02)</i></div>
+      <div class="ex"><mark>How interesting!</mark> <i>How + 형용사! 감탄문 (03)</i></div>
+    </div>
+  </div>
+`);
+
+page(M8,"확인 문제",`
+  <style>.qz{gap:10px!important}.qz .q{padding:8px 16px;gap:2px 12px}.qz .q .qq{font-size:18.5px;line-height:1.35}.qz .q .qa{font-size:17.5px;padding:4px 10px}.qz .q .hint{display:none}</style>
+  <h2>대화 내용 T / F</h2>
+  <div class="grid qz" style="grid-template-columns:1fr 1fr">
+    <div class="q"><div class="qn">1</div><div class="qq">They are talking about the top three things from movies that they wish were imaginary.</div><div class="qa">F (진짜였으면 하는 것 : wish were real)</div></div>
+    <div class="q"><div class="qn">2</div><div class="qq">Irene could see the sunrise 16 times in a day.</div><div class="qa">T</div></div>
+    <div class="q"><div class="qn">3</div><div class="qq">It's impossible to grow vegetables in space.</div><div class="qa">F (특수한 주머니에 길러서 매일 먹음)</div></div>
+    <div class="q"><div class="qn">4</div><div class="qq">Astronauts can make food by using a 3D printer in space.</div><div class="qa">T (5분도 안 걸려 피자를 출력함)</div></div>
+    <div class="q"><div class="qn">5</div><div class="qq">They're able to feel like they are in space if they wear the VR glasses.</div><div class="qa">T</div></div>
+    <div class="q"><div class="qn">6</div><div class="qq">The woman wants to be an astronaut.</div><div class="qa">F (떠다니고 싶은 건 남자, 여자는 불편해 보인다고 함)</div></div>
+    <div class="q"><div class="qn">7</div><div class="qq">If we go to space, we can become taller.</div><div class="qa">T (우주에 있는 동안 키가 2인치 자람)</div></div>
+  </div>
+`);
+
+/* ---------- 렌더링 ---------- */
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function fmt(en){
+  return esc(en)
+    .replace(/ \/\/ /g,"  ")
+    .replace(/\[([^\]]+)\]/g,"<mark>$1</mark>")
+    .replace(/ \/ /g,' <span class="sl">/</span> ');
+}
+function sentHTML(o){
+  const sp = o.sp ? `<span class="sp ${o.sp.startsWith("Dr")||o.sp==="W"?"dr":""}">${o.sp}</span>` : "";
+  return `<div class="s${o.h?" h":""}"><div class="n">${String(o.dn||o.n).padStart(2,"0")}</div><div>
+    <div class="en">${sp}${fmt(o.en)}</div>
+    <div class="nt">${o.nt.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
+    <div class="kc"><b>끊어 해석</b><span>${esc(o.kc).replace(/ \/\/ /g,"  ").replace(/ \/ /g,' <span class="sl">/</span> ')}</span></div>
+    <div class="ko"><b>해석</b><span>${esc(o.ko)}</span></div></div></div>`;
+}
+let SS = S;
+document.getElementById("bar").style.background = "#4b5bd6";
+
+const stage = document.getElementById("stage");
+let slides = [];
+function slideHTML(x){
+  if(x.raw) return x.raw;
+  const body = x.ns ? x.ns.map(n=>sentHTML(x.data[n-1])).join("") : x.html;
+  const dn = n => String(x.data[n-1].dn || n).padStart(2,"0");   /* 대화문은 대화마다 번호가 1부터 */
+  const rng = x.ns ? `${dn(x.ns[0])}${x.ns.length>1?" – "+dn(x.ns[x.ns.length-1]):""}` : "";
+  return `<section class="slide ${x.m.cls}">
+    <div class="hd"><span class="ls">${x.m.ls}</span><span class="sec">${x.sec}</span><span class="rng">${rng}</span></div>
+    <div class="bd">${body}</div>
+    <div class="ft">${x.m.ls} · ${x.m.t}<span class="pg"></span></div></section>`;
+}
+function render(){
+  stage.innerHTML = SS.map(slideHTML).join("");
+  slides = [...stage.querySelectorAll(".slide")];
+  slides.forEach((s,i)=>{ const p=s.querySelector(".pg"); if(p) p.textContent = `${i+1} / ${slides.length}`; });
+  stage.querySelectorAll(".q").forEach(q=>q.addEventListener("click",()=>q.classList.toggle("open")));
+}
+/* 글씨 크기에 맞춰 같은 소제목 안의 문장들을 슬라이드에 다시 나눠 담음 */
+function repack(){
+  const H = {}; let limit = 0;
+  slides.forEach((s,i)=>{
+    if(!SS[i].ns) return;
+    s.classList.add("on");
+    const b = s.querySelector(".bd");
+    limit = b.clientHeight - 56 - 50;                 /* 위아래 여백을 넉넉히 남긴 높이 */
+    b.querySelectorAll(".s").forEach((el,k)=>{ H[SS[i].ns[k]] = el.offsetHeight; });
+    s.classList.remove("on");
+  });
+  const GAP = 16, out = [];
+  for(let i=0; i<SS.length; ){
+    const x = SS[i];
+    if(!x.ns){ out.push(x); i++; continue; }
+    const run = [];
+    while(i<SS.length && SS[i].ns && SS[i].sec===x.sec){ run.push(...SS[i].ns); i++; }
+    const pages = []; let pg = [], h = 0;
+    run.forEach(n=>{
+      const add = H[n] + (pg.length ? GAP : 0);
+      if(pg.length && h + add > limit){ pages.push(pg); pg = []; h = 0; }
+      h += H[n] + (pg.length ? GAP : 0); pg.push(n);
+    });
+    if(pg.length) pages.push(pg);
+    /* 마지막 장에 한 문장만 남으면 앞 장에서 하나 넘겨 균형 맞추기 */
+    const L = pages.length;
+    if(L>1 && pages[L-1].length===1 && pages[L-2].length>2) pages[L-1].unshift(pages[L-2].pop());
+    pages.forEach(p=>out.push({...x, ns:p}));
+  }
+  SS = out;
+}
+render();
+
+let cur = 0;
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle("on", k===cur));
+  document.getElementById("bar").style.width = ((cur+1)/slides.length*100)+"%";
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+}
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.transform = `translate(${(innerWidth-1280*s)/2}px,${(innerHeight-720*s)/2}px) scale(${s})`;
+}
+function tg(c){ document.body.classList.toggle(c); }
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+addEventListener("resize", fit);
+addEventListener("keydown", e=>{
+  const k = e.key;
+  if(["ArrowRight","PageDown"," ","Enter"].includes(k)){ e.preventDefault(); go(cur+1); }
+  else if(["ArrowLeft","PageUp","Backspace"].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home") go(0);
+  else if(k==="End") go(slides.length-1);
+  else if(k==="k"||k==="K") tg("hideKo");
+  else if(k==="n"||k==="N") tg("hideNt");
+  else if(k==="f"||k==="F") fs();
+});
+fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+document.fonts.ready.then(()=>{ repack(); render(); go((parseInt(location.hash.slice(1))||1)-1); });
+</script>
+<script src="https://s2ionn.github.io/class-tools/board.js"></script>
+</body>
+</html>
