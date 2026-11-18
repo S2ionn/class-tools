@@ -255,6 +255,12 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
 .gs .nm{vertical-align:2px;margin-right:5px}
 .gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
 .ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
+/* 본문 끊어 읽기 */
+/* 본문 끊어 읽기: 문장을 누르면 / 표시 */
+.ck .cs{display:none;color:var(--red);font-weight:700;margin-right:.3em}
+.ck .cs.n{margin-left:.3em}
+.ck.open .cs,.ckall .cs{display:inline}
+@media print{.ck .cs{display:inline}}
 </style>
 </head>
 <body class="hideKo">
@@ -370,7 +376,7 @@ add("U02","표지",`
 
 /* ===== READING 04 ===== */
 add("R04","본문",`<div class="rd">${rdSide(4,{ex:"#follow #ditto spending #buying same things"})}
-  <div class="main"><div class="psg">${nm(1)}“You choose, I’ll follow.” ${nm(2)}This is the idea behind ditto spending. ${nm(3)}“Ditto” means “me too.” ${nm(4)}So “ditto spending” means buying the same things as others whose taste or style is similar to yours. ${nm(5)}Because of social media, ditto spending is growing fast. ${nm(6)}For example, many people follow a star or influencer whose style they like. ${nm(7)}They often buy the same things—such as clothes, food, or other items—as this person. ${nm(8)}They think, “If it’s good for them, it must be good for me, too.” ${nm(9)}This kind of spending can feel easy and safe, but it can cause problems. ${nm(10)}People may buy things they don’t really need and waste money. ${nm(11)}They might lose their own style and feel unhappy with what they bought. ${nm(12)}In the end, they may miss the chance to make their own decisions.</div>
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">“You choose, <b class="cs">/</b>I’ll follow.”</span> ${nm(2)}<span class="q ck">This is the idea <b class="cs">/</b>behind ditto spending.</span> ${nm(3)}<span class="q ck">“Ditto” means “me too.”</span> ${nm(4)}<span class="q ck">So “ditto spending” means <b class="cs">/</b>buying the same things as others <b class="cs">/</b>whose taste or style is similar to yours.</span> ${nm(5)}<span class="q ck">Because of social media, <b class="cs">/</b>ditto spending is growing fast.</span> ${nm(6)}<span class="q ck">For example, <b class="cs">/</b>many people follow a star or influencer <b class="cs">/</b>whose style they like.</span> ${nm(7)}<span class="q ck">They often buy the same things<b class="cs n">/</b>—such as clothes, food, or other items—<b class="cs n">/</b>as this person.</span> ${nm(8)}<span class="q ck">They think, <b class="cs">/</b>“If it’s good for them, <b class="cs">/</b>it must be good for me, too.”</span> ${nm(9)}<span class="q ck">This kind of spending <b class="cs">/</b>can feel easy and safe, <b class="cs">/</b>but it can cause problems.</span> ${nm(10)}<span class="q ck">People may buy things <b class="cs">/</b>they don’t really need <b class="cs">/</b>and waste money.</span> ${nm(11)}<span class="q ck">They might lose their own style <b class="cs">/</b>and feel unhappy <b class="cs">/</b>with what they bought.</span> ${nm(12)}<span class="q ck">In the end, <b class="cs">/</b>they may miss the chance <b class="cs">/</b>to make their own decisions.</span></div>
   <div class="fn">*influencer: 인플루언서, 영향력을 행사하는 사람</div></div></div>${FT}<div class="bp">20</div>`);
 
 add("R04","문제 1-3",`<div class="qs" style="gap:24px">
@@ -431,7 +437,7 @@ add("R04","워크북 B",wbB([["소셜 미디어 때문에 / 디토 소비는 늘
 /* ===== READING 05 ===== */
 CUR = "R05";
 add("R05","본문",`<div class="rd">${rdSide(5,{gichul:1,ex:"#emotions #fear #good feelings #survive"})}
-  <div class="main"><div class="psg">${nm(1)}Our emotions are important because they help us survive. ${nm(2)}Fear keeps us away from danger. ${nm(3)}Anger can scare away our enemies. ${nm(4)}And good feelings help us get closer to others. ${nm(5)}<u>These emotions work like “programs” in our brains.</u> ${nm(6)}When something happens, an emotion starts and controls what we do. ${nm(7)}It changes how we pay attention, how we move, and what we remember. ${nm(8)}For example, when we meet our enemies, fear makes us focus more on the danger. ${nm(9)}Then we can choose to fight or run away. ${nm(10)}We also remember this kind of scary event more clearly, so we can stay safe in the future. ${nm(11)}Thus, each emotion helps protect us. ${nm(12)}If emotions did not help us survive, we would not still have them today.</div></div></div>${FT}<div class="bp">22</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">Our emotions are important <b class="cs">/</b>because they help us survive.</span> ${nm(2)}<span class="q ck">Fear keeps us away from danger.</span> ${nm(3)}<span class="q ck">Anger can scare away <b class="cs">/</b>our enemies.</span> ${nm(4)}<span class="q ck">And good feelings help us <b class="cs">/</b>get closer to others.</span> ${nm(5)}<span class="q ck"><u>These emotions work <b class="cs">/</b>like “programs” in our brains.</u></span> ${nm(6)}<span class="q ck">When something happens, <b class="cs">/</b>an emotion starts <b class="cs">/</b>and controls what we do.</span> ${nm(7)}<span class="q ck">It changes <b class="cs">/</b>how we pay attention, <b class="cs">/</b>how we move, <b class="cs">/</b>and what we remember.</span> ${nm(8)}<span class="q ck">For example, <b class="cs">/</b>when we meet our enemies, <b class="cs">/</b>fear makes us <b class="cs">/</b>focus more on the danger.</span> ${nm(9)}<span class="q ck">Then we can choose <b class="cs">/</b>to fight or run away.</span> ${nm(10)}<span class="q ck">We also remember <b class="cs">/</b>this kind of scary event <b class="cs">/</b>more clearly, <b class="cs">/</b>so we can stay safe <b class="cs">/</b>in the future.</span> ${nm(11)}<span class="q ck">Thus, <b class="cs">/</b>each emotion helps protect us.</span> ${nm(12)}<span class="q ck">If emotions did not help us survive, <b class="cs">/</b>we would not still have them today.</span></div></div></div>${FT}<div class="bp">22</div>`);
 
 add("R05","문제 1-2",`<div class="qs">
   <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -491,7 +497,7 @@ add("R05","워크북 B",wbB([["두려움은 우리를 멀리 떨어지게 한다
 /* ===== READING 06 ===== */
 CUR = "R06";
 add("R06","본문",`<div class="rd">${rdSide(6,{gichul:1,ex:"#multitasking #whole focus #focus on one task"})}
-  <div class="main"><div class="psg">${nm(1)}Today’s fast-paced lifestyle makes us put one thing on top of another. ${nm(2)}Many people believe that multitasking saves time, but it doesn’t. ${nm(3)}Very often, multitasking only slows you down. ${nm(4)}Give your whole focus to what you’re doing at the moment. ${nm(5)}While doing the laundry, just do the laundry. ${nm(6)}Listen to the sound of the water as it fills the washing machine and feel the clothes in your hand. ${nm(7)}Talking on the phone while you are doing the laundry will not save you a lot of time. ${nm(8)}The same applies to all your work. ${nm(9)}Focus on one task at a time, and you’ll accomplish each task better, and probably faster.</div></div></div>${FT}<div class="bp">24</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">Today’s fast-paced lifestyle <b class="cs">/</b>makes us put one thing <b class="cs">/</b>on top of another.</span> ${nm(2)}<span class="q ck">Many people believe <b class="cs">/</b>that multitasking saves time, <b class="cs">/</b>but it doesn’t.</span> ${nm(3)}<span class="q ck">Very often, <b class="cs">/</b>multitasking only slows you down.</span> ${nm(4)}<span class="q ck">Give your whole focus <b class="cs">/</b>to what you’re doing <b class="cs">/</b>at the moment.</span> ${nm(5)}<span class="q ck">While doing the laundry, <b class="cs">/</b>just do the laundry.</span> ${nm(6)}<span class="q ck">Listen <b class="cs">/</b>to the sound of the water <b class="cs">/</b>as it fills the washing machine <b class="cs">/</b>and feel the clothes <b class="cs">/</b>in your hand.</span> ${nm(7)}<span class="q ck">Talking on the phone <b class="cs">/</b>while you are doing the laundry <b class="cs">/</b>will not save you <b class="cs">/</b>a lot of time.</span> ${nm(8)}<span class="q ck">The same applies <b class="cs">/</b>to all your work.</span> ${nm(9)}<span class="q ck">Focus on one task <b class="cs">/</b>at a time, <b class="cs">/</b>and you’ll accomplish each task better, <b class="cs">/</b>and probably faster.</span></div></div></div>${FT}<div class="bp">24</div>`);
 
 add("R06","문제 1-3",`<div class="qs" style="gap:24px">
   <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -550,7 +556,7 @@ add("R06","워크북 B",wbB([["많은 사람들은 믿는다 / 멀티태스킹�
 /* ===== READING 07 ===== */
 CUR = "R07";
 add("R07","본문",`<div class="rd">${rdSide(7,{gichul:1,ex:"#encourage your friend #process of change"})}
-  <div class="main"><div class="psg">${nm(1)}How do you encourage your friends who are trying to change their behavior? ${nm(2)}Suppose you see a friend who has been working on a diet and losing a lot of weight. ${nm(3)}Definitely, you would want to tell her that she looks great. ${nm(4)}Anyone who hears positive comments will feel good, and this feedback will also be very encouraging. ${nm(5)}However, if you end the discussion there, the only feedback your friend is getting is about the outcome. ${nm(6)}Instead, continue the discussion by asking about the process. ${nm(7)}Ask her what she is doing to be so successful. ${nm(8)}What is she eating? ${nm(9)}Where is she working out? ${nm(10)}When the conversation focuses on the process of change rather than the outcome, it encourages her to keep making the change.</div></div></div>${FT}<div class="bp">26</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">How do you encourage your friends <b class="cs">/</b>who are trying to change <b class="cs">/</b>their behavior?</span> ${nm(2)}<span class="q ck">Suppose <b class="cs">/</b>you see a friend <b class="cs">/</b>who has been working on a diet <b class="cs">/</b>and losing a lot of weight.</span> ${nm(3)}<span class="q ck">Definitely, <b class="cs">/</b>you would want to tell her <b class="cs">/</b>that she looks great.</span> ${nm(4)}<span class="q ck">Anyone <b class="cs">/</b>who hears positive comments <b class="cs">/</b>will feel good, <b class="cs">/</b>and this feedback will also be very encouraging.</span> ${nm(5)}<span class="q ck">However, <b class="cs">/</b>if you end the discussion there, <b class="cs">/</b>the only feedback <b class="cs">/</b>your friend is getting <b class="cs">/</b>is about the outcome.</span> ${nm(6)}<span class="q ck">Instead, <b class="cs">/</b>continue the discussion <b class="cs">/</b>by asking about the process.</span> ${nm(7)}<span class="q ck">Ask her <b class="cs">/</b>what she is doing <b class="cs">/</b>to be so successful.</span> ${nm(8)}<span class="q ck">What is she eating?</span> ${nm(9)}<span class="q ck">Where is she working out?</span> ${nm(10)}<span class="q ck">When the conversation focuses <b class="cs">/</b>on the process of change <b class="cs">/</b>rather than the outcome, <b class="cs">/</b>it encourages her <b class="cs">/</b>to keep making the change.</span></div></div></div>${FT}<div class="bp">26</div>`);
 
 add("R07","문제 1-3",`<div class="qs" style="gap:24px">
   <div class="qi"><div><span class="tag2">기출문제</span><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -675,11 +681,12 @@ function fitPsg(){
   slides.forEach(sl=>{
     const p = sl.querySelector(".psg.one"); if(!p) return;
     const was = sl.classList.contains("on"); sl.classList.add("on");
-    const lim = 664;
+    const lim = 664; p.classList.add("ckall");
     for(let f=25; f>=17; f-=.5){
       p.style.fontSize = f+"px";
       if(p.offsetTop + p.offsetHeight <= lim) break;
     }
+    p.classList.remove("ckall");
     if(!was) sl.classList.remove("on");
   });
 }

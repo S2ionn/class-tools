@@ -233,6 +233,12 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
 .gs .nm{vertical-align:2px;margin-right:5px}
 .gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
 .ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
+/* 본문 끊어 읽기 */
+/* 본문 끊어 읽기: 문장을 누르면 / 표시 */
+.ck .cs{display:none;color:var(--red);font-weight:700;margin-right:.3em}
+.ck .cs.n{margin-left:.3em}
+.ck.open .cs,.ckall .cs{display:inline}
+@media print{.ck .cs{display:inline}}
 </style>
 </head>
 <body class="hideKo">
@@ -353,7 +359,7 @@ add("U01","PART 1",`<div class="q3">
 
 /* ===== READING 01 ===== */
 add("R01","본문",`<div class="rd">${rdSide(1,{gichul:1,note:1,ex:"#brain #being happy #positive thoughts"})}
-  <div class="main"><div class="psg">${nm(1)}We used to think that our brains could not change. ${nm(2)}But now scientists know that they can. ${nm(3)}A scientist named Richard Davidson says that our brains are shaped by repeating the same thoughts again and again. ${nm(4)}He explains, “Being happy is like learning to play the cello. If we practice, we can get better.” ${nm(5)}In other words, we can train our brains to feel more thankful, relaxed, or brave. ${nm(6)}When we repeat the same thoughts and actions, our brain cells work together. ${nm(7)}As these brain cells continue to work together, their connections get stronger. ${nm(8)}Over time, these strong connections help us form new habits and change our brains. ${nm(9)}This idea is supported by another scientist, Donald Hebb. ${nm(10)}He says, “Brain cells that work together connect together.” ${nm(11)}This is good news. ${nm(12)}If we keep thinking positive thoughts, our brains can become happier.</div>
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">We used to think <b class="cs">/</b>that our brains could not change.</span> ${nm(2)}<span class="q ck">But now scientists know <b class="cs">/</b>that they can.</span> ${nm(3)}<span class="q ck">A scientist named Richard Davidson says <b class="cs">/</b>that our brains are shaped <b class="cs">/</b>by repeating the same thoughts again and again.</span> ${nm(4)}<span class="q ck">He explains, <b class="cs">/</b>“Being happy is like <b class="cs">/</b>learning to play the cello. <b class="cs">//</b>If we practice, <b class="cs">/</b>we can get better.”</span> ${nm(5)}<span class="q ck">In other words, <b class="cs">/</b>we can train our brains <b class="cs">/</b>to feel more thankful, relaxed, or brave.</span> ${nm(6)}<span class="q ck">When we repeat <b class="cs">/</b>the same thoughts and actions, <b class="cs">/</b>our brain cells work together.</span> ${nm(7)}<span class="q ck">As these brain cells continue <b class="cs">/</b>to work together, <b class="cs">/</b>their connections get stronger.</span> ${nm(8)}<span class="q ck">Over time, <b class="cs">/</b>these strong connections help us <b class="cs">/</b>form new habits <b class="cs">/</b>and change our brains.</span> ${nm(9)}<span class="q ck">This idea is supported <b class="cs">/</b>by another scientist, Donald Hebb.</span> ${nm(10)}<span class="q ck">He says, <b class="cs">/</b>“Brain cells that work together <b class="cs">/</b>connect together.”</span> ${nm(11)}<span class="q ck">This is good news.</span> ${nm(12)}<span class="q ck">If we keep thinking positive thoughts, <b class="cs">/</b>our brains can become happier.</span></div>
   <div class="fn">*cell: 세포</div></div></div>${FT}<div class="bp">12</div>`);
 
 add("R01","문제 1-3",`<div class="qs">
@@ -416,7 +422,7 @@ add("R01","워크북 B",wbB([["우리는 생각하곤 했다 / 우리의 뇌가 
 
 /* ===== READING 02 ===== */
 add("R02","본문",`<div class="rd">${rdSide(2,{ex:"#fish are smaller #global warming"})}
-  <div class="main"><div class="psg">${nm(1)}Do you know how big the fish in the ocean are? ${nm(2)}A new report says that fish are smaller than before due to global warming. ${nm(3)}According to the research, most fish will become even smaller by the year 2050 because the ocean is getting warmer. ${nm(4)}The biggest changes will be seen in tropical areas. ${nm(5)}The scientists say that the fish cannot grow enough because there is less oxygen in warmer water. ${nm(6)}They also say that many fish will move to cooler water outside the tropics. ${nm(7)}Professor William Cheung said, “We found that the fish are much smaller these days. ${nm(8)}It occurred over a short period of time. ${nm(9)}It is very surprising. ${nm(10)}It is known that fish respond to climate change. ${nm(11)}Thus, it is very important to reduce greenhouse gases and control global warming.”</div></div></div>${FT}<div class="bp">14</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">Do you know <b class="cs">/</b>how big <b class="cs">/</b>the fish in the ocean are?</span> ${nm(2)}<span class="q ck">A new report says <b class="cs">/</b>that fish are smaller than before <b class="cs">/</b>due to global warming.</span> ${nm(3)}<span class="q ck">According to the research, <b class="cs">/</b>most fish will become even smaller <b class="cs">/</b>by the year 2050 <b class="cs">/</b>because the ocean is getting warmer.</span> ${nm(4)}<span class="q ck">The biggest changes will be seen <b class="cs">/</b>in tropical areas.</span> ${nm(5)}<span class="q ck">The scientists say <b class="cs">/</b>that the fish cannot grow enough <b class="cs">/</b>because there is less oxygen <b class="cs">/</b>in warmer water.</span> ${nm(6)}<span class="q ck">They also say <b class="cs">/</b>that many fish will move <b class="cs">/</b>to cooler water <b class="cs">/</b>outside the tropics.</span> ${nm(7)}<span class="q ck">Professor William Cheung said, <b class="cs">/</b>“We found <b class="cs">/</b>that the fish are much smaller <b class="cs">/</b>these days.</span> ${nm(8)}<span class="q ck">It occurred <b class="cs">/</b>over a short period of time.</span> ${nm(9)}<span class="q ck">It is very surprising.</span> ${nm(10)}<span class="q ck">It is known <b class="cs">/</b>that fish respond <b class="cs">/</b>to climate change.</span> ${nm(11)}<span class="q ck">Thus, <b class="cs">/</b>it is very important <b class="cs">/</b>to reduce greenhouse gases <b class="cs">/</b>and control global warming.”</span></div></div></div>${FT}<div class="bp">14</div>`);
 
 add("R02","문제 1-3",`<div class="qs" style="gap:24px">
   <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -478,7 +484,7 @@ add("R02","워크북 B",wbB([["여러분은 알고 있는가 / 얼마나 큰지 
 
 /* ===== READING 03 ===== */
 add("R03","본문",`<div class="rd">${rdSide(3,{ex:"#smartphone addiction #negative effects on the brains"})}
-  <div class="main"><div class="psg">${nm(1)}Smartphones are the must-have devices for people these days. ${nm(2)}“I often bring my smartphone to the bathroom,” said a 14-year-old student. ${nm(3)}“I also use it just before I go to bed and right after I wake up. ${nm(4)}I just can’t live without my smartphone.” ${nm(5)}Regarding this situation, the government encourages students to understand their levels of smartphone addiction through a self-test. ${nm(6)}Doctors warn about the danger of smartphone addiction in teens. ${nm(7)}It has negative effects on the brains of students. ${nm(8)}When they are addicted to smartphones, students find it difficult to make a decision or control their feelings. ${nm(9)}Besides, as they constantly check their phones while they are studying, they can’t focus on their studies.</div></div></div>${FT}<div class="bp">16</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">Smartphones are the must-have devices <b class="cs">/</b>for people <b class="cs">/</b>these days.</span> ${nm(2)}<span class="q ck">“I often bring my smartphone <b class="cs">/</b>to the bathroom,” <b class="cs">/</b>said a 14-year-old student.</span> ${nm(3)}<span class="q ck">“I also use it <b class="cs">/</b>just before I go to bed <b class="cs">/</b>and right after I wake up.</span> ${nm(4)}<span class="q ck">I just can’t live <b class="cs">/</b>without my smartphone.”</span> ${nm(5)}<span class="q ck">Regarding this situation, <b class="cs">/</b>the government encourages students <b class="cs">/</b>to understand <b class="cs">/</b>their levels of smartphone addiction <b class="cs">/</b>through a self-test.</span> ${nm(6)}<span class="q ck">Doctors warn <b class="cs">/</b>about the danger of smartphone addiction <b class="cs">/</b>in teens.</span> ${nm(7)}<span class="q ck">It has negative effects <b class="cs">/</b>on the brains of students.</span> ${nm(8)}<span class="q ck">When they are addicted to smartphones, <b class="cs">/</b>students find it difficult <b class="cs">/</b>to make a decision <b class="cs">/</b>or control their feelings.</span> ${nm(9)}<span class="q ck">Besides, <b class="cs">/</b>as they constantly check their phones <b class="cs">/</b>while they are studying, <b class="cs">/</b>they can’t focus <b class="cs">/</b>on their studies.</span></div></div></div>${FT}<div class="bp">16</div>`);
 
 add("R03","문제 1-3",`<div class="qs" style="gap:26px">
   <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -599,11 +605,12 @@ function fitPsg(){
   slides.forEach(sl=>{
     const p = sl.querySelector(".psg.one"); if(!p) return;
     const was = sl.classList.contains("on"); sl.classList.add("on");
-    const lim = 664;
+    const lim = 664; p.classList.add("ckall");
     for(let f=25; f>=17; f-=.5){
       p.style.fontSize = f+"px";
       if(p.offsetTop + p.offsetHeight <= lim) break;
     }
+    p.classList.remove("ckall");
     if(!was) sl.classList.remove("on");
   });
 }

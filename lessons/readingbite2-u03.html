@@ -259,6 +259,12 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
 .gs .nm{vertical-align:2px;margin-right:5px}
 .gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
 .ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
+/* 본문 끊어 읽기 */
+/* 본문 끊어 읽기: 문장을 누르면 / 표시 */
+.ck .cs{display:none;color:var(--red);font-weight:700;margin-right:.3em}
+.ck .cs.n{margin-left:.3em}
+.ck.open .cs,.ckall .cs{display:inline}
+@media print{.ck .cs{display:inline}}
 </style>
 </head>
 <body class="hideKo">
@@ -362,7 +368,7 @@ add("U03","표지",`
 
 /* ===== READING 08 ===== */
 add("R08","본문",`<div class="rd">${rdSide(8,{ex:"#unique traditions #bring wealth #the New Year"})}
-  <div class="main"><div class="psg">${nm(1)}People all over the world have unique traditions to bring wealth in the New Year. ${nm(2)}For example, in the southern United States, people eat a special dish called Hoppin’ John. ${nm(3)}This dish is made with peas and other vegetables that look like coins and dollar bills. ${nm(4)}People enjoy this dish to get lots of money in the coming year. ${nm(5)}Another example is First Footing, the Scottish New Year’s tradition. ${nm(6)}Scots believe that the first person to enter the house after midnight will bring good luck and wealth in the New Year. ${nm(7)}The first-footer should be a tall, handsome male with dark hair. ${nm(8)}He should be carrying symbolic gifts of coal, salt, and cake. ${nm(9)}They represent warmth, wealth, and food respectively.</div></div></div>${FT}<div class="bp">30</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">People all over the world <b class="cs">/</b>have unique traditions <b class="cs">/</b>to bring wealth <b class="cs">/</b>in the New Year.</span> ${nm(2)}<span class="q ck">For example, <b class="cs">/</b>in the southern United States, <b class="cs">/</b>people eat a special dish <b class="cs">/</b>called Hoppin’ John.</span> ${nm(3)}<span class="q ck">This dish is made <b class="cs">/</b>with peas and other vegetables <b class="cs">/</b>that look like coins and dollar bills.</span> ${nm(4)}<span class="q ck">People enjoy this dish <b class="cs">/</b>to get lots of money <b class="cs">/</b>in the coming year.</span> ${nm(5)}<span class="q ck">Another example is First Footing, <b class="cs">/</b>the Scottish New Year’s tradition.</span> ${nm(6)}<span class="q ck">Scots believe <b class="cs">/</b>that the first person <b class="cs">/</b>to enter the house after midnight <b class="cs">/</b>will bring good luck and wealth <b class="cs">/</b>in the New Year.</span> ${nm(7)}<span class="q ck">The first-footer should be a tall, handsome male <b class="cs">/</b>with dark hair.</span> ${nm(8)}<span class="q ck">He should be carrying <b class="cs">/</b>symbolic gifts <b class="cs">/</b>of coal, salt, and cake.</span> ${nm(9)}<span class="q ck">They represent warmth, wealth, and food <b class="cs">/</b>respectively.</span></div></div></div>${FT}<div class="bp">30</div>`);
 
 add("R08","문제 1-3",`<div class="qs" style="gap:22px">
   <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -420,7 +426,7 @@ add("R08","워크북 B",wbB([["사람들은 / 독특한 전통을 가지고 있�
 /* ===== READING 09 ===== */
 CUR = "R09";
 add("R09","본문",`<div class="rd">${rdSide(9,{ex:"#a fireman #the September 11 attacks #a real hero"})}
-  <div class="main"><div class="psg">${nm(1)}“Brian, I’ll tell you about a man I’ll never forget. ${nm(2)}My friend, Mark, was working at a fire station near the World Trade Center. ${nm(3)}(a) <u>A buddy</u> of his was scheduled to work on September 11, 2001, but his wife had to go to the hospital to give birth to (b) <u>their baby</u>. ${nm(4)}So Mark took his shift. Do you know what happened that day?” ${nm(5)}“The September 11 attacks,” I answered. ${nm(6)}“Mark was one of the first to run into the World Trade Center,” Dad paused. ${nm(7)}“Some people running out of the building said, ‘There’s a fireman up there. ${nm(8)}He got us out of here. Help him!’ ${nm(9)}But, it was too late. He never came out.” ${nm(10)}He was silent for a moment. “Listen, Brian. Mark was a real hero. ${nm(11)}It was I that changed my schedule, and you were the baby who was born that day. ${nm(12)}We are here thanks to him.”</div></div></div>${FT}<div class="bp">32</div>`);
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">“Brian, <b class="cs">/</b>I’ll tell you about a man <b class="cs">/</b>I’ll never forget.</span> ${nm(2)}<span class="q ck">My friend, Mark, was working at a fire station <b class="cs">/</b>near the World Trade Center.</span> ${nm(3)}<span class="q ck">(a) <u>A buddy</u> of his <b class="cs">/</b>was scheduled to work on September 11, 2001, <b class="cs">/</b>but his wife had to go to the hospital <b class="cs">/</b>to give birth to (b) <u>their baby</u>.</span> ${nm(4)}<span class="q ck">So Mark took his shift. <b class="cs">//</b>Do you know <b class="cs">/</b>what happened that day?”</span> ${nm(5)}<span class="q ck">“The September 11 attacks,” <b class="cs">/</b>I answered.</span> ${nm(6)}<span class="q ck">“Mark was one of the first <b class="cs">/</b>to run into the World Trade Center,” <b class="cs">/</b>Dad paused.</span> ${nm(7)}<span class="q ck">“Some people <b class="cs">/</b>running out of the building <b class="cs">/</b>said, <b class="cs">/</b>‘There’s a fireman <b class="cs">/</b>up there.</span> ${nm(8)}<span class="q ck">He got us out of here. <b class="cs">//</b>Help him!’</span> ${nm(9)}<span class="q ck">But, <b class="cs">/</b>it was too late. <b class="cs">//</b>He never came out.”</span> ${nm(10)}<span class="q ck">He was silent <b class="cs">/</b>for a moment. <b class="cs">//</b>“Listen, Brian. <b class="cs">//</b>Mark was a real hero.</span> ${nm(11)}<span class="q ck">It was I <b class="cs">/</b>that changed my schedule, <b class="cs">/</b>and you were the baby <b class="cs">/</b>who was born that day.</span> ${nm(12)}<span class="q ck">We are here <b class="cs">/</b>thanks to him.”</span></div></div></div>${FT}<div class="bp">32</div>`);
 
 add("R09","문제 1-3",`<div class="qs" style="gap:24px">
   <div class="qi"><div><div class="no">1</div><span class="bdg g">주제<br>파악</span></div>
@@ -477,7 +483,7 @@ add("R09","워크북 B",wbB([["내가 너에게 말해 줄게 / 한 남자에 �
 /* ===== READING 10 ===== */
 CUR = "R10";
 add("R10","본문",`<div class="rd">${rdSide(10,{gichul:1,ex:"#whales #carbon tanks #Earth’s protectors"})}
-  <div class="main"><div class="psg">${nm(1)}Whales are huge carbon tanks. ${nm(2)}When a whale dies, it sinks to the bottom of the ocean with about 30 tons of carbon dioxide inside its body. ${nm(3)}This carbon stays deep in the ocean for a long time. ${nm(4)}One tree takes in only about 22 kilograms of carbon dioxide each year, so one whale is equal to thousands of trees. ${nm(5)}Whales also help the ocean in another way. ${nm(6)}Their waste becomes food for tiny plants called phytoplankton. ${nm(7)}These tiny plants also remove carbon from the air. ${nm(8)}That’s why scientists call whales “Earth’s protectors.” ${nm(9)}In 2019, some experts said, “Every whale is worth more than two million dollars because it helps nature so much. ${nm(10)}But many whales were hunted in the past, and their number decreased.” ${nm(11)}A plan is needed to protect whales. ${nm(12)}They can be a key to slowing down climate change.</div>
+  <div class="main"><div class="psg">${nm(1)}<span class="q ck">Whales are huge carbon tanks.</span> ${nm(2)}<span class="q ck">When a whale dies, <b class="cs">/</b>it sinks to the bottom of the ocean <b class="cs">/</b>with about 30 tons of carbon dioxide <b class="cs">/</b>inside its body.</span> ${nm(3)}<span class="q ck">This carbon stays deep <b class="cs">/</b>in the ocean <b class="cs">/</b>for a long time.</span> ${nm(4)}<span class="q ck">One tree takes in <b class="cs">/</b>only about 22 kilograms of carbon dioxide <b class="cs">/</b>each year, <b class="cs">/</b>so one whale is equal to thousands of trees.</span> ${nm(5)}<span class="q ck">Whales also help the ocean <b class="cs">/</b>in another way.</span> ${nm(6)}<span class="q ck">Their waste becomes food <b class="cs">/</b>for tiny plants <b class="cs">/</b>called phytoplankton.</span> ${nm(7)}<span class="q ck">These tiny plants also remove carbon <b class="cs">/</b>from the air.</span> ${nm(8)}<span class="q ck">That’s why scientists call whales <b class="cs">/</b>“Earth’s protectors.”</span> ${nm(9)}<span class="q ck">In 2019, <b class="cs">/</b>some experts said, <b class="cs">/</b>“Every whale is worth <b class="cs">/</b>more than two million dollars <b class="cs">/</b>because it helps nature so much.</span> ${nm(10)}<span class="q ck">But many whales were hunted in the past, <b class="cs">/</b>and their number decreased.”</span> ${nm(11)}<span class="q ck">A plan is needed <b class="cs">/</b>to protect whales.</span> ${nm(12)}<span class="q ck">They can be a key <b class="cs">/</b>to slowing down climate change.</span></div>
   <div class="fn">*carbon dioxide: 이산화탄소 **phytoplankton: 식물성 플랑크톤</div></div></div>${FT}<div class="bp">34</div>`);
 
 add("R10","문제 1-3",`<div class="qs" style="gap:22px">
@@ -608,11 +614,12 @@ function fitPsg(){
   slides.forEach(sl=>{
     const p = sl.querySelector(".psg.one"); if(!p) return;
     const was = sl.classList.contains("on"); sl.classList.add("on");
-    const lim = 664;
+    const lim = 664; p.classList.add("ckall");
     for(let f=25; f>=17; f-=.5){
       p.style.fontSize = f+"px";
       if(p.offsetTop + p.offsetHeight <= lim) break;
     }
+    p.classList.remove("ckall");
     if(!was) sl.classList.remove("on");
   });
 }
