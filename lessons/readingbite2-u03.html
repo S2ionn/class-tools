@@ -233,6 +233,32 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
   @page{size:1280px 720px;margin:0}
 }
 .dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+
+/* 워크북, 중요 문법 */
+.wbL{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;background:var(--purple);color:#fff;font:400 21px/1 Title,sans-serif;margin-right:12px}
+.wba{position:absolute;left:90px;right:90px;top:134px;display:grid;grid-auto-flow:column;column-gap:64px}
+.wr{display:flex;align-items:center;gap:10px;font-size:21px;line-height:1.3;padding:7px 0;border-bottom:1px dashed var(--line)}
+.wr .wn{font:900 17px Hyemin,sans-serif;color:var(--navy);width:26px;flex:none}
+.wr .ww{width:196px;flex:none;font-weight:700}
+.wr .ps{margin:0;flex:none}
+.wr .ps0{display:inline-block;width:17px;flex:none}
+.wr .b{flex:1;min-width:0;text-align:left;font-size:19px;line-height:1.3}
+.wbb{position:absolute;left:84px;right:84px;top:126px;display:grid;gap:12px}
+.wq{display:grid;grid-template-columns:40px 1fr;column-gap:6px}
+.wq .wn{font:900 21px/1.45 Hyemin,sans-serif;color:var(--navy)}
+.wk{font-size:21px;line-height:1.45}
+.wc{font-size:19px;line-height:1.45;color:var(--sub)}
+.wl2{display:flex;gap:8px;font-size:21px;line-height:1.45;margin-top:2px}
+.wl2 .b{flex:1;min-width:0;text-align:left}
+.wbb.six{gap:7px}.wbb.six .wk,.wbb.six .wl2{font-size:19.5px}.wbb.six .wc{font-size:17.5px}
+.gr{position:absolute;left:80px;right:80px;top:128px;display:grid}
+.gi{display:grid;grid-template-columns:240px 1fr;column-gap:20px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.gi:last-child{border-bottom:0}
+.gn{grid-row:span 2;font:900 19px/1.4 Hyemin,sans-serif;color:var(--purple)}
+.gs{font-size:19.5px;line-height:1.5}
+.gs .nm{vertical-align:2px;margin-right:5px}
+.gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
 </style>
 </head>
 <body class="hideKo">
@@ -275,6 +301,12 @@ const rcSlide = (sents, words, page) => `${rcHead()}
 
 const SS = [];
 const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+/* 워크북, 중요 문법 슬라이드 */
+const wbHead = L => `<div class="rch"><div class="tab"><span>Work</span><span>book</span></div><div class="ins"><b class="wbL">${L}</b>${L==="A"?"다음 영어의 우리말 뜻을 쓰시오.":"우리말과 의미가 같도록 주어진 말을 바르게 배열하시오."}</div></div>`;
+const n2 = i => String(i+1).padStart(2,"0");
+const wbA = (it, p) => `${wbHead("A")}<div class="wba" style="grid-template-rows:repeat(${Math.ceil(it.length/2)},auto)">${it.map((x,i)=>`<div class="wr"><span class="wn">${n2(i)}</span><span class="ww">${x[0]}</span>${x[1]?ps(x[1]):`<span class="ps0"></span>`}${b(x[2])}</div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const wbB = (it, p) => `${wbHead("B")}<div class="wbb${it.length>5?" six":""}">${it.map((x,i)=>`<div class="wq"><span class="wn">${n2(i)}</span><div><div class="wk">${x[0]}</div><div class="wc">(${x[1]})</div><div class="wl2">→ ${b(x[2])}</div></div></div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const grSlide = it => `<div class="rch"><div class="tab"><span>중요</span><span>문법</span></div></div><div class="gr">${it.map(x=>`<div class="gi"><div class="gn">${x[0]}</div><div class="gs">${x[1]}</div><div class="ge">${x[2]}</div></div>`).join("")}</div>${FT}`;
 
 
 /* 정답과 해설 (해답지) */
@@ -380,6 +412,11 @@ add("R08","Read Closely 3",rcSlide(
 add("R08","Story BITE",`<div class="sb"><div class="sbh"><span>Story <b>BITE</b></span>세계 각국의 독특한 새해 맞이</div>
   <p>문화는 달라도 새해의 행운을 기원하는 마음은 모두 같을 거예요. 스페인에서는 새해 전날 자정을 알리는 12번의 종소리에 맞춰 입 안 가득 12개의 포도 알을 먹으면서 행운을 빌어요. 독일에서는 12월 31일에 ‘납 붓기’를 행하는 전통이 있는데, 국자에 납 조각을 녹인 후 찬물을 부어 반지(결혼), 돼지(재물)와 같이 굳은 모양에 따라 새해의 운세를 점친다고 해요. 브라질에서는 새해 첫날 흰 옷을 입는데, 분홍색(사랑), 흰색(평화), 노란색(재물) 등을 뜻하는 다채로운 색깔의 속옷까지 갖춰 입기도 한다고 해요.</p></div>${FT}<div class="bp">31</div>`);
 
+/* R08 중요 문법, 워크북 */
+add("R08","중요 문법",grSlide([["to부정사의 형용사적 용법", "<span class=\"nm\">1</span>&#8288; unique traditions <b class=\"gk\">to bring</b> wealth &nbsp;<span class=\"nm\">6</span>&#8288; the first person <b class=\"gk\">to enter</b> the house", "to부정사가 앞의 명사를 꾸며요. ‘~할, ~하는’"], ["과거분사의 뒤 수식", "<span class=\"nm\">2</span>&#8288; a special dish <b class=\"gk\">called</b> Hoppin’ John", "called Hoppin’ John이 a special dish를 꾸며요. ‘~라고 불리는’"], ["수동태 be made with", "<span class=\"nm\">3</span>&#8288; This dish <b class=\"gk\">is made with</b> peas and other vegetables", "‘~로 만들어지다’라는 뜻이에요."], ["주격 관계대명사 that", "<span class=\"nm\">3</span>&#8288; other vegetables <b class=\"gk\">that look like</b> coins and dollar bills", "that 이하가 vegetables를 꾸며요. look like + 명사는 ‘~처럼 보이다’예요."], ["조동사 + 진행형", "<span class=\"nm\">8</span>&#8288; He <b class=\"gk\">should be carrying</b> symbolic gifts", "‘조동사 + be + -ing’ 형태로 ‘~하고 있어야 한다’라는 뜻이에요."]]));
+add("R08","워크북 A",wbA([["unique", "형", "독특한"], ["tradition", "명", "전통"], ["bring", "동", "가지고 오다"], ["wealth", "명", "재물, 부(富)"], ["pea", "명", "완두콩"], ["look like", "", "~처럼 보이다"], ["coin", "명", "동전"], ["enter", "동", "들어가다"], ["midnight", "명", "자정"], ["male", "명", "남자, 남성"], ["southern", "형", "남쪽의"], ["bill", "명", "지폐"], ["coming", "형", "다가오는"], ["carry", "동", "들고 있다"], ["symbolic", "형", "상징적인"], ["represent", "동", "나타내다, 상징하다"], ["warmth", "명", "따뜻함"], ["respectively", "부", "각각"]],9));
+add("R08","워크북 B",wbB([["사람들은 / 독특한 전통을 가지고 있다 / 재물을 불러오는 / 새해에", "unique / to / people / bring / have / in / traditions / wealth / the New Year", "People have unique traditions to bring wealth in the New Year."], ["사람들은 먹는다 / 특별한 요리를 / 호핑 존이라는 이름의", "eat / dish / Hoppin’ John / a / called / special / people", "People eat a special dish called Hoppin’ John."], ["사람들은 즐겨 먹는다 / 이 음식을 / 많은 돈을 얻기 위해", "enjoy / to / this / of / people / money / lots / dish / get", "People enjoy this dish to get lots of money."], ["그는 들고 있어야 한다 / 상징적인 선물을", "should / symbolic / be / he / gifts / carrying", "He should be carrying symbolic gifts."], ["그것들은 상징한다 / 따뜻함, 재물, 그리고 음식을 / 각각", "respectively / wealth / food / represent / and / warmth / they", "They represent warmth, wealth, and food respectively."]],9));
+
 /* ===== READING 09 ===== */
 CUR = "R09";
 add("R09","본문",`<div class="rd">${rdSide(9,{ex:"#a fireman #the September 11 attacks #a real hero"})}
@@ -431,6 +468,11 @@ add("R09","Read Closely 3",rcSlide(
   gtip("It is[was] ~ that … 강조 구문","It is[was]와 that 사이에 강조할 부분을 넣어 ‘…한 것은 바로 ~이다[였다]’라는 의미를 나타내요. 주어, 목적어, 부사어를 강조할 수 있어요.",["<b>It is</b> Mike <b>that[who]</b> is my best friend. (주어 강조)","<b>It was</b> my bag <b>that</b> I left on the train. (목적어 강조)"])+
   sen(12,"We are here thanks to him.”"),
   W9.slice(14).join(""), 33));
+
+/* R09 중요 문법, 워크북 */
+add("R09","중요 문법",grSlide([["목적격 관계대명사 생략", "<span class=\"nm\">1</span>&#8288; I’ll tell you about a man <b class=\"gk\">I’ll never forget</b>.", "a man 뒤에 목적격 관계대명사 who(m)[that]이 생략됐어요."], ["간접의문문 (의문사가 주어)", "<span class=\"nm\">4</span>&#8288; Do you know <b class=\"gk\">what happened</b> that day?", "의문사가 주어일 때는 ‘의문사 + 동사’ 순서 그대로 써요."], ["현재분사의 뒤 수식", "<span class=\"nm\">7</span>&#8288; Some people <b class=\"gk\">running out of the building</b> said, …", "running 이하가 people을 꾸며요. ‘건물 밖으로 달려 나오던 사람들’"], ["It was ~ that 강조 구문", "<span class=\"nm\">11</span>&#8288; <b class=\"gk\">It was</b> I <b class=\"gk\">that</b> changed my schedule", "It was와 that 사이의 I를 강조해요. ‘일정을 바꾼 것은 바로 나였다’"], ["주격 관계대명사 who", "<span class=\"nm\">11</span>&#8288; you were the baby <b class=\"gk\">who was born</b> that day", "who 이하가 the baby를 꾸며요. be born은 ‘태어나다’예요."]]));
+add("R09","워크북 A",wbA([["forget", "동", "잊다"], ["trade", "명", "무역, 거래"], ["be scheduled to", "", "~하기로 예정되어 있다"], ["fire station", "", "소방서"], ["silent", "형", "침묵하는"], ["for a moment", "", "잠시 동안"], ["thanks to", "", "~ 덕분에"], ["schedule", "명", "일정"], ["give birth to", "", "~을 낳다"], ["shift", "명", "교대 근무 (시간)"], ["pause", "동", "잠시 멈추다"], ["attack", "명", "공격"], ["real", "형", "진짜의"], ["hero", "명", "영웅"], ["buddy", "명", "친구, 동료"], ["fireman", "명", "소방대원"]],10));
+add("R09","워크북 B",wbB([["내가 너에게 말해 줄게 / 한 남자에 대해 / 내가 절대 잊지 못할", "a man / about / you / tell / I / never / will / I / forget / will", "I will tell you about a man I will never forget."], ["그의 동료 한 명이 / 근무할 예정이었어 / 9월 11일에", "was scheduled / his / on September 11 / a buddy / work / of / to", "A buddy of his was scheduled to work on September 11."], ["Mark는 하나였어 / 최초의 사람들 중 / 뛰어든 / 세계무역센터 안으로", "the first / one / the World Trade Center / run into / Mark / was / of / to", "Mark was one of the first to run into the World Trade Center."], ["바로 나였어 / 나의 (근무) 일정을 바꾼 것은", "I / my / that / was / schedule / it / changed", "It was I that changed my schedule."], ["네가 그 아기였단다 / 태어난 / 그날", "who / the baby / that day / were / was / you / born", "You were the baby who was born that day."]],10));
 
 /* ===== READING 10 ===== */
 CUR = "R10";
@@ -491,6 +533,11 @@ add("R10","Read Closely 3",rcSlide(
 
 /* ===== Memory POP ===== */
 const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+/* R10 중요 문법, 워크북 */
+add("R10","중요 문법",grSlide([["접속사 when", "<span class=\"nm\">2</span>&#8288; <b class=\"gk\">When a whale dies</b>, it sinks to the bottom of the ocean", "‘~할 때, ~하면’이라는 뜻으로 뒤에 ‘주어 + 동사’가 와요."], ["과거분사의 뒤 수식", "<span class=\"nm\">6</span>&#8288; tiny plants <b class=\"gk\">called</b> phytoplankton", "called phytoplankton이 tiny plants를 꾸며요. ‘~라고 불리는’"], ["That’s why + 주어 + 동사", "<span class=\"nm\">8</span>&#8288; <b class=\"gk\">That’s why</b> scientists <b class=\"gk\">call whales “Earth’s protectors.”</b>", "That’s why는 ‘그래서 ~하다’예요. call A B는 ‘A를 B라고 부르다’예요."], ["be worth + 가치", "<span class=\"nm\">9</span>&#8288; Every whale <b class=\"gk\">is worth</b> more than two million dollars", "‘~의 가치가 있다’라는 뜻이에요."], ["수동태", "<span class=\"nm\">10</span>&#8288; many whales <b class=\"gk\">were hunted</b> &nbsp;<span class=\"nm\">11</span>&#8288; A plan <b class=\"gk\">is needed</b> to protect whales.", "‘be동사 + 과거분사’로 ‘~되다, ~당하다’라는 뜻이에요. to protect는 ‘보호하기 위해’라는 목적을 나타내요."]]));
+add("R10","워크북 A",wbA([["climate change", "", "기후 변화"], ["decrease", "동", "감소하다"], ["nature", "명", "자연"], ["million", "명", "백만"], ["hunt", "동", "사냥하다"], ["expert", "명", "전문가"], ["be worth", "", "~의 가치가 있다"], ["remove", "동", "제거하다"], ["plant", "명", "식물"], ["tiny", "형", "아주 작은"], ["waste", "명", "배설물, 쓰레기"], ["be equal to", "", "~와 같다"], ["take in", "", "~을 흡수하다"], ["ocean", "명", "대양, 바다"], ["carbon", "명", "탄소"], ["whale", "명", "고래"], ["huge", "형", "거대한"], ["sink", "동", "가라앉다"]],11));
+add("R10","워크북 B",wbB([["고래 한 마리가 죽으면 / 그것은 가라앉는다 / 바다 밑바닥으로", "sinks / a whale / to / the ocean / when / dies / it / the bottom / of", "When a whale dies, it sinks to the bottom of the ocean."], ["그것이 이유이다 / 과학자들이 고래를 부르는 / ‘지구의 수호자’라고", "why / “Earth’s protectors” / call / scientists / that / whales / is", "That is why scientists call whales “Earth’s protectors.”"], ["한 마리의 고래는 / 가치가 있다 / 2백만 달러가 넘는", "is / more / every whale / two / dollars / than / million / worth", "Every whale is worth more than two million dollars."], ["많은 고래들이 / 사냥당했다 / 과거에", "in / past / whales / the / many / were / hunted", "Many whales were hunted in the past."], ["계획이 필요하다 / 고래를 보호하기 위해서", "protect / a / to / is / whales / plan / needed", "A plan is needed to protect whales."]],11));
+
 add("POP","1",`${MPH}<div class="mp">
   <div class="mq"><h4><span class="no">1</span>빈칸에 알맞은 단어를 <span class="bk1">보기</span>에서 골라 쓰시오. ${exb("POP-1")}</h4>
     <div class="bogi"><span>respectively</span><span>hunt</span><span>sink</span><span>wealth</span><span>unique</span></div><ol>

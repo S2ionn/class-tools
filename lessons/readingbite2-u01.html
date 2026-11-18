@@ -207,6 +207,32 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
   @page{size:1280px 720px;margin:0}
 }
 .dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+
+/* 워크북, 중요 문법 */
+.wbL{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;background:var(--purple);color:#fff;font:400 21px/1 Title,sans-serif;margin-right:12px}
+.wba{position:absolute;left:90px;right:90px;top:134px;display:grid;grid-auto-flow:column;column-gap:64px}
+.wr{display:flex;align-items:center;gap:10px;font-size:21px;line-height:1.3;padding:7px 0;border-bottom:1px dashed var(--line)}
+.wr .wn{font:900 17px Hyemin,sans-serif;color:var(--navy);width:26px;flex:none}
+.wr .ww{width:196px;flex:none;font-weight:700}
+.wr .ps{margin:0;flex:none}
+.wr .ps0{display:inline-block;width:17px;flex:none}
+.wr .b{flex:1;min-width:0;text-align:left;font-size:19px;line-height:1.3}
+.wbb{position:absolute;left:84px;right:84px;top:126px;display:grid;gap:12px}
+.wq{display:grid;grid-template-columns:40px 1fr;column-gap:6px}
+.wq .wn{font:900 21px/1.45 Hyemin,sans-serif;color:var(--navy)}
+.wk{font-size:21px;line-height:1.45}
+.wc{font-size:19px;line-height:1.45;color:var(--sub)}
+.wl2{display:flex;gap:8px;font-size:21px;line-height:1.45;margin-top:2px}
+.wl2 .b{flex:1;min-width:0;text-align:left}
+.wbb.six{gap:7px}.wbb.six .wk,.wbb.six .wl2{font-size:19.5px}.wbb.six .wc{font-size:17.5px}
+.gr{position:absolute;left:80px;right:80px;top:128px;display:grid}
+.gi{display:grid;grid-template-columns:240px 1fr;column-gap:20px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.gi:last-child{border-bottom:0}
+.gn{grid-row:span 2;font:900 19px/1.4 Hyemin,sans-serif;color:var(--purple)}
+.gs{font-size:19.5px;line-height:1.5}
+.gs .nm{vertical-align:2px;margin-right:5px}
+.gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
 </style>
 </head>
 <body class="hideKo">
@@ -250,6 +276,12 @@ const rcSlide = (sents, words, page) => `${rcHead()}
 
 const SS = [];
 const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+/* 워크북, 중요 문법 슬라이드 */
+const wbHead = L => `<div class="rch"><div class="tab"><span>Work</span><span>book</span></div><div class="ins"><b class="wbL">${L}</b>${L==="A"?"다음 영어의 우리말 뜻을 쓰시오.":"우리말과 의미가 같도록 주어진 말을 바르게 배열하시오."}</div></div>`;
+const n2 = i => String(i+1).padStart(2,"0");
+const wbA = (it, p) => `${wbHead("A")}<div class="wba" style="grid-template-rows:repeat(${Math.ceil(it.length/2)},auto)">${it.map((x,i)=>`<div class="wr"><span class="wn">${n2(i)}</span><span class="ww">${x[0]}</span>${x[1]?ps(x[1]):`<span class="ps0"></span>`}${b(x[2])}</div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const wbB = (it, p) => `${wbHead("B")}<div class="wbb${it.length>5?" six":""}">${it.map((x,i)=>`<div class="wq"><span class="wn">${n2(i)}</span><div><div class="wk">${x[0]}</div><div class="wc">(${x[1]})</div><div class="wl2">→ ${b(x[2])}</div></div></div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const grSlide = it => `<div class="rch"><div class="tab"><span>중요</span><span>문법</span></div></div><div class="gr">${it.map(x=>`<div class="gi"><div class="gn">${x[0]}</div><div class="gs">${x[1]}</div><div class="ge">${x[2]}</div></div>`).join("")}</div>${FT}`;
 
 
 /* 정답과 해설 (해답지) */
@@ -377,6 +409,11 @@ add("R01","Read Closely 3",rcSlide(
   sen(12,"If we keep thinking positive thoughts, our brains can become happier."),
   W1.slice(16).join(""), 13));
 
+/* R01 중요 문법, 워크북 */
+add("R01","중요 문법",grSlide([["used to + 동사원형", "<span class=\"nm\">1</span>&#8288; We <b class=\"gk\">used to think</b> that our brains could not change.", "과거에 자주 하던 일이나 예전 상태를 나타내요. ‘~하곤 했다’로 해석해요."], ["과거분사의 뒤 수식", "<span class=\"nm\">3</span>&#8288; A scientist <b class=\"gk\">named</b> Richard Davidson says …", "named Richard Davidson이 앞의 명사 a scientist를 꾸며요. ‘~라는 이름의’"], ["동명사 주어", "<span class=\"nm\">4</span>&#8288; <b class=\"gk\">Being happy</b> is like <b class=\"gk\">learning</b> to play the cello.", "동명사가 주어 자리에 오면 단수 취급해서 is를 써요. 전치사 like 뒤에도 동명사 learning이 왔어요."], ["help + 목적어 + 동사원형", "<span class=\"nm\">8</span>&#8288; these strong connections <b class=\"gk\">help us form</b> new habits", "help는 목적격 보어로 동사원형과 to부정사를 모두 쓸 수 있어요. ‘우리가 ~하도록 돕다’"], ["주격 관계대명사 that", "<span class=\"nm\">10</span>&#8288; Brain cells <b class=\"gk\">that work together</b> connect together.", "that 이하가 brain cells를 꾸며요. 문장 전체의 동사는 connect예요."]]));
+add("R01","워크북 A",wbA([["used to", "", "~하곤 했다"], ["brain", "명", "뇌"], ["shape", "동", "형성하다"], ["explain", "동", "설명하다"], ["in other words", "", "다시 말해서"], ["get better", "", "더 나아지다, 향상되다"], ["train", "동", "훈련하다"], ["relaxed", "형", "편안한, 느긋한"], ["continue", "동", "계속하다"], ["practice", "동", "연습하다"], ["thankful", "형", "감사하는"], ["brave", "형", "용감한"], ["connect", "동", "연결하다"], ["form", "동", "형성하다"], ["habit", "명", "습관"], ["positive", "형", "긍정적인"], ["support", "동", "지지하다"], ["over time", "", "오랜 시간에 걸쳐"]],2));
+add("R01","워크북 B",wbB([["우리는 생각하곤 했다 / 우리의 뇌가 / 변할 수 없다고", "think / we / our brains / that / used to / change / could not", "We used to think that our brains could not change."], ["행복해지는 것은 ~와 같다 / 배우는 것 / 첼로를 연주하는 것을", "is / learning / happy / like / to play / being / the cello", "Being happy is like learning to play the cello."], ["이러한 강한 연결들은 / 우리에게 도움을 준다 / 새로운 습관을 형성하는 데", "form / strong / habits / us / new / help / connections / these", "These strong connections help us form new habits."], ["뇌세포는 / 함께 작용하는 / 함께 연결된다", "together / connect / that / work / brain cells / together", "Brain cells that work together connect together."], ["우리가 계속 생각을 한다면 / 긍정적인 생각을 / 우리의 뇌는 더 행복해질 수 있다", "keep / our brains / happier / if / thinking / can / positive / we / thoughts / become", "If we keep thinking positive thoughts, our brains can become happier."]],2));
+
 /* ===== READING 02 ===== */
 add("R02","본문",`<div class="rd">${rdSide(2,{ex:"#fish are smaller #global warming"})}
   <div class="main"><div class="psg">${nm(1)}Do you know how big the fish in the ocean are? ${nm(2)}A new report says that fish are smaller than before due to global warming. ${nm(3)}According to the research, most fish will become even smaller by the year 2050 because the ocean is getting warmer. ${nm(4)}The biggest changes will be seen in tropical areas. ${nm(5)}The scientists say that the fish cannot grow enough because there is less oxygen in warmer water. ${nm(6)}They also say that many fish will move to cooler water outside the tropics. ${nm(7)}Professor William Cheung said, “We found that the fish are much smaller these days. ${nm(8)}It occurred over a short period of time. ${nm(9)}It is very surprising. ${nm(10)}It is known that fish respond to climate change. ${nm(11)}Thus, it is very important to reduce greenhouse gases and control global warming.”</div></div></div>${FT}<div class="bp">14</div>`);
@@ -434,6 +471,11 @@ add("R02","Read Closely 3",rcSlide(
   sen(11,`Thus, <span class="hl">it</span> is very important <span class="hl">to reduce greenhouse gases and control global warming</span>.”`,2),
   W2.slice(15).join(""), 15));
 
+/* R02 중요 문법, 워크북 */
+add("R02","중요 문법",grSlide([["간접의문문", "<span class=\"nm\">1</span>&#8288; Do you know <b class=\"gk\">how big the fish in the ocean are</b>?", "의문문이 문장 속에 들어가면 ‘의문사(+형용사) + 주어 + 동사’ 순서가 돼요."], ["비교급 강조", "<span class=\"nm\">3</span>&#8288; most fish will become <b class=\"gk\">even smaller</b> &nbsp;<span class=\"nm\">7</span>&#8288; the fish are <b class=\"gk\">much smaller</b>", "even, much, far, a lot이 비교급 앞에 오면 ‘훨씬’이라는 뜻이에요."], ["조동사가 있는 수동태", "<span class=\"nm\">4</span>&#8288; The biggest changes <b class=\"gk\">will be seen</b> in tropical areas.", "‘조동사 + be + 과거분사’ 형태로 써요. ‘보일 것이다’"], ["가주어 it, 진주어 that절", "<span class=\"nm\">10</span>&#8288; <b class=\"gk\">It</b> is known <b class=\"gk\">that fish respond to climate change</b>.", "긴 that절 주어를 뒤로 보내고 주어 자리에 it을 써요. 이 it은 해석하지 않아요."], ["가주어 it, 진주어 to부정사", "<span class=\"nm\">11</span>&#8288; <b class=\"gk\">it</b> is very important <b class=\"gk\">to reduce greenhouse gases</b>", "to부정사구가 진짜 주어예요. ‘온실가스를 줄이는 것은 매우 중요하다’"]]));
+add("R02","워크북 A",wbA([["control", "동", "제어하다"], ["greenhouse gas", "", "온실가스"], ["ocean", "명", "바다, 해양"], ["according to", "", "~에 따르면"], ["oxygen", "명", "산소"], ["occur", "동", "발생하다"], ["period", "명", "기간"], ["climate", "명", "기후"], ["reduce", "동", "줄이다"], ["research", "명", "조사, 연구"], ["due to", "", "~ 때문에"], ["global warming", "", "지구 온난화"], ["tropical", "형", "열대의"], ["tropics", "명", "열대 지방"], ["professor", "명", "교수"], ["these days", "", "요즘"], ["respond", "동", "반응을 보이다"], ["happen", "동", "일어나다"], ["weather", "명", "날씨"], ["increase", "동", "증가하다"]],3));
+add("R02","워크북 B",wbB([["여러분은 알고 있는가 / 얼마나 큰지 / 바닷속 물고기들이", "big / do / in / how / know / the fish / the ocean / you / are", "Do you know how big the fish in the ocean are?"], ["가장 큰 변화는 / 보일 것이다 / 열대 지방에서", "will / the / tropical / biggest / seen / changes / be / in / areas", "The biggest changes will be seen in tropical areas."], ["그것은 일어났습니다 / 짧은 시간의 기간 동안", "a / of / period / it / short / occurred / time / over", "It occurred over a short period of time."], ["알려져 있습니다 / 물고기들이 반응한다고 / 기후 변화에", "that / it / climate change / to / known / fish / is / respond", "It is known that fish respond to climate change."], ["매우 중요합니다 / 줄이는 것이 / 온실가스를", "reduce / important / greenhouse gases / very / it / to / is", "It is very important to reduce greenhouse gases."]],3));
+
 /* ===== READING 03 ===== */
 add("R03","본문",`<div class="rd">${rdSide(3,{ex:"#smartphone addiction #negative effects on the brains"})}
   <div class="main"><div class="psg">${nm(1)}Smartphones are the must-have devices for people these days. ${nm(2)}“I often bring my smartphone to the bathroom,” said a 14-year-old student. ${nm(3)}“I also use it just before I go to bed and right after I wake up. ${nm(4)}I just can’t live without my smartphone.” ${nm(5)}Regarding this situation, the government encourages students to understand their levels of smartphone addiction through a self-test. ${nm(6)}Doctors warn about the danger of smartphone addiction in teens. ${nm(7)}It has negative effects on the brains of students. ${nm(8)}When they are addicted to smartphones, students find it difficult to make a decision or control their feelings. ${nm(9)}Besides, as they constantly check their phones while they are studying, they can’t focus on their studies.</div></div></div>${FT}<div class="bp">16</div>`);
@@ -484,6 +526,11 @@ add("R03","Read Closely 2",rcSlide(
 
 /* ===== Memory POP ===== */
 const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+/* R03 중요 문법, 워크북 */
+add("R03","중요 문법",grSlide([["시간의 부사절 before, after", "<span class=\"nm\">3</span>&#8288; I also use it just <b class=\"gk\">before I go to bed</b> and right <b class=\"gk\">after I wake up</b>.", "before, after 뒤에 ‘주어 + 동사’가 와요. ‘자기 직전에’, ‘일어난 직후에’"], ["encourage + 목적어 + to부정사", "<span class=\"nm\">5</span>&#8288; the government <b class=\"gk\">encourages students to understand</b> …", "‘(목적어)가 ~하도록 권장하다[격려하다]’라는 뜻이에요."], ["be addicted to", "<span class=\"nm\">8</span>&#8288; When they <b class=\"gk\">are addicted to</b> smartphones, …", "‘~에 중독되다’라는 뜻이에요. 이 to는 전치사라서 뒤에 명사가 와요."], ["가목적어 it, 진목적어 to부정사", "<span class=\"nm\">8</span>&#8288; students <b class=\"gk\">find it difficult to make</b> a decision", "it은 가목적어이고 진짜 목적어는 to make 이하예요. ‘결정을 내리는 것을 어렵다고 여기다’"], ["접속사 as, while", "<span class=\"nm\">9</span>&#8288; <b class=\"gk\">as</b> they constantly check their phones <b class=\"gk\">while</b> they are studying", "as는 여기서 ‘~해서, ~하기 때문에’, while은 ‘~하는 동안’이라는 뜻이에요."]]));
+add("R03","워크북 A",wbA([["device", "명", "도구, 장치"], ["without", "전", "~ 없이"], ["situation", "명", "상황"], ["encourage", "동", "권장[격려]하다"], ["level", "명", "정도, 수준"], ["addiction", "명", "중독"], ["warn", "동", "경고하다"], ["danger", "명", "위험"], ["have an effect on", "", "~에 영향을 미치다"], ["brain", "명", "뇌"], ["make a decision", "", "결정하다"], ["besides", "부", "게다가"], ["constantly", "부", "끊임없이"], ["focus on", "", "~에 집중하다"], ["must-have", "형", "꼭 필요한"], ["government", "명", "정부"], ["self-test", "", "자가 진단"], ["negative", "형", "부정적인"], ["regarding", "전", "~에 관하여"], ["control", "동", "조절하다"]],4));
+add("R03","워크북 B",wbB([["스마트폰은 꼭 필요한 도구이다 / 사람들에게 / 요즘", "devices / for / these days / must-have / are / people / smartphones / the", "Smartphones are the must-have devices for people these days."], ["나는 살 수 없어요 / 내 스마트폰 없이는", "can’t / without / smartphone / I / live / my", "I can’t live without my smartphone."], ["의사들은 경고한다 / 위험성에 대해 / 스마트폰 중독의", "warn / the danger / smartphone / doctors / addiction / about / of", "Doctors warn about the danger of smartphone addiction."], ["그것은 끼친다 / 부정적인 영향을 / 학생들의 뇌에", "effects / the brains / it / of / on / negative / students / has", "It has negative effects on the brains of students."], ["그들이 스마트폰에 중독되면 / 학생들은 어려워한다 / 판단을 내리는 것을", "are addicted to / students / it / smartphones / difficult / when / to / find / make a decision / they", "When they are addicted to smartphones, students find it difficult to make a decision."]],4));
+
 add("POP","1",`${MPH}<div class="mp">
   <div class="mq"><h4><span class="no">1</span>괄호 안에서 문맥상 적절한 단어를 고르시오. ${exb("POP-1")}</h4><ol>
     <li>(1) A warm bath can make you feel [nervous / relaxed]. ${chip("relaxed")}</li>

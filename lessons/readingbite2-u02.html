@@ -229,6 +229,32 @@ body{font-family:Hyemin,"Malgun Gothic",sans-serif;color:var(--ink);-webkit-font
   @page{size:1280px 720px;margin:0}
 }
 .dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:4px;margin-right:8px}
+
+/* 워크북, 중요 문법 */
+.wbL{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;background:var(--purple);color:#fff;font:400 21px/1 Title,sans-serif;margin-right:12px}
+.wba{position:absolute;left:90px;right:90px;top:134px;display:grid;grid-auto-flow:column;column-gap:64px}
+.wr{display:flex;align-items:center;gap:10px;font-size:21px;line-height:1.3;padding:7px 0;border-bottom:1px dashed var(--line)}
+.wr .wn{font:900 17px Hyemin,sans-serif;color:var(--navy);width:26px;flex:none}
+.wr .ww{width:196px;flex:none;font-weight:700}
+.wr .ps{margin:0;flex:none}
+.wr .ps0{display:inline-block;width:17px;flex:none}
+.wr .b{flex:1;min-width:0;text-align:left;font-size:19px;line-height:1.3}
+.wbb{position:absolute;left:84px;right:84px;top:126px;display:grid;gap:12px}
+.wq{display:grid;grid-template-columns:40px 1fr;column-gap:6px}
+.wq .wn{font:900 21px/1.45 Hyemin,sans-serif;color:var(--navy)}
+.wk{font-size:21px;line-height:1.45}
+.wc{font-size:19px;line-height:1.45;color:var(--sub)}
+.wl2{display:flex;gap:8px;font-size:21px;line-height:1.45;margin-top:2px}
+.wl2 .b{flex:1;min-width:0;text-align:left}
+.wbb.six{gap:7px}.wbb.six .wk,.wbb.six .wl2{font-size:19.5px}.wbb.six .wc{font-size:17.5px}
+.gr{position:absolute;left:80px;right:80px;top:128px;display:grid}
+.gi{display:grid;grid-template-columns:240px 1fr;column-gap:20px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.gi:last-child{border-bottom:0}
+.gn{grid-row:span 2;font:900 19px/1.4 Hyemin,sans-serif;color:var(--purple)}
+.gs{font-size:19.5px;line-height:1.5}
+.gs .nm{vertical-align:2px;margin-right:5px}
+.gk{color:var(--red);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.ge{font-size:16.5px;line-height:1.5;color:var(--sub);margin-top:1px}
 </style>
 </head>
 <body class="hideKo">
@@ -272,6 +298,12 @@ const rcSlide = (sents, words, page) => `${rcHead()}
 
 const SS = [];
 const add = (ls, sec, html, cls="") => SS.push({m:{ls}, sec, html, cls});
+/* 워크북, 중요 문법 슬라이드 */
+const wbHead = L => `<div class="rch"><div class="tab"><span>Work</span><span>book</span></div><div class="ins"><b class="wbL">${L}</b>${L==="A"?"다음 영어의 우리말 뜻을 쓰시오.":"우리말과 의미가 같도록 주어진 말을 바르게 배열하시오."}</div></div>`;
+const n2 = i => String(i+1).padStart(2,"0");
+const wbA = (it, p) => `${wbHead("A")}<div class="wba" style="grid-template-rows:repeat(${Math.ceil(it.length/2)},auto)">${it.map((x,i)=>`<div class="wr"><span class="wn">${n2(i)}</span><span class="ww">${x[0]}</span>${x[1]?ps(x[1]):`<span class="ps0"></span>`}${b(x[2])}</div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const wbB = (it, p) => `${wbHead("B")}<div class="wbb${it.length>5?" six":""}">${it.map((x,i)=>`<div class="wq"><span class="wn">${n2(i)}</span><div><div class="wk">${x[0]}</div><div class="wc">(${x[1]})</div><div class="wl2">→ ${b(x[2])}</div></div></div>`).join("")}</div>${FT}<div class="bp">워크북 ${p}</div>`;
+const grSlide = it => `<div class="rch"><div class="tab"><span>중요</span><span>문법</span></div></div><div class="gr">${it.map(x=>`<div class="gi"><div class="gn">${x[0]}</div><div class="gs">${x[1]}</div><div class="ge">${x[2]}</div></div>`).join("")}</div>${FT}`;
 
 
 /* 정답과 해설 (해답지) */
@@ -391,6 +423,11 @@ add("R04","Read Closely 3",rcSlide(
   sen(12,"In the end, they may miss the chance to make their own decisions."),
   W4.slice(12).join(""), 21));
 
+/* R04 중요 문법, 워크북 */
+add("R04","중요 문법",grSlide([["동명사 목적어", "<span class=\"nm\">4</span>&#8288; “ditto spending” means <b class=\"gk\">buying</b> the same things as others", "mean 뒤에 동명사가 오면 ‘~하는 것을 의미하다’예요. the same ~ as …는 ‘…와 같은 ~’이에요."], ["소유격 관계대명사 whose", "<span class=\"nm\">6</span>&#8288; a star or influencer <b class=\"gk\">whose style</b> they like", "whose 바로 뒤에 명사가 오고, 앞의 선행사가 가진 것을 나타내요. ‘그 사람의 스타일’"], ["조동사 must (강한 추측)", "<span class=\"nm\">8</span>&#8288; it <b class=\"gk\">must be</b> good for me, too", "여기서 must는 ‘~임에 틀림없다’라는 추측의 뜻이에요."], ["목적격 관계대명사 생략", "<span class=\"nm\">10</span>&#8288; People may buy things <b class=\"gk\">they don’t really need</b>", "things 뒤에 목적격 관계대명사 that[which]이 생략됐어요."], ["관계대명사 what", "<span class=\"nm\">11</span>&#8288; feel unhappy with <b class=\"gk\">what they bought</b>", "what은 선행사를 포함해서 ‘~하는 것’이라는 뜻이에요."]]));
+add("R04","워크북 A",wbA([["choose", "동", "선택하다"], ["follow", "동", "따르다"], ["behind", "전", "~ 뒤에, ~의 이면에"], ["mean", "동", "의미하다"], ["spending", "명", "소비"], ["taste", "명", "취향"], ["similar", "형", "비슷한"], ["for example", "", "예를 들어"], ["cause", "동", "일으키다"], ["need", "동", "필요로 하다"], ["waste", "동", "낭비하다"], ["lose", "동", "잃다"], ["unhappy", "형", "불만족스러워하는"], ["miss the chance", "", "기회를 놓치다"], ["in the end", "", "결국"], ["safe", "형", "안전한"]],5));
+add("R04","워크북 B",wbB([["소셜 미디어 때문에 / 디토 소비는 늘고 있다 / 빠르게", "social media / is / ditto spending / fast / because of / growing", "Because of social media, ditto spending is growing fast."], ["사람들이 스타를 따라 한다 / 자신이 좋아하는 스타일의", "people / a star / style / like / whose / follow / they", "People follow a star whose style they like."], ["이러한 소비는 / 느껴질 수 있다 / 쉽고 안전하게", "feel / easy / this / safe / kind of / can / spending / and", "This kind of spending can feel easy and safe."], ["사람들은 살 수도 있다 / 물건을 / 그들이 정말 필요하지 않은", "need / things / people / buy / really / don’t / may / they", "People may buy things they don’t really need."], ["그들은 느낄 수도 있다 / 불만족스럽다고 / 그들이 샀던 것에", "might / bought / with / they / feel / what / unhappy / they", "They might feel unhappy with what they bought."], ["그들은 놓친다 / 기회를 / 자신만의 선택을 할", "miss / decisions / make / own / the chance / their / to / they", "They miss the chance to make their own decisions."]],5));
+
 /* ===== READING 05 ===== */
 CUR = "R05";
 add("R05","본문",`<div class="rd">${rdSide(5,{gichul:1,ex:"#emotions #fear #good feelings #survive"})}
@@ -446,6 +483,11 @@ add("R05","Read Closely 3",rcSlide(
   sen(12,`If emotions did not <span class="hl">help us survive</span>, we would not still have them today.`),
   W5.slice(13).join(""), 23));
 
+/* R05 중요 문법, 워크북 */
+add("R05","중요 문법",grSlide([["help + 목적어 + 동사원형", "<span class=\"nm\">4</span>&#8288; good feelings <b class=\"gk\">help us get</b> closer to others", "help 뒤 목적격 보어 자리에 동사원형이 왔어요. ‘우리가 ~하도록 돕다’"], ["관계대명사 what", "<span class=\"nm\">6</span>&#8288; an emotion starts and controls <b class=\"gk\">what we do</b>", "what we do는 ‘우리가 하는 것(행동)’이라는 뜻이에요."], ["간접의문문", "<span class=\"nm\">7</span>&#8288; It changes <b class=\"gk\">how we pay attention</b>, <b class=\"gk\">how we move</b>, …", "‘의문사 + 주어 + 동사’ 순서로 changes의 목적어 역할을 해요."], ["사역동사 make + 목적어 + 동사원형", "<span class=\"nm\">8</span>&#8288; fear <b class=\"gk\">makes us focus</b> more on the danger", "사역동사 make는 목적격 보어로 동사원형을 써요. ‘우리가 ~에 집중하게 만들다’"], ["가정법 과거", "<span class=\"nm\">12</span>&#8288; If emotions <b class=\"gk\">did not help</b> us survive, we <b class=\"gk\">would not</b> still <b class=\"gk\">have</b> them today.", "‘If + 주어 + 과거동사, 주어 + would + 동사원형’으로 현재 사실과 반대되는 일을 가정해요."]]));
+add("R05","워크북 A",wbA([["important", "형", "중요한"], ["control", "동", "조절하다, 통제하다"], ["survive", "동", "생존하다"], ["emotion", "명", "감정"], ["get closer to", "", "~에 더 가까워지다"], ["work", "동", "작동하다"], ["remember", "동", "기억하다"], ["fight", "동", "싸우다"], ["scare ~ away", "", "겁주어 ~을 물리치다"], ["clearly", "부", "뚜렷하게"], ["protect", "동", "보호하다"], ["run away", "", "도망가다"], ["pay attention", "", "주의를 기울이다"], ["focus on", "", "~에 집중하다"], ["choose", "동", "선택하다"], ["keep A away from B", "", "A를 B로부터 멀리하게 하다"]],6));
+add("R05","워크북 B",wbB([["두려움은 우리를 멀리 떨어지게 한다 / 위험에서", "keeps / away / danger / fear / us / from", "Fear keeps us away from danger."], ["좋은 감정들은 우리를 도와준다 / 더 가까워지도록 / 다른 사람들과", "help / feelings / get / to / good / us / closer / others", "Good feelings help us get closer to others."], ["감정은 생겨난다 / 그리고 조절한다 / 우리가 하는 행동을", "an / controls / emotion / and / what / do / starts / we", "An emotion starts and controls what we do."], ["두려움은 우리를 만든다 / 더 집중하도록 / 위험에", "makes / focus / us / on / more / fear / the danger", "Fear makes us focus more on the danger."], ["우리는 선택할 수 있다 / 싸울지 / 혹은 도망칠지를", "fight / we / or / choose / can / run away / to", "We can choose to fight or run away."], ["우리는 기억한다 / 이러한 무서운 사건을 / 더 뚜렷하게", "this kind of / scary / we / clearly / event / remember / more", "We remember this kind of scary event more clearly."]],6));
+
 /* ===== READING 06 ===== */
 CUR = "R06";
 add("R06","본문",`<div class="rd">${rdSide(6,{gichul:1,ex:"#multitasking #whole focus #focus on one task"})}
@@ -499,6 +541,11 @@ add("R06","Read Closely 3",rcSlide(
 
 add("R06","Story BITE",`<div class="sb"><div class="sbh"><span>Story <b>BITE</b></span>집중하기 어렵다면, ‘포모도로 기법’을?</div>
   <p>‘포모도로 기법(The Pomodoro Technique)’은 이탈리아의 경영 컨설턴트 ‘프란체스코 치릴로(Francesco Cirillo)’가 제안한 시간 관리법으로, 그가 대학 시절 토마토(pomodoro) 모양의 요리용 타이머를 활용해 공부한 데서 붙여진 이름이라고 해요. 방법은 간단해요. 타이머를 맞추고 ‘25분 집중 + 5분 휴식’을 1세트로 하여 4회 반복한 후 15~30분간 쉬면 돼요. 이러한 패턴을 여러 번 반복하세요. 이렇게 하면 긴 시간을 집중해야 하는 부담이 없고, 작업과 휴식을 반복하면서 뇌의 피로를 풀 수 있으며, 적절한 시간의 압박을 통해 집중력이 올라가 일의 효율을 높일 수 있다고 해요.</p></div>${FT}<div class="bp">25</div>`);
+
+/* R06 중요 문법, 워크북 */
+add("R06","중요 문법",grSlide([["사역동사 make + 목적어 + 동사원형", "<span class=\"nm\">1</span>&#8288; Today’s fast-paced lifestyle <b class=\"gk\">makes us put</b> one thing on top of another.", "‘(목적어)가 ~하게 만들다’라는 뜻이에요. 목적격 보어로 동사원형 put이 왔어요."], ["관계대명사 what", "<span class=\"nm\">4</span>&#8288; Give your whole focus to <b class=\"gk\">what you’re doing</b> at the moment.", "what은 ‘~하는 것’이라는 뜻이에요. give A to B는 ‘A를 B에 주다’예요."], ["접속사 + 분사", "<span class=\"nm\">5</span>&#8288; <b class=\"gk\">While doing</b> the laundry, just do the laundry.", "While you are doing에서 ‘주어 + be동사’가 생략된 형태예요."], ["동명사 주어", "<span class=\"nm\">7</span>&#8288; <b class=\"gk\">Talking on the phone</b> while you are doing the laundry <b class=\"gk\">will not save</b> you a lot of time.", "동명사구 주어는 길어도 단수 취급해요. save + 사람 + 시간은 ‘~에게 …을 아껴 주다’예요."], ["명령문, and …", "<span class=\"nm\">9</span>&#8288; Focus on one task at a time, <b class=\"gk\">and</b> you’ll accomplish each task better", "‘~해라, 그러면 …할 것이다’라는 뜻이에요."]]));
+add("R06","워크북 A",wbA([["lifestyle", "명", "생활 방식"], ["slow ~ down", "", "~의 속도를 늦추다, 느리게 하다"], ["at the moment", "", "지금"], ["fill", "동", "채우다"], ["apply to", "", "~에 적용되다"], ["at a time", "", "한 번에"], ["probably", "부", "아마도"], ["accomplish", "동", "성취하다"], ["fast-paced", "형", "빨리 진행되는"], ["on top of", "", "~의 위에, ~에 더하여"], ["whole", "형", "전부의, 모든"], ["do the laundry", "", "빨래하다"], ["washing machine", "", "세탁기"], ["task", "명", "일, 과업"], ["multitask", "동", "한꺼번에 여러 가지 일을 처리하다"], ["empty", "동", "비우다"], ["focus", "명", "집중"], ["achieve", "동", "성취하다"]],7));
+add("R06","워크북 B",wbB([["많은 사람들은 믿는다 / 멀티태스킹이 시간을 절약한다고", "believe / many / time / multitasking / people / that / saves", "Many people believe that multitasking saves time."], ["여러분의 모든 집중력을 써라 / 여러분이 하고 있는 일에", "to / doing / give / you / focus / your / what / whole / are", "Give your whole focus to what you are doing."], ["빨래를 하는 동안에는 / 빨래만 해라", "doing / while / laundry / just / laundry / the / do / the", "While doing the laundry, just do the laundry."], ["같은 것이 적용된다 / 여러분의 모든 일에", "the / your / all / applies / same / work / to", "The same applies to all your work."], ["한 가지 일에 집중해라 / 그러면 여러분은 성취할 것이다 / 각각의 일을 / 더 잘", "and / one task / each task / focus on / accomplish / you / better / will", "Focus on one task, and you will accomplish each task better."]],7));
 
 /* ===== READING 07 ===== */
 CUR = "R07";
@@ -555,6 +602,11 @@ add("R07","Read Closely 3",rcSlide(
 
 /* ===== Memory POP ===== */
 const MPH = `<div class="mph"><span>M</span>emory<div class="pop">POP</div></div>`;
+/* R07 중요 문법, 워크북 */
+add("R07","중요 문법",grSlide([["주격 관계대명사 who", "<span class=\"nm\">1</span>&#8288; your friends <b class=\"gk\">who are trying to change</b> their behavior", "who 이하가 앞의 friends를 꾸며요. try to + 동사원형은 ‘~하려고 노력하다’예요."], ["현재완료진행", "<span class=\"nm\">2</span>&#8288; a friend who <b class=\"gk\">has been working</b> on a diet", "‘have[has] been + -ing’로 과거부터 지금까지 계속 ~해 오고 있다는 뜻이에요."], ["감각동사 + 형용사", "<span class=\"nm\">3</span>&#8288; tell her that she <b class=\"gk\">looks great</b>", "look, feel, sound 같은 감각동사 뒤에는 형용사가 와요. tell + 사람 + that절은 ‘~에게 …라고 말하다’예요."], ["by + 동명사", "<span class=\"nm\">6</span>&#8288; continue the discussion <b class=\"gk\">by asking</b> about the process", "‘~함으로써’라는 뜻이에요."], ["간접의문문", "<span class=\"nm\">7</span>&#8288; Ask her <b class=\"gk\">what she is doing</b> to be so successful.", "의문사 what 뒤에 ‘주어 + 동사’ 순서로 써요."]]));
+add("R07","워크북 A",wbA([["encouraging", "형", "격려하는, 용기를 북돋워 주는"], ["behavior", "명", "행동"], ["suppose", "동", "가정하다"], ["lose weight", "", "체중이 줄다"], ["positive", "형", "긍정적인"], ["discussion", "명", "논의, 토론"], ["outcome", "명", "결과"], ["comment", "명", "언급, 말"], ["continue", "동", "계속하다"], ["instead", "부", "대신에"], ["work out", "", "운동하다"], ["successful", "형", "성공적인"], ["process", "명", "과정"], ["conversation", "명", "대화"], ["discourage", "동", "낙담시키다, 용기를 잃게 하다"], ["definitely", "부", "분명히"]],8));
+add("R07","워크북 B",wbB([["여러분은 어떻게 격려하는가 / 여러분의 친구들을 / 바꾸려고 노력하고 있는 / 자신의 행동을", "encourage / change / are / your friends / you / how / do / who / trying to / their behavior", "How do you encourage your friends who are trying to change their behavior?"], ["여러분은 하고 싶을 것이다 / 그녀에게 말하는 것을 / 그녀가 멋져 보인다고", "tell / you / would / to / looks / want / great / her / that / she", "You would want to tell her that she looks great."], ["누구든 / 긍정적인 말을 듣는 / 기분이 좋아질 것이다", "who / positive / will / good / feel / anyone / hears / comments", "Anyone who hears positive comments will feel good."], ["그 논의를 계속해라 / 물음으로써 / 과정에 관해", "the / asking / discussion / by / the / about / process / continue", "Continue the discussion by asking about the process."], ["그녀에게 물어봐라 / 그녀가 무엇을 하고 있는지 / 그렇게 성공적이기 위해", "her / what / successful / is / to / doing / ask / so / she / be", "Ask her what she is doing to be so successful."]],8));
+
 add("POP","1",`${MPH}<div class="mp">
   <div class="mq"><h4><span class="no">1</span>괄호 안에서 문맥상 적절한 단어를 고르시오. ${exb("POP-1")}</h4><ol>
     <li>(1) City life is busy and [slow-paced / fast-paced]. ${chip("fast-paced")}</li>
