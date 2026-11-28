@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-04-2";
+const VERSION = "2026-11-28";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -68,6 +68,8 @@ const CSS = `
 #ui.bar #unblankBtn.arm{background:#e5322d;color:#fff}
 #helpBtn{position:fixed;right:8px;top:8px;width:18px;height:18px;padding:0;border:0;border-radius:50%;background:rgba(29,36,51,.6);color:#fff;font:700 11px/18px Body,"Malgun Gothic",sans-serif;text-align:center;cursor:pointer;z-index:9;opacity:.35;transition:opacity .2s}
 #helpBtn:hover{opacity:1}
+#zoomBtn{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:9;border:0;border-radius:6px;background:rgba(29,36,51,.82);color:#fff;font:500 13px Body,"Malgun Gothic",sans-serif;padding:5px 11px;cursor:pointer}
+#zoomBtn b{font-weight:700;margin-right:7px}
 #help{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,14,22,.5);z-index:30}
 #help.open{display:flex}
 #help .box{position:relative;width:min(580px,92vw);max-height:86vh;overflow:auto;background:#fff;color:#1d2433;border-radius:16px;padding:22px 26px 18px;font:500 14px/1.6 Body,"Malgun Gothic",sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.35)}
@@ -89,7 +91,7 @@ const CSS = `
 img.bd-print{display:none}
 @media print{img.bd-print{display:block;position:absolute;left:0;top:0;width:1280px;height:720px;z-index:50;pointer-events:none}.slide.bd-noprint{display:none!important}#saveAsk{display:none!important}}
 
-@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui,#helpBtn,#help,#saveAsk{display:none!important}}
+@media print{#bd,#pen,#co,#shapeMenu,#bdToast,#ui,#helpBtn,#zoomBtn,#help,#saveAsk{display:none!important}}
 `;
 document.head.insertAdjacentHTML("beforeend", `<style>${CSS}</style>`);
 
@@ -170,6 +172,7 @@ document.body.insertAdjacentHTML("beforeend", `
 </div>
 <div id="bdToast"></div>
 <button id="helpBtn" title="판서 사용설명서 (?)">?</button>
+<button id="zoomBtn" title="원래 크기로 (0)" style="display:none"></button>
 <div id="help"><div class="box">
   <button class="x" id="helpX" title="닫기">✕</button>
   <h3>판서 사용설명서</h3>
@@ -180,7 +183,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <ul><li><b>펜</b> 매끈한 선 · <b>색연필</b> 크레용 느낌, 펜을 세게 누르면 진하게</li>
   <li><b>형광펜</b> 곧은 선, 거의 수평이면 딱 수평 · <b>지우개</b> <kbd>E</kbd> — 지우개 버튼을 누르면 <b>지우개</b>(문지른 곳만) / <b>획 지우개</b>(<kbd>S</kbd>, 닿은 선을 통째로) 고르기. 크기는 점 크기 버튼</li>
   <li><b>판서 중 버튼</b> 판서를 켠 채로도 슬라이드 안의 버튼(정답 등)을 콕 찍으면 눌려요. 끌면 그대로 그려져요</li>
-  <li><b>펜 지우개</b> 펜 뒤쪽 지우개나 옆 버튼을 누른 채 대면 지우개, 떼면 원래 펜으로 (지우개 종류는 지우개 버튼에서 고른 것)</li>
+  <li><b>펜 지우개</b> 펜 뒤쪽 지우개나 옆 버튼을 누르면 바로 지우개(쓰는 도중에도), 펜을 떼면 원래 쓰던 도구로 (지우개 종류는 지우개 버튼에서 고른 것)</li>
   <li><b>레이저</b> <kbd>L</kbd> 평소엔 빨간 점이 커서 대신 따라다니고, 누르고 움직이면 꼬리가 생겨요 (상대 화면에도 보여요)</li>
   <li><b>도형</b> 직선·원·세모·하트·별 — 끌어서 그려요. 색연필로 쓰면 손으로 그린 느낌</li>
   <li>색: 동그라미 / 무지개 동그라미로 아무 색이나 · 굵기: 점 크기 버튼</li></ul>
@@ -197,6 +200,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <li>되돌리기는 내가 한 일만 하나씩 돌려요 — 내가 그은 선, 획 지우개로 지운 선, 모두 지우기</li></ul>
   <h4>슬라이드</h4>
   <ul><li>넘기기 <kbd>←</kbd> <kbd>→</kbd> · 해석 숨기기 <kbd>K</kbd> · 문법 숨기기 <kbd>N</kbd> · 전체화면 <kbd>F</kbd></li>
+  <li><b>확대</b> 두 손가락으로 벌리기, <kbd>Ctrl</kbd>+휠, <kbd>+</kbd> <kbd>-</kbd>. 확대한 채로 두 손가락이나 휠로 옮기기. 위쪽 "원래 크기" 또는 <kbd>0</kbd>으로 돌아오기, 장을 넘겨도 돌아와요</li>
   <li><b>빈 칠판</b> 칠판 버튼 → 지금 장 다음에 빈 장 추가. 지울 때는 "칠판 지우기"를 두 번</li></ul>
   <h4>같이 쓰기 (온라인 과외)</h4>
   <ul><li>같이 쓰기 → 방 이름 → 시작 → <b>수업방에 올릴 링크 복사</b> → 수업방에 붙여 넣기. 둘 다 그 링크로 들어오면 자동 연결</li>
@@ -235,15 +239,73 @@ function toast(msg){ const t = $("bdToast"); t.textContent = msg; t.classList.ad
 /* ---------- 페이지와 연결 ---------- */
 const bd = $("bd"), ink = $("ink"), ctx = ink.getContext("2d"), fx = $("fx"), fctx = fx.getContext("2d");
 const data = () => typeof SS !== "undefined" ? SS : S;           /* 슬라이드 데이터 (slides와 같은 순서) */
-const syncBox = () => { bd.style.transform = stage.style.transform; };
-addEventListener("resize", ()=>setTimeout(syncBox));
+/* 확대: 페이지가 화면에 맞춘 크기(BASE) 위에 배율·이동(ZM)을 얹음. 판서 좌표는 슬라이드 기준(1280×720)이라 확대해도 그대로 맞음.
+   두 손가락 벌리기·끌기, Ctrl+휠(노트북 터치패드 벌리기), + - 0 키. 확대 중 휠은 이동, 판서를 끄고 마우스로 끌어도 이동. 장을 넘기면 원래 크기 */
+let BASE = new DOMMatrix(), baseStr = "", zSet = "", ZM = {s:1, x:0, y:0}, pinch = null, lastPen = 0;
+function readBase(){ const t = stage.style.transform; if(t && t!==zSet){ baseStr = t; try{ BASE = new DOMMatrix(t); }catch(e){ BASE = new DOMMatrix(); } } }
+function applyZoom(){
+  const b = BASE, s = ZM.s;
+  if(s===1){ ZM.x = ZM.y = 0; stage.style.transform = baseStr; }
+  else {
+    const L = b.e, T = b.f, R = L + 1280*b.a, B = T + 720*b.d;     /* 확대한 슬라이드가 원래 자리를 늘 덮도록 이동을 제한 */
+    ZM.x = Math.min(L*(1-s), Math.max(R*(1-s), ZM.x));
+    ZM.y = Math.min(T*(1-s), Math.max(B*(1-s), ZM.y));
+    stage.style.transform = `matrix(${b.a*s},0,0,${b.d*s},${b.e*s+ZM.x},${b.f*s+ZM.y})`;
+  }
+  zSet = stage.style.transform; bd.style.transform = zSet;
+  const zb = $("zoomBtn"); zb.style.display = s===1 ? "none" : ""; zb.innerHTML = `<b>${Math.round(s*100)}%</b>원래 크기`;
+}
+function zoomTo(ns, cx = innerWidth/2, cy = innerHeight/2){
+  ns = Math.min(4, Math.max(1, ns)); if(ns < 1.03) ns = 1;
+  const qx = (cx-ZM.x)/ZM.s, qy = (cy-ZM.y)/ZM.s;
+  ZM = {s:ns, x:cx-ns*qx, y:cy-ns*qy}; applyZoom();
+}
+const panBy = (dx, dy) => { if(ZM.s===1) return; ZM.x += dx; ZM.y += dy; applyZoom(); };
+const syncBox = () => { readBase(); if(ZM.s!==1 && stage.style.transform!==zSet) applyZoom(); else bd.style.transform = stage.style.transform; };
+addEventListener("resize", ()=>setTimeout(()=>{ readBase(); if(ZM.s!==1){ ZM = {s:1, x:0, y:0}; applyZoom(); } else syncBox(); }));
 new MutationObserver(syncBox).observe(stage, {attributes:true, attributeFilter:["style"]});
 syncBox();
+$("zoomBtn").onclick = ()=>zoomTo(1);
+/* 두 손가락: 벌리면 확대, 같이 끌면 이동. 펜을 대고 있거나 펜이 화면 가까이 떠 있으면(손바닥) 무시 */
+const tmid = t => [(t[0].clientX+t[1].clientX)/2, (t[0].clientY+t[1].clientY)/2];
+const tdist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY) || 1;
+const inPanel = el => el && el.closest && el.closest("#help, #co, #saveAsk, #shapeMenu, #eraseMenu");
+document.addEventListener("touchstart", e=>{
+  pinch = e.touches.length===2 && !stroke && !inPanel(e.target) && performance.now()-lastPen > 500 ? {d:tdist(e.touches), m:tmid(e.touches)} : null;
+}, {passive:true});
+document.addEventListener("touchmove", e=>{
+  if(e.touches.length > 1 && !inPanel(e.target)) e.preventDefault();      /* 브라우저 자체 확대 대신 슬라이드만 확대 */
+  if(!pinch || e.touches.length!==2) return;
+  const d = tdist(e.touches), m = tmid(e.touches);
+  ZM.x += m[0]-pinch.m[0]; ZM.y += m[1]-pinch.m[1];
+  zoomTo(ZM.s*d/pinch.d, m[0], m[1]);
+  pinch.d = d; pinch.m = m;
+}, {passive:false});
+document.addEventListener("touchend", e=>{ if(e.touches.length!==2) pinch = null; });
+document.addEventListener("gesturestart", e=>e.preventDefault());       /* 아이패드 사파리 */
+addEventListener("wheel", e=>{
+  if(e.ctrlKey || e.metaKey){ e.preventDefault(); const dy = Math.max(-100, Math.min(100, e.deltaMode ? e.deltaY*33 : e.deltaY)); zoomTo(ZM.s*Math.exp(-dy*.002), e.clientX, e.clientY); return; }
+  if(ZM.s===1 || inPanel(e.target)) return;
+  e.preventDefault();
+  const k = e.deltaMode ? 33 : 1;
+  panBy(-(e.shiftKey ? e.deltaY : e.deltaX)*k, -(e.shiftKey ? 0 : e.deltaY)*k);
+}, {passive:false});
+/* 판서를 끈 채 확대했을 때 마우스·펜으로 끌면 이동(콕 누르기는 그대로 눌림) */
+let panAt = null, panEat = false;
+stage.addEventListener("pointerdown", e=>{ if(ZM.s===1 || e.pointerType==="touch" || e.button!==0 || document.body.classList.contains("drawing")) return; panAt = {x:e.clientX, y:e.clientY, id:e.pointerId, go:false}; });
+addEventListener("pointermove", e=>{
+  const p = panAt; if(!p || e.pointerId!==p.id) return;
+  if(!p.go && Math.hypot(e.clientX-p.x, e.clientY-p.y) > 6){ p.go = true; try{ stage.setPointerCapture(e.pointerId); }catch(err){} }
+  if(p.go){ panBy(e.clientX-p.x, e.clientY-p.y); p.x = e.clientX; p.y = e.clientY; }
+});
+addEventListener("pointerup", e=>{ if(panAt && e.pointerId===panAt.id){ panEat = panAt.go; panAt = null; setTimeout(()=>panEat = false, 0); } });
+stage.addEventListener("click", e=>{ if(panEat){ e.stopPropagation(); e.preventDefault(); panEat = false; } }, true);
 
 const pageGo = window.go, pageTg = window.tg;
 let remoteGo = false;
 window.go = function(i){
   if(!remoteGo && !canNav()){ toast("지금은 상대만 슬라이드를 넘길 수 있어요."); return; }
+  if(ZM.s!==1) zoomTo(1);
   pageGo(i); blankUI();
   if(!remoteGo){ if(coLoaded) touched = true; send({type:"go", k:skey()}); }
   drawInk();
@@ -611,7 +673,7 @@ function pos(e){ const r = ink.getBoundingClientRect(); return [(e.clientX-r.lef
 let lastLive = 0;
 function sendLive(force){ if(conns.length && (force || Date.now()-lastLive > 40)){ lastLive = Date.now(); send({type:"live", who:ME, st:stroke}); } }
 let activeId = null;                              /* 지금 긋고 있는 펜(마우스)의 번호. 다른 포인터(손바닥)의 움직임·떼기는 무시 */
-ink.addEventListener("pointerdown", e=>{
+function startStroke(e){
   if(e.pointerType==="touch") return;              /* 손가락·손바닥은 무시, 펜(과 마우스)으로만 판서 */
   if(stroke && activeId!==null && e.pointerId!==activeId) return;
   activeId = e.pointerId;
@@ -628,7 +690,8 @@ ink.addEventListener("pointerdown", e=>{
   if(stroke.shape==="line") holdT = setTimeout(freeAngle, 450);
   else if(tool!=="shape" && (base==="pen" || base==="pc")) holdT = setTimeout(snapStroke, 700);
   drawInk();
-});
+}
+ink.addEventListener("pointerdown", startStroke);
 ink.addEventListener("pointermove", e=>{
   if(e.pointerType==="touch") return;
   if(activeId!==null && e.pointerId!==activeId) return;
@@ -674,15 +737,32 @@ const endStroke = e=>{
 ink.addEventListener("pointerup", endStroke);
 ink.addEventListener("pointercancel", endStroke);
 ink.addEventListener("pointerleave", ()=>{ if(tool==="laser" && !laserDown) laserAt(null, "out"); ERING = null; kickFx(); });
-/* 펜 지우개: 펜 뒤쪽 지우개(buttons 32)나 옆 버튼(buttons 2)을 누른 채 대면 그 한 번만 지우개, 떼면 원래 도구로 */
-let penSwap = null;
+/* 펜 지우개: 펜 뒤쪽 지우개(buttons 32)나 옆 버튼(buttons 2)을 누르는 순간 지우개로(펜을 대기 전 떠 있을 때, 긋는 도중에도),
+   펜을 떼면 원래 도구로. 대지 않고 버튼만 놓아도 원래 도구로 */
+let penSwap = null, penDown = false;
 const penErase = e => e.pointerType==="pen" && ((e.buttons & 32) || (e.buttons & 2) || e.button===5 || e.button===2);
-ink.addEventListener("pointerdown", e=>{
-  if(penErase(e) && tool!=="er" && tool!=="se"){ penSwap = tool; setTool(eraseMode); }
-}, true);                                          /* 그리기 처리보다 먼저 */
+const swapIn = () => { if(penSwap || tool==="er" || tool==="se") return false; penSwap = tool; setTool(eraseMode); return true; };
 const penBack = e=>{ if(e && e.pointerType!=="pen") return; if(penSwap){ const t = penSwap; penSwap = null; setTool(t); ERING = null; kickFx(); } };
-ink.addEventListener("pointerup", penBack);
-ink.addEventListener("pointercancel", penBack);
+ink.addEventListener("pointerdown", e=>{
+  if(e.pointerType!=="pen") return;
+  penDown = true; lastPen = performance.now(); pinch = null;
+  if(penErase(e)) swapIn();
+}, true);                                          /* 그리기 처리보다 먼저 */
+ink.addEventListener("pointermove", e=>{
+  if(e.pointerType!=="pen") return;
+  lastPen = performance.now();
+  if(penErase(e)){
+    if(penSwap || tool==="er" || tool==="se") return;
+    const mid = penDown && e.pointerId===activeId && (stroke || laserDown);   /* 긋는 도중: 지금 선은 끝내고 이 자리부터 지우개로 */
+    if(mid) endStroke(e);
+    swapIn();
+    if(mid) startStroke(e);
+  }
+  else if(penSwap && !penDown) penBack(e);        /* 떠 있는 채로 버튼만 놓음 */
+}, true);
+const penUp = e=>{ if(e.pointerType!=="pen") return; penDown = false; penBack(e); };
+ink.addEventListener("pointerup", penUp);
+ink.addEventListener("pointercancel", penUp);
 ink.addEventListener("contextmenu", e=>e.preventDefault());   /* 펜 옆 버튼이 오른쪽 클릭 메뉴를 띄우지 않게 */
 /* 판서 중에도 슬라이드 안 버튼(정답 등)이 눌리게: 그림판 아래 누를 수 있는 것을 콕 찍으면(짧게, 거의 안 움직이고) 점은 버리고 그것을 누름 */
 const TAPPABLE = ".q, button, a[href], [onclick], input, select, label, summary, [role=button]";
@@ -1097,7 +1177,7 @@ function cleanupPrint(){
   document.querySelectorAll(".slide.bd-noprint").forEach(x=>x.classList.remove("bd-noprint"));
   prepared = false;
 }
-addEventListener("beforeprint", ()=>{ if(!prepared) preparePrint(false); });   /* Ctrl+P로 인쇄해도 필기가 같이 나옴 */
+addEventListener("beforeprint", ()=>{ if(ZM.s!==1) zoomTo(1); if(!prepared) preparePrint(false); });   /* Ctrl+P로 인쇄해도 필기가 같이 나옴 */
 addEventListener("afterprint", ()=>{ cleanupPrint(); savedSig = inkSig(); });
 function savePdf(onlyInk){
   saveAsk(false);
@@ -1232,6 +1312,9 @@ addEventListener("keydown", e=>{
   if($("help").classList.contains("open") && k==="Escape"){ helpOpen(false); return; }
   if($("saveAsk").classList.contains("open") && k==="Escape"){ saveAsk(false); return; }
   if(k==="?"){ helpOpen(); return; }
+  if(k==="+" || k==="=" || k==="-" || k==="_" || (k==="0" && (ZM.s!==1 || e.ctrlKey || e.metaKey))){   /* 확대 (Ctrl과 같이 눌러도 브라우저 대신 슬라이드를) */
+    e.preventDefault(); zoomTo(k==="0" ? 1 : ZM.s*(k==="-" || k==="_" ? 1/1.25 : 1.25)); return;
+  }
   if(k==="p"||k==="P"){ togglePen(); return; }
   if(document.body.classList.contains("drawing")){
     if(k==="e"||k==="E"){ setTool(tool==="er" || tool==="se" ? drawBase : eraseMode); return; }
