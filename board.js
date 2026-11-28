@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-28";
+const VERSION = "2026-11-28-2";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -353,8 +353,8 @@ function goKey(k){ const i = indexOfKey(k); if(i>=0 && i!==cur){ remoteGo = true
 const INK = {}, REDO = {};                         /* 슬라이드 이름 → 획 목록 / 내가 되돌린 획 */
 const PAL = {pen:["#e5322d","#2563eb","#16a34a","#111827"], pc:["#d93a2b","#ee7f1f","#2f66cf","#2f8f52","#4d515a"], hl:["#ffe14d","#7ee08a","#ff8fc7","#7cc8ff"]};
 const SIZES = {pen:[2,4,7,11], pc:[3,6,10], hl:[14,24,36], er:[10,20,36,60,100], se:[3,10,22]};   /* se = 선에 닿았다고 보는 거리 */
-const sel = {pen:{c:0,s:1}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:2}, se:{s:1}};
-let eraseMode = "er";
+const sel = {pen:{c:0,s:0}, pc:{c:0,s:1}, hl:{c:0,s:1}, er:{s:2}, se:{s:1}};
+let eraseMode = "se";                              /* 처음 지우개는 획 지우개 */
 const CUSTOM = {};
 let tool = "pen", drawBase = "pen", shapeKind = "circle", stroke = null;
 const ME = Math.random().toString(36).slice(2,8);
