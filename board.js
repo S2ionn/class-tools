@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-28-3";
+const VERSION = "2026-11-28-4";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -267,7 +267,24 @@ function zoomTo(ns, cx = innerWidth/2, cy = innerHeight/2){
 const panBy = (dx, dy) => { if(ZM.s===1) return; ZM.x += dx; ZM.y += dy; applyZoom(); };
 /* 움직이는 동안만 한 장의 그림으로 옮김(빠름), 멈추고 0.15초 뒤 선명하게 다시 그림 */
 let wcT = 0;
-function moving(){ clearTimeout(wcT); if(!stage.style.willChange){ stage.style.willChange = bd.style.willChange = "transform"; } wcT = setTimeout(()=>{ stage.style.willChange = bd.style.willChange = ""; }, 150); }
+function moving(){ clearTimeout(wcT); if(!stage.style.willChange){ stage.style.willChange = bd.style.willChange = "transform"; } if(!pinch) wcT = setTimeout(()=>{ stage.style.willChange = bd.style.willChange = ""; }, 150); }   /* 손가락을 대고 있는 동안은 잠깐 멈춰도 다시 그리지 않음(다시 움직일 때 끊김 방지) */
+/* 관성: 끌다가 놓으면 그 빠르기로 조금 더 미끄러지다 멈춤 */
+let flingRaf = 0, vel = null;
+const track = (x, y) => { const t = performance.now(); if(vel && t-vel.t < 100){ const k = Math.min(1, (t-vel.t)/40); vel.vx = vel.vx*(1-k) + (x-vel.x)/Math.max(1, t-vel.t)*k; vel.vy = vel.vy*(1-k) + (y-vel.y)/Math.max(1, t-vel.t)*k; } else vel = {vx:0, vy:0}; vel.x = x; vel.y = y; vel.t = t; };
+const flingStop = () => { if(flingRaf){ cancelAnimationFrame(flingRaf); flingRaf = 0; } };
+function fling(){
+  flingStop(); const v = vel; vel = null;
+  if(!v || ZM.s===1 || performance.now()-v.t > 80 || Math.hypot(v.vx, v.vy) < .25) return;
+  let vx = Math.max(-4, Math.min(4, v.vx)), vy = Math.max(-4, Math.min(4, v.vy)), last = performance.now();
+  const step = now=>{
+    const dt = Math.min(40, now-last); last = now;
+    const x0 = ZM.x, y0 = ZM.y; moving(); panBy(vx*dt, vy*dt);
+    if(ZM.x===x0) vx = 0; if(ZM.y===y0) vy = 0;               /* 가장자리에 닿으면 그 방향은 멈춤 */
+    const f = Math.pow(.994, dt); vx *= f; vy *= f;
+    flingRaf = Math.hypot(vx, vy) > .03 ? requestAnimationFrame(step) : 0;
+  };
+  flingRaf = requestAnimationFrame(step);
+}
 /* 휠·키·버튼: 목표 배율까지 짧게 미끄러지듯 */
 let zT = null, zRaf = 0;
 function zoomSmooth(ts, cx = innerWidth/2, cy = innerHeight/2){
@@ -283,7 +300,7 @@ function zStep(){
 }
 const zStop = () => { zT = null; if(zRaf){ cancelAnimationFrame(zRaf); zRaf = 0; } };
 const syncBox = () => { readBase(); if(ZM.s!==1 && stage.style.transform!==zSet) applyZoom(); else bd.style.transform = stage.style.transform; };
-addEventListener("resize", ()=>setTimeout(()=>{ readBase(); zStop(); if(ZM.s!==1){ ZM = {s:1, x:0, y:0}; applyZoom(); } else syncBox(); }));
+addEventListener("resize", ()=>setTimeout(()=>{ readBase(); zStop(); flingStop(); if(ZM.s!==1){ ZM = {s:1, x:0, y:0}; applyZoom(); } else syncBox(); }));
 new MutationObserver(syncBox).observe(stage, {attributes:true, attributeFilter:["style"]});
 syncBox();
 $("zoomBtn").onclick = ()=>zoomSmooth(1);
@@ -295,7 +312,7 @@ const inPanel = el => el && el.closest && el.closest("#help, #co, #saveAsk, #sha
 let pinchNow = null, pinchRaf = 0;
 document.addEventListener("touchstart", e=>{
   if(e.touches.length===2 && !stroke && !inPanel(e.target) && performance.now()-lastPen > 500){
-    const p = pts2(e.touches); pinch = {d:tdist(p), m:tmid(p)}; panAt = null; zStop();
+    const p = pts2(e.touches); pinch = {d:tdist(p), m:tmid(p)}; panAt = null; zStop(); flingStop(); vel = null; track(...pinch.m);
   } else pinch = null;
 }, {passive:true});
 function pinchApply(){
@@ -304,7 +321,7 @@ function pinchApply(){
   moving();
   ZM.x += m[0]-pinch.m[0]; ZM.y += m[1]-pinch.m[1];
   zoomTo(ZM.s*d/pinch.d, m[0], m[1]);
-  pinch.d = d; pinch.m = m;
+  pinch.d = d; pinch.m = m; track(m[0], m[1]);
 }
 document.addEventListener("touchmove", e=>{
   if(e.touches.length > 1 && !inPanel(e.target)) e.preventDefault();      /* 브라우저 자체 확대 대신 슬라이드만 확대 */
@@ -312,8 +329,8 @@ document.addEventListener("touchmove", e=>{
   pinchNow = pts2(e.touches);
   if(!pinchRaf) pinchRaf = requestAnimationFrame(pinchApply);
 }, {passive:false});
-document.addEventListener("touchend", e=>{ if(e.touches.length!==2){ if(pinch && pinchNow) pinchApply(); pinch = null; pinchNow = null; } });
-document.addEventListener("touchcancel", ()=>{ pinch = null; pinchNow = null; });
+document.addEventListener("touchend", e=>{ if(e.touches.length!==2 && pinch){ if(pinchNow) pinchApply(); pinch = null; pinchNow = null; moving(); fling(); } });
+document.addEventListener("touchcancel", ()=>{ if(pinch){ pinch = null; pinchNow = null; vel = null; moving(); } });
 document.addEventListener("gesturestart", e=>e.preventDefault());       /* 아이패드 사파리 */
 addEventListener("wheel", e=>{
   if(e.ctrlKey || e.metaKey){
@@ -330,14 +347,14 @@ addEventListener("wheel", e=>{
 }, {passive:false});
 /* 판서를 끈 채 확대했을 때 한 손가락·마우스·펜으로 끌면 이동(콕 누르기는 그대로 눌림) */
 let panAt = null, panEat = false;
-stage.addEventListener("pointerdown", e=>{ if(ZM.s===1 || pinch || (e.pointerType!=="touch" && e.button!==0) || document.body.classList.contains("drawing")) return; zStop(); panAt = {x:e.clientX, y:e.clientY, id:e.pointerId, go:false}; });
+stage.addEventListener("pointerdown", e=>{ if(ZM.s===1 || pinch || (e.pointerType!=="touch" && e.button!==0) || document.body.classList.contains("drawing")) return; zStop(); flingStop(); vel = null; panAt = {x:e.clientX, y:e.clientY, id:e.pointerId, go:false}; });
 addEventListener("pointermove", e=>{
   const p = panAt; if(!p || e.pointerId!==p.id) return;
   if(pinch){ panAt = null; return; }
   if(!p.go && Math.hypot(e.clientX-p.x, e.clientY-p.y) > 6){ p.go = true; try{ stage.setPointerCapture(e.pointerId); }catch(err){} }
-  if(p.go){ moving(); panBy(e.clientX-p.x, e.clientY-p.y); p.x = e.clientX; p.y = e.clientY; }
+  if(p.go){ moving(); panBy(e.clientX-p.x, e.clientY-p.y); p.x = e.clientX; p.y = e.clientY; track(p.x, p.y); }
 });
-const panEnd = e=>{ if(panAt && e.pointerId===panAt.id){ panEat = panAt.go; panAt = null; setTimeout(()=>panEat = false, 0); } };
+const panEnd = e=>{ if(panAt && e.pointerId===panAt.id){ panEat = panAt.go; if(panAt.go && e.type==="pointerup") fling(); panAt = null; setTimeout(()=>panEat = false, 0); } };
 addEventListener("pointerup", panEnd); addEventListener("pointercancel", panEnd);
 stage.addEventListener("click", e=>{ if(panEat){ e.stopPropagation(); e.preventDefault(); panEat = false; } }, true);
 
@@ -345,7 +362,7 @@ const pageGo = window.go, pageTg = window.tg;
 let remoteGo = false;
 window.go = function(i){
   if(!remoteGo && !canNav()){ toast("지금은 상대만 슬라이드를 넘길 수 있어요."); return; }
-  zStop(); if(ZM.s!==1) zoomTo(1);
+  zStop(); flingStop(); if(ZM.s!==1) zoomTo(1);
   pageGo(i); blankUI();
   if(!remoteGo){ if(coLoaded) touched = true; send({type:"go", k:skey()}); }
   drawInk();
