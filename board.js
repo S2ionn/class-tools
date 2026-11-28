@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-28-4";
+const VERSION = "2026-11-28-5";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -256,11 +256,11 @@ function applyZoom(){
     stage.style.transform = `matrix(${b.a*s},0,0,${b.d*s},${b.e*s+ZM.x},${b.f*s+ZM.y})`;
   }
   zSet = stage.style.transform; bd.style.transform = zSet;
-  const p = s===1 ? 0 : Math.round(s*100);
+  const p = s < 1.005 ? 0 : Math.round(s*100);
   if(p!==zPct){ zPct = p; const zb = $("zoomBtn"); zb.style.display = p ? "" : "none"; if(p) zb.innerHTML = `<b>${p}%</b>원래 크기`; }
 }
 function zoomTo(ns, cx = innerWidth/2, cy = innerHeight/2){
-  ns = Math.min(4, Math.max(1, ns)); if(ns < 1.02) ns = 1;
+  ns = Math.min(4, Math.max(1, ns));             /* 1에 가까워도 여기서 1로 붙이지 않음: 천천히 벌리면 한 번에 조금씩만 커지므로 (붙이기는 손을 뗀 뒤 settle) */
   const qx = (cx-ZM.x)/ZM.s, qy = (cy-ZM.y)/ZM.s;
   ZM = {s:ns, x:cx-ns*qx, y:cy-ns*qy}; applyZoom();
 }
@@ -298,6 +298,9 @@ function zStep(){
   if(Math.abs(zT.s-s) < .003){ zoomTo(zT.s, zT.cx, zT.cy); zT = null; return; }
   zoomTo(s, zT.cx, zT.cy); zRaf = requestAnimationFrame(zStep);
 }
+/* 손을 뗐을 때 거의 원래 크기(105% 아래)면 원래 크기로 */
+let settleT = 0;
+const settle = () => { if(ZM.s!==1 && ZM.s < 1.05){ zoomSmooth(1); return true; } return false; };
 const zStop = () => { zT = null; if(zRaf){ cancelAnimationFrame(zRaf); zRaf = 0; } };
 const syncBox = () => { readBase(); if(ZM.s!==1 && stage.style.transform!==zSet) applyZoom(); else bd.style.transform = stage.style.transform; };
 addEventListener("resize", ()=>setTimeout(()=>{ readBase(); zStop(); flingStop(); if(ZM.s!==1){ ZM = {s:1, x:0, y:0}; applyZoom(); } else syncBox(); }));
@@ -312,16 +315,16 @@ const inPanel = el => el && el.closest && el.closest("#help, #co, #saveAsk, #sha
 let pinchNow = null, pinchRaf = 0;
 document.addEventListener("touchstart", e=>{
   if(e.touches.length===2 && !stroke && !inPanel(e.target) && performance.now()-lastPen > 500){
-    const p = pts2(e.touches); pinch = {d:tdist(p), m:tmid(p)}; panAt = null; zStop(); flingStop(); vel = null; track(...pinch.m);
+    const p = pts2(e.touches), m = tmid(p); pinch = {d0:tdist(p), s0:ZM.s, qx:(m[0]-ZM.x)/ZM.s, qy:(m[1]-ZM.y)/ZM.s, m}; panAt = null; zStop(); flingStop(); vel = null; track(...pinch.m);
   } else pinch = null;
 }, {passive:true});
 function pinchApply(){
   pinchRaf = 0; if(!pinch || !pinchNow) return;
-  const d = tdist(pinchNow), m = tmid(pinchNow);
+  const d = tdist(pinchNow), m = tmid(pinchNow);  /* 처음 댄 순간 기준으로 계산: 손가락 사이가 벌어진 만큼 배율, 처음 손가락 사이에 있던 글자는 손가락 가운데를 따라옴 */
   moving();
-  ZM.x += m[0]-pinch.m[0]; ZM.y += m[1]-pinch.m[1];
-  zoomTo(ZM.s*d/pinch.d, m[0], m[1]);
-  pinch.d = d; pinch.m = m; track(m[0], m[1]);
+  const ns = Math.min(4, Math.max(1, pinch.s0*d/pinch.d0));
+  ZM = {s:ns, x:m[0]-ns*pinch.qx, y:m[1]-ns*pinch.qy}; applyZoom();
+  pinch.m = m; track(m[0], m[1]);
 }
 document.addEventListener("touchmove", e=>{
   if(e.touches.length > 1 && !inPanel(e.target)) e.preventDefault();      /* 브라우저 자체 확대 대신 슬라이드만 확대 */
@@ -329,14 +332,14 @@ document.addEventListener("touchmove", e=>{
   pinchNow = pts2(e.touches);
   if(!pinchRaf) pinchRaf = requestAnimationFrame(pinchApply);
 }, {passive:false});
-document.addEventListener("touchend", e=>{ if(e.touches.length!==2 && pinch){ if(pinchNow) pinchApply(); pinch = null; pinchNow = null; moving(); fling(); } });
+document.addEventListener("touchend", e=>{ if(e.touches.length!==2 && pinch){ if(pinchNow) pinchApply(); pinch = null; pinchNow = null; moving(); if(!settle()) fling(); } });
 document.addEventListener("touchcancel", ()=>{ if(pinch){ pinch = null; pinchNow = null; vel = null; moving(); } });
 document.addEventListener("gesturestart", e=>e.preventDefault());       /* 아이패드 사파리 */
 addEventListener("wheel", e=>{
   if(e.ctrlKey || e.metaKey){
     e.preventDefault();
     const dy = Math.max(-120, Math.min(120, e.deltaMode ? e.deltaY*33 : e.deltaY));
-    if(Math.abs(dy) < 50){ zStop(); moving(); zoomTo(ZM.s*Math.exp(-dy*.01), e.clientX, e.clientY); }   /* 터치패드 벌리기: 잘게 여러 번 → 바로 따라감 */
+    if(Math.abs(dy) < 50){ zStop(); moving(); zoomTo(ZM.s*Math.exp(-dy*.01), e.clientX, e.clientY); clearTimeout(settleT); settleT = setTimeout(settle, 250); }   /* 터치패드 벌리기: 잘게 여러 번 → 바로 따라감 */
     else zoomSmooth((zT ? zT.s : ZM.s)*Math.exp(-dy*.0022), e.clientX, e.clientY);                   /* 마우스 휠 한 칸 → 미끄러지듯 */
     return;
   }
