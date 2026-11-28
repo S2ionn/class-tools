@@ -5,7 +5,7 @@
          꾹 누르면 직선·원·세모·네모로 정리, 빈 칠판, 같이 쓰기(PeerJS: 판서·슬라이드·해석/문법·퀴즈·커서·레이저 동기화) */
 (()=>{
 "use strict";
-const VERSION = "2026-11-28-5";
+const VERSION = "2026-11-28-6";
 
 /* ---------- 스타일 ---------- */
 const CSS = `
@@ -243,6 +243,7 @@ const data = () => typeof SS !== "undefined" ? SS : S;           /* 슬라이드
 /* 확대: 페이지가 화면에 맞춘 크기(BASE) 위에 배율·이동(ZM)을 얹음. 판서 좌표는 슬라이드 기준(1280×720)이라 확대해도 그대로 맞음.
    두 손가락 벌리기·끌기, Ctrl+휠(노트북 터치패드 벌리기), + - 0 키. 확대 중 휠은 이동, 판서를 끄면 한 손가락·마우스로 끌어도 이동. 장을 넘기면 원래 크기.
    부드럽게: 손가락 움직임은 한 화면(프레임)에 한 번만 반영, 움직이는 동안만 will-change로 그림을 통째로 옮기고 멈추면 다시 선명하게, 휠·키·버튼은 짧게 미끄러지듯 */
+const ZMAX = 8;                                   /* 최대 8배 */
 let BASE = new DOMMatrix(), baseStr = "", zSet = "", ZM = {s:1, x:0, y:0}, pinch = null, lastPen = 0;
 function readBase(){ const t = stage.style.transform; if(t && t!==zSet){ baseStr = t; try{ BASE = new DOMMatrix(t); }catch(e){ BASE = new DOMMatrix(); } } }
 let zPct = -1;
@@ -260,7 +261,7 @@ function applyZoom(){
   if(p!==zPct){ zPct = p; const zb = $("zoomBtn"); zb.style.display = p ? "" : "none"; if(p) zb.innerHTML = `<b>${p}%</b>원래 크기`; }
 }
 function zoomTo(ns, cx = innerWidth/2, cy = innerHeight/2){
-  ns = Math.min(4, Math.max(1, ns));             /* 1에 가까워도 여기서 1로 붙이지 않음: 천천히 벌리면 한 번에 조금씩만 커지므로 (붙이기는 손을 뗀 뒤 settle) */
+  ns = Math.min(ZMAX, Math.max(1, ns));             /* 1에 가까워도 여기서 1로 붙이지 않음: 천천히 벌리면 한 번에 조금씩만 커지므로 (붙이기는 손을 뗀 뒤 settle) */
   const qx = (cx-ZM.x)/ZM.s, qy = (cy-ZM.y)/ZM.s;
   ZM = {s:ns, x:cx-ns*qx, y:cy-ns*qy}; applyZoom();
 }
@@ -288,7 +289,7 @@ function fling(){
 /* 휠·키·버튼: 목표 배율까지 짧게 미끄러지듯 */
 let zT = null, zRaf = 0;
 function zoomSmooth(ts, cx = innerWidth/2, cy = innerHeight/2){
-  zT = {s:Math.min(4, Math.max(1, ts)), cx, cy};
+  zT = {s:Math.min(ZMAX, Math.max(1, ts)), cx, cy};
   if(!zRaf) zRaf = requestAnimationFrame(zStep);
 }
 function zStep(){
@@ -322,7 +323,7 @@ function pinchApply(){
   pinchRaf = 0; if(!pinch || !pinchNow) return;
   const d = tdist(pinchNow), m = tmid(pinchNow);  /* 처음 댄 순간 기준으로 계산: 손가락 사이가 벌어진 만큼 배율, 처음 손가락 사이에 있던 글자는 손가락 가운데를 따라옴 */
   moving();
-  const ns = Math.min(4, Math.max(1, pinch.s0*d/pinch.d0));
+  const ns = Math.min(ZMAX, Math.max(1, pinch.s0*d/pinch.d0));
   ZM = {s:ns, x:m[0]-ns*pinch.qx, y:m[1]-ns*pinch.qy}; applyZoom();
   pinch.m = m; track(m[0], m[1]);
 }
